@@ -11,6 +11,21 @@
 	// 	}]
 	// },
 	"pages": [{
+			"path": "pages/chatPart/chatPage",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false
+			}
+		
+		}, {
+			"path": "pages/myPart/my",
+			"style": {
+				"navigationBarTitleText": "我的",
+				"enablePullDownRefresh": false
+			}
+
+		},{
 			"path": "pages/findPart/find",
 			"style": {
 				"navigationStyle": "custom",
@@ -19,10 +34,9 @@
 			}
 
 		},{
-			"path": "pages/myPart/goodsList",
+			"path": "pages/myPart/goodsHome/goodsHome",
 			"style": {
-				"navigationStyle": "custom",
-				"navigationBarTitleText": "",
+				"navigationBarTitleText": "闲置主页",
 				"enablePullDownRefresh": false
 			}
 
@@ -30,13 +44,6 @@
 			"path": "pages/findPart/group/group",
 			"style": {
 				"navigationBarTitleText": "",
-				"enablePullDownRefresh": false
-			}
-
-		}, {
-			"path": "pages/myPart/my",
-			"style": {
-				"navigationBarTitleText": "我的",
 				"enablePullDownRefresh": false
 			}
 
@@ -48,6 +55,14 @@
 			}
 
 		}, {
+			"path": "pages/myPart/goodsList",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false
+			}
+
+		},{
 			"path": "pages/chatPart/sessioList",
 			"style": {
 				"navigationBarTitleText": "消息",
@@ -81,6 +96,21 @@
 				"enablePullDownRefresh": false
 			}
 		},{
+			"path": "pages/myPart/goodsHome/transfer",
+			"style": {
+				"navigationBarTitleText": "转送",
+				"enablePullDownRefresh": false
+			}
+
+		},{
+			"path": "pages/findPart/search",
+			"style": {
+				"navigationBarTitleText": "搜索",
+				"enablePullDownRefresh": false
+			}
+
+		},
+		{
 			"path": "pages/myPart/notice",
 			"style": {
 				"navigationBarTitleText": "通知",

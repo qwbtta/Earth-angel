@@ -23,51 +23,7 @@
 		</view>
 
 
-		<view class="waterfallCon" v-if="showWaterfall">
-			<u-waterfall v-model="goodsList">
-				<template v-slot:left="{leftList}">
-					<view class="goodsItem" v-for="(item, index) in leftList" :key="index">
-						<u-lazy-load threshold="-300" border-radius="10" :image="item.image" :index="index">
-						</u-lazy-load>
-						<view class="describe">
-							<view class="goodsHead u-flex">
-								<view class="goodsHeadLeft u-flex">
-									<image src="/static/common/image/tab-chat.png" mode="" class="goodsHeadIcon">
-									</image>
-									<text class="goodsName">王老五</text>
-								</view>
-		
-								<button type="default" class="want">想要</button>
-							</view>
-							<text class="details">去年十月购入的机械手表。比较复古的风格，适合上班族朋友</text>
-		
-						</view>
-					</view>
-				</template>
-				<template v-slot:right="{rightList}">
-					<view class="goodsItem" v-for="(item, index) in rightList" :key="index">
-						<u-lazy-load threshold="-300" border-radius="10" :image="item.image" :index="index">
-						</u-lazy-load>
-						<view class="describe">
-							<view class="goodsHead u-flex">
-								<view class="goodsHeadLeft u-flex">
-									<image src="/static/common/image/tab-chat.png" mode="" class="goodsHeadIcon">
-									</image>
-									<text class="goodsName">王老五</text>
-								</view>
-								<button type="default" class="want">想要</button>
-							</view>
-							<text
-								class="details">去年十月购入的机械手表。比较复古的风格，适合上班族朋友去年十月购入的机械手表。比较复古的风格，适合上班族朋友去年十月购入的机械手表。比较复古的风格，适合上班族朋友</text>
-		
-		
-						</view>
-					</view>
-				</template>
-			</u-waterfall>
-		</view>
-		
-
+		<GoodsWaterfall :goodsList="goodsList"  v-if="showWaterfall"/>
 
 	</view>
 </template>
@@ -193,14 +149,13 @@
 		}
 
 		.bulletin-board {
-			margin: 0 48rpx;
+			margin: 40rpx 48rpx 36rpx;
 			padding: 20rpx 24rpx;
 			display: flex;
 			background: #FEFFF0;
 			border-radius: 8rpx;
 			border: 1px solid #000000;
-			margin-top: 40rpx;
-
+			
 			.horn {
 				flex-shrink: 0;
 				width: 44rpx;

@@ -7,80 +7,31 @@
 			</view>
 		</u-navbar>
 		<view class="main">
-
 			<view class="searchCon">
 				<input type="text" placeholder="搜索用户或群组名称" class="search" />
 				<button type="default" class="createGroup">创建群组</button>
 			</view>
 
 			<view class="swiperCon">
-				<u-swiper :list="swiperList" mode="dot" height="350" effect3d="true" bg-color="#ffffff" @click="swiperClick()"></u-swiper>
+				<u-swiper :list="swiperList" mode="dot" height="350" effect3d="true" bg-color="#ffffff"
+					@click="swiperClick()"></u-swiper>
 			</view>
 			<view class="goodsCon">
 				<view class="tabCon u-flex">
 					<view :class="selected==1?'tab-item-slected':'tab-item'" @click="select(1)">
 						<text>我的关注 </text>
-						<image v-if="selected==1" src="/static/common/image/selected.png" mode=""
-							class="imgSlected">
+						<image v-if="selected==1" src="/static/common/image/selected.png" mode="" class="imgSlected">
 						</image>
 					</view>
 					<view :class="selected==2?'tab-item-slected':'tab-item'" @click="select(2)">
 						<text class="tab2">我的群组 </text>
-						<image v-if="selected==2" src="/static/common/image/selected.png" mode=""
-							class="imgSlected">
+						<image v-if="selected==2" src="/static/common/image/selected.png" mode="" class="imgSlected">
 						</image>
 					</view>
 
 				</view>
 
-				<!-- <GoodsWaterfall :goodsList="goodsList"  v-if="selected==1"/> -->
-
-
-				<view class="waterfallCon" v-if="selected==1">
-					<u-waterfall v-model="goodsList">
-						<template v-slot:left="{leftList}">
-							<view class="goodsItem" v-for="(item, index) in leftList" :key="index" @click="goDetail(item)">
-								<u-lazy-load threshold="-300" border-radius="10" :image="item.image" :index="index">
-								</u-lazy-load>
-								<view class="describe">
-									<view class="head u-flex">
-										<view class="headLeft u-flex">
-											<image src="/static/common/image/tab-chat.png" mode="" class="headIcon">
-											</image>
-											<text class="name">王老五</text>
-										</view>
-
-										<button type="default" class="want">想要</button>
-									</view>
-									<text class="details">去年十月购入的机械手表。比较复古的风格，适合上班族朋友</text>
-
-								</view>
-							</view>
-						</template>
-						<template v-slot:right="{rightList}">
-							<view class="goodsItem" v-for="(item, index) in rightList" :key="index" @click="goDetail(item)">
-								<u-lazy-load threshold="-300" border-radius="10" :image="item.image" :index="index">
-								</u-lazy-load>
-								<view class="describe">
-									<view class="head u-flex">
-										<view class="headLeft u-flex">
-											<image src="/static/common/image/tab-chat.png" mode="" class="headIcon">
-											</image>
-											<text class="name">王老五</text>
-										</view>
-										<button type="default" class="want">想要</button>
-									</view>
-									<text
-										class="details">去年十月购入的机械手表。比较复古的风格，适合上班族朋友去年十月购入的机械手表。比较复古的风格，适合上班族朋友去年十月购入的机械手表。比较复古的风格，适合上班族朋友</text>
-
-
-
-								</view>
-							</view>
-						</template>
-					</u-waterfall>
-				</view>
-
+				<GoodsWaterfall :goodsList="goodsList" v-if="selected==1" />
 
 				<view class="group" v-if="selected==2">
 					<view class="group-item" v-for="item in [1, 2, 3, 4, 5, 6]" :key="item">
@@ -114,6 +65,19 @@
 
 			</view>
 		</view>
+		<u-popup v-model="shareShow" mode="center" border-radius="20">
+			<text class="popupTitle">大张伟给你分享的闲置物品</text>
+			<image src="../../static/common/image/kk.jpg" mode="aspectFit" class="popupImg"></image>
+			<view class="popupInfo">
+				<view class="popupInfoLeft u-flex">
+					<image src="/static/common/image/card1.png" mode="" class="popupHeadIcon"></image>
+					<text class="popupName">九尺板鸭爱好者</text>
+				</view>
+				<button type="default" class="apply">发送好友申请</button>
+			</view>
+			<text class="popupDetail">日本设计大师经典之作，放置在家中增加品味，彰显高格调</text>
+		</u-popup>
+
 	</view>
 </template>
 
@@ -125,7 +89,9 @@
 		},
 		data() {
 			return {
+				code:"",
 				search: "",
+				shareShow:false,
 				swiperList: [{
 						image: 'https://cdn.uviewui.com/uview/swiper/1.jpg',
 						title: '昨夜星辰昨夜风，画楼西畔桂堂东'
@@ -164,10 +130,11 @@
 			}
 		},
 		methods: {
-			goDetail(e){
-				uni.navigateTo({
-					url:'./goodsDetail'
-				})
+			kk(){
+				console.log(1);
+			},
+			bb(){
+				console.log(2);
 			},
 			select(e) {
 				console.log(e);
@@ -182,9 +149,17 @@
 					url: './group/group'
 				})
 			},
-			swiperClick(e){
+			swiperClick(e) {
 				console.log(e);
 			}
+		},
+		onLoad() {
+			uni.login({
+				provider: 'weixin',
+				success: function(loginRes) {
+					console.log("登录", loginRes)
+				},
+			})
 		}
 	}
 </script>
@@ -280,57 +255,6 @@
 						}
 					}
 
-				}
-
-				.waterfallCon {
-					padding: 0 24rpx;
-					.goodsItem {
-						margin: 0 20rpx;
-						.describe {
-							.head {
-								margin-top: 20rpx;
-								justify-content: space-between;
-
-								.headLeft {
-									.headIcon {
-										width: 64rpx;
-										height: 64rpx;
-										border-radius: 64rpx;
-									}
-
-									.name {
-										font-size: 24rpx;
-										font-weight: 500;
-										color: #333333;
-										margin-left: 20rpx;
-									}
-
-								}
-
-								.want {
-									@extend .btn;
-									margin: 0;
-									width: 88rpx;
-									height: 44rpx;
-									line-height: 44rpx;
-									border-radius: 12rpx;
-									font-size: 24rpx;
-									color: #000000;
-								}
-							}
-						}
-
-						.details {
-							margin-top: 16rpx;
-							margin-bottom: 28rpx;
-							display: -webkit-box;
-							-webkit-box-orient: vertical;
-							-webkit-line-clamp: 2;
-							overflow: hidden;
-
-
-						}
-					}
 				}
 
 				.group {
@@ -434,5 +358,59 @@
 
 		}
 
+	/deep/ .u-mode-center-box{
+		width: 604rpx !important;
+		padding: 46rpx 48rpx !important 	;
+	}
+		.popupTitle{
+			
+			font-size: 34rpx;
+			font-weight: 400;
+			color: #000000;
+		}
+		.popupImg{
+			width: 100%;
+			display: block;
+			margin: 42rpx auto;
+		}
+		.popupInfo{
+			
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			.popupInfoLeft{
+				.popupHeadIcon{
+					width: 72rpx;
+					height: 72rpx;
+				}
+				.popupName{
+					font-size: 26rpx;
+					font-weight: 500;
+					color: #333333;
+					margin-left: 16rpx;
+					}
+			}
+			.apply{
+				margin: 0;
+				padding: 0;
+				width: 174rpx;
+				height: 50rpx;
+				font-size: 24rpx;
+				font-weight: 500;
+				color: #333333;
+				line-height: 48rpx;
+				background: #25EFCF;
+				border-radius: 8rpx;
+				border: 2px solid #000000;
+			}
+			
+		}
+		.popupDetail{
+			margin-top: 26rpx;
+			display: -webkit-box;
+			-webkit-box-orient: vertical;
+			-webkit-line-clamp: 2;
+			overflow: hidden;
+		}
 	}
 </style>

@@ -13,7 +13,7 @@
 					<image src="/static/common/image/contacts.png" mode="" class="mainImg"></image>
 					<text>联系人</text>
 				</view>
-				<view class="item">
+				<view class="item" @click="goGoodsHome">
 					<image src="/static/common/image/home.png" mode="" class="mainImg"></image>
 					<text>闲置主页</text>
 				</view>
@@ -67,6 +67,11 @@
 			goContacts(){
 				uni.navigateTo({
 					url:'./contacts' 
+				})
+			},
+			goGoodsHome(){
+				uni.navigateTo({
+					url:'./goodsHome/goodsHome' 
 				})
 			},
 			goNotice(){

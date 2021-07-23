@@ -53,9 +53,15 @@
 
 			</view>
 			<view class="popupBottom u-flex">
-				<u-checkbox v-model="allChecked" shape="circle" active-color="#000000" @change="checkedAll"><text
-						class="all">全选</text>
-				</u-checkbox>
+				<view class="popupBottomLeft">
+					<view class="specialCheckboxCon">
+						<u-checkbox v-model="allChecked" shape="circle" active-color="#000000" @change="checkedAll" size="22">
+						</u-checkbox>
+					</view> 
+					
+					<text class="all" @click="textCheckedAll">全选</text>
+				</view>
+				
 				<button type="default" class="confirm" @click="groupShow=false">确定</button>
 			</view>
 		</u-popup>
@@ -95,6 +101,13 @@
 					item.checked = !this.allChecked
 				})
 			},
+			//为了完成UI样式，checkbox和全选字体分开绑定事件
+			textCheckedAll(){
+				this.allChecked = !this.allChecked
+				this.groupInfo.map(item => {
+					item.checked = this.allChecked
+				})
+			},
 			monitor() {
 				for (let i = 0; i < this.groupInfo.length; i++) {
 					if (this.groupInfo[i].checked == false) {
@@ -114,7 +127,11 @@
 	.release {
 		border-top: 1px solid #DBDEE3;
 		padding: 44rpx 48rpx 100rpx;
-
+		
+		/deep/ .u-icon{
+			display: none;
+		}
+		
 		.btn {
 			padding: 0;
 			background: #25EFCF;
@@ -123,7 +140,9 @@
 			border-radius: 8rpx;
 			font-weight: 500;
 		}
-
+		
+		
+	
 		.titleCon {
 			display: flex;
 			align-items: center;
@@ -221,7 +240,9 @@
 			/deep/.u-checkbox-group {
 				display: inline-grid !important;
 			}
-
+			/deep/ .u-checkbox__icon-wrap,.u-checkbox__icon-wrap-checked{
+				border: 2px solid #000000 !important;
+			}
 			.checkboxItem {
 				margin-top: 28rpx;
 
@@ -248,12 +269,38 @@
 			background: #25EFCF;
 			justify-content: space-between;
 			padding: 0 60rpx;
-
-			.all {
-				font-size: 28rpx;
-				font-weight: 500;
-				color: #333333;
+			
+			.popupBottomLeft{
+				display: flex;
+				align-items: center;
+				.specialCheckboxCon{
+					width: 34rpx;
+					height: 34rpx;
+					border-radius: 34rpx;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					border: 4rpx solid #333333;
+					/deep/ .u-checkbox__icon-wrap,.u-checkbox__icon-wrap-checked{
+						border: none !important;
+					}
+					u-checkbox{
+						display: flex;
+						width: 22rpx;
+						height: 22rpx;
+					}
+					
+				}
+				.all {
+					font-size: 28rpx;
+					font-weight: 500;
+					color: #333333;
+					margin-left: 10rpx;
+				}
 			}
+			
+
+			
 
 			.confirm {
 				@extend .btn;

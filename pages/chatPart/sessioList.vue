@@ -1,7 +1,7 @@
 <template>
 	<view class="sessionList">
 		<view class="main">
-			<view class="listItem" v-for="item in [1,2,1,1,1,1,5,52,3]">
+			<view class="listItem" v-for="item in [1,2,1,1,1,1,5,52,3]" @click="goChatPage">
 				<image src="/static/common/image/tab-chat.png" mode="" class="headIcon"></image>
 
 				<view class="list-main">
@@ -27,6 +27,13 @@
 		data() {
 			return {
 
+			}
+		},
+		methods:{
+			goChatPage(){
+				uni.navigateTo({
+					url:'./chatPage'
+				})
 			}
 		}
 	}
