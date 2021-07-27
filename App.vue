@@ -22,4 +22,5 @@
 	@import "uview-ui/index.scss";
 	@import "common/demo.scss";
 	@import "common/myStyle.scss";
+	
 </style>

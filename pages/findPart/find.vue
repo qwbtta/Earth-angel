@@ -158,7 +158,7 @@
 				provider: 'weixin',
 				success: function(loginRes) {
 					console.log("登录", loginRes)
-				},
+				}
 			})
 		}
 	}

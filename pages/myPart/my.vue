@@ -2,10 +2,10 @@
 	<view class="my">
 		<view class="top">
 			<view class="head u-flex">
-				<image src="/static/common/image/tab-chat-selected.png" mode="" class="headIcon"></image>
+				<image :src="vuex_avatar_url" mode="" class="headIcon"></image>
 				<view class="nameCon">
-					<text class="name">九尺办呀爱好者</text>
-					<text class="id">ID: 54566sad65456</text>
+					<text class="name">{{vuex_nick_name}}</text>
+					<text class="id" @longpress="copy">{{vuex_openid}}</text>
 				</view>
 			</view>
 			<view class="main">
@@ -64,6 +64,19 @@
 			}
 		},
 		methods:{
+			copy(){
+				let _this = this
+				uni.setClipboardData({
+				    data: _this.vuex_openid,
+				    success: function () {
+						uni.hideToast()
+						uni.showToast({
+				           title: '复制成功',
+				           duration: 2000
+				       });
+				    }
+				});
+			},
 			goContacts(){
 				uni.navigateTo({
 					url:'./contacts' 

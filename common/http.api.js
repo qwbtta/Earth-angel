@@ -1,6 +1,6 @@
 // 如果没有通过拦截器配置域名的话，可以在这里写上完整的URL(加上域名部分)
 let cosCredentialsUrl = '/third/tencent_cloud_storage_credential';
-let wxLoginUrl = '/third/login';
+let wxLoginUrl = '/third_service/login';
 let releaseUrl = '/user/release_items'
 let editUrl = '/user/edit_items'
 let selfItemsUrl = '/user/self_items'
