@@ -31,7 +31,7 @@
 
 				</view>
 
-				<GoodsWaterfall :goodsList="goodsList" v-if="selected==1" />
+				<GoodsWaterfall :goodsList="goodsList"  v-if="selected==1" />
 
 				<view class="group" v-if="selected==2">
 					<view class="group-item" v-for="item in [1, 2, 3, 4, 5, 6]" :key="item">
@@ -89,9 +89,9 @@
 		},
 		data() {
 			return {
-				code:"",
+				code: "",
 				search: "",
-				shareShow:false,
+				shareShow: false,
 				swiperList: [{
 						image: 'https://cdn.uviewui.com/uview/swiper/1.jpg',
 						title: '昨夜星辰昨夜风，画楼西畔桂堂东'
@@ -107,22 +107,27 @@
 				],
 				selected: 1,
 				goodsList: [{
+					id:1,
 					image: 'http://pic.sc.chinaz.com/Files/pic/pic9/202002/zzpic23327_s.jpg',
 					title: '谁念西风独自凉',
 					detail: '谁念西'
 				}, {
+					id:1,
 					image: '/static/common/image/kk.jpg',
 					title: '谁念西风独自凉',
 					detail: '谁念西'
 				}, {
+					id:1,
 					image: '/static/common/image/kk.jpg',
 					title: '谁念西风独自凉',
 					detail: '谁念西风独的'
 				}, {
+					id:1,
 					image: '/static/common/image/kk.jpg',
 					title: '谁念西风独自凉',
 					detail: '谁念西风独'
 				}, {
+					id:1,
 					image: 'http://pic.sc.chinaz.com/Files/pic/pic9/202002/zzpic23327_s.jpg',
 					title: '谁念西风独自凉',
 					detail: '谁念西风独'
@@ -130,12 +135,7 @@
 			}
 		},
 		methods: {
-			kk(){
-				console.log(1);
-			},
-			bb(){
-				console.log(2);
-			},
+		
 			select(e) {
 				console.log(e);
 				if (e === 1) {
@@ -153,14 +153,14 @@
 				console.log(e);
 			}
 		},
-		onLoad() {
-			uni.login({
-				provider: 'weixin',
-				success: function(loginRes) {
-					console.log("登录", loginRes)
-				}
-			})
-		}
+		// onLoad() {
+		// 	uni.login({
+		// 		provider: 'weixin',
+		// 		success: function(loginRes) {
+		// 			console.log("登录", loginRes)
+		// 		}
+		// 	})
+		// }
 	}
 </script>
 
@@ -358,39 +358,45 @@
 
 		}
 
-	/deep/ .u-mode-center-box{
-		width: 604rpx !important;
-		padding: 46rpx 48rpx !important 	;
-	}
-		.popupTitle{
-			
+		/deep/ .u-mode-center-box {
+			width: 604rpx !important;
+			padding: 46rpx 48rpx !important;
+		}
+
+		.popupTitle {
+
 			font-size: 34rpx;
 			font-weight: 400;
 			color: #000000;
 		}
-		.popupImg{
+
+		.popupImg {
 			width: 100%;
 			display: block;
 			margin: 42rpx auto;
 		}
-		.popupInfo{
-			
+
+		.popupInfo {
+
 			display: flex;
 			align-items: center;
 			justify-content: space-between;
-			.popupInfoLeft{
-				.popupHeadIcon{
+
+			.popupInfoLeft {
+				.popupHeadIcon {
 					width: 72rpx;
 					height: 72rpx;
 				}
-				.popupName{
+
+				.popupName {
 					font-size: 26rpx;
 					font-weight: 500;
 					color: #333333;
 					margin-left: 16rpx;
-					}
+				}
 			}
-			.apply{
+
+			.apply {
 				margin: 0;
 				padding: 0;
 				width: 174rpx;
@@ -403,9 +409,10 @@
 				border-radius: 8rpx;
 				border: 2px solid #000000;
 			}
-			
+
 		}
-		.popupDetail{
+
+		.popupDetail {
 			margin-top: 26rpx;
 			display: -webkit-box;
 			-webkit-box-orient: vertical;

@@ -18,7 +18,7 @@
 				
 				<view class="headRight" v-if="isMine">
 					<text class="people">已有20人想要</text>
-					<button type="default" class="want">联系他</button>
+					<button type="default" class="want">转送</button>
 				</view>
 				<view class="headRight" v-else>
 					<button type="default" class="want">想要</button>
@@ -91,7 +91,16 @@
 		},
 		methods: {
 
+		},
+		onLoad(options) {
+			console.log(options);
+			if(options.id == this.vuex_openid){
+				this.isMine = true
+			}else{
+				this.isMine = false
+			}
 		}
+		
 	}
 </script>
 

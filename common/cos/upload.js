@@ -3,6 +3,7 @@ let CosAuth = require('./cos-auth.js')
 // 请求用到的参数
 var prefix = 'https://earth-angel-1302656840.cos.ap-chengdu.myqcloud.com/';
 
+
 // 对更多字符编码的 url encode 格式
 var camSafeUrlEncode = function (str) {
     return encodeURIComponent(str)

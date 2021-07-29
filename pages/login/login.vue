@@ -39,7 +39,6 @@
 					desc: "test",
 					lang: "zh_CN",
 					success: async (res) => {
-						console.log(res,"dddd");
 						console.log(that.code);
 						const reqData = {
 							avatarUrl: res.userInfo.avatarUrl,
@@ -49,17 +48,18 @@
 							nickName: res.userInfo.nickName,
 							province: res.userInfo.province,
 							code: that.code,
+							operationId: that.code + JSON.stringify(new Date().getTime())
 						}
-						console.log(reqData);
+						// console.log(reqData);
 						that.$u.api.wxLogin(reqData).then(loginRes=>{
-							console.log(loginRes);
+							console.log(loginRes,"后台返回");
 							that.$u.vuex('vuex_nick_name', res.userInfo.nickName);
 							that.$u.vuex('vuex_avatar_url', res.userInfo.avatarUrl);
 							that.$u.vuex('vuex_gender', res.userInfo.gender);
 							that.$u.vuex('vuex_openid', loginRes.data.openid);
 							that.$u.vuex('vuex_token', loginRes.data.token);
-							that.$u.vuex('vuex_userId', loginRes.data.uid);
-							console.log(vuex_userId);
+							// that.$u.vuex('vuex_userId', loginRes.data.uid);
+							
 							this.loading = false
 							that.$refs.uToast.show({
 												title: '登录成功',

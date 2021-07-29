@@ -11,16 +11,52 @@
 	// 	}]
 	// },
 	"pages": [{
-			"path": "pages/findPart/find",
+			"path": "pages/myPart/my",
+			"style": {
+				"navigationBarTitleText": "我的",
+				"enablePullDownRefresh": false
+			}
+
+		},{
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false
+			}
+
+		},{
+			"path": "pages/releasePart/release",
+			"style": {
+				"navigationBarTitleText": "发布",
+				"enablePullDownRefresh": false
+			}
+
+		},{
+			"path": "pages/findPart/group/editGroupName",
+			"style": {
+				"navigationBarTitleText": "修改群名",
+				"enablePullDownRefresh": false
+			}
+
+		},{
+			"path": "pages/chatPart/chatPage",
 			"style": {
 				"navigationStyle": "custom",
 				"navigationBarTitleText": "",
 				"enablePullDownRefresh": false
 			}
+		
+		},{
+			"path": "pages/chatPart/sessioList",
+			"style": {
+				"navigationBarTitleText": "消息",
+				"enablePullDownRefresh": false
+			}
 
 		}, {
-			"path": "pages/login/login",
+			"path": "pages/findPart/find",
 			"style": {
+				"navigationStyle": "custom",
 				"navigationBarTitleText": "",
 				"enablePullDownRefresh": false
 			}
@@ -47,14 +83,7 @@
 				"enablePullDownRefresh": false
 			}
 
-		}, {
-			"path": "pages/findPart/group/editGroupName",
-			"style": {
-				"navigationBarTitleText": "修改群名",
-				"enablePullDownRefresh": false
-			}
-
-		}, {
+		},  {
 			"path": "pages/findPart/group/transferLeader",
 			"style": {
 				"navigationBarTitleText": "移交群主",
@@ -69,21 +98,6 @@
 			}
 
 		},{
-			"path": "pages/chatPart/chatPage",
-			"style": {
-				"navigationStyle": "custom",
-				"navigationBarTitleText": "",
-				"enablePullDownRefresh": false
-			}
-		
-		},{
-			"path": "pages/myPart/my",
-			"style": {
-				"navigationBarTitleText": "我的",
-				"enablePullDownRefresh": false
-			}
-
-		},{
 			"path": "pages/myPart/goodsHome/goodsHome",
 			"style": {
 				"navigationBarTitleText": "闲置主页",
@@ -94,20 +108,6 @@
 			"path": "pages/findPart/group/group",
 			"style": {
 				"navigationBarTitleText": "",
-				"enablePullDownRefresh": false
-			}
-
-		},{
-			"path": "pages/releasePart/release",
-			"style": {
-				"navigationBarTitleText": "发布",
-				"enablePullDownRefresh": false
-			}
-
-		}, {
-			"path": "pages/chatPart/sessioList",
-			"style": {
-				"navigationBarTitleText": "消息",
 				"enablePullDownRefresh": false
 			}
 
@@ -177,8 +177,8 @@
 		"backgroundColor": "#FFFFFF"
 	},
 	"tabBar": {
-		"color": "#909399",
-		"selectedColor": "#303133",
+		"color": "#999999",
+		"selectedColor": "#000000",
 		"backgroundColor": "#FFFFFF",
 		"borderStyle": "black",
 		"list": [{

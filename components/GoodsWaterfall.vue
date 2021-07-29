@@ -2,11 +2,18 @@
 	<view class="x-waterfallCon">
 		<u-waterfall v-model="goodsList">
 			<template v-slot:left="{leftList}">
-				<view class="x-goodsItem" v-for="(item, index) in leftList" :key="index" @click="goDetail(item)">
-					<u-lazy-load threshold="-300" border-radius="10" :image="item.image" :index="index">
+				<view class="x-goodsItem" v-for="(item, index) in leftList" :key="index">
+					<u-lazy-load threshold="-300" border-radius="10" :image="item.imgUrls[0]" :index="index"  @click="goDetail(item)">
 					</u-lazy-load>
 					<view class="describe">
-						<view class="x-head u-flex">
+						<view class="x-head u-flex" v-if="isMyHome!=null">
+							<view class="x-headLeft u-flex">
+								<text class="x-name-home">王老五</text>
+							</view>
+							<button type="default" class="x-want" v-if="isMyHome == true" @click="toEdit(item)">编辑</button>
+							<button type="default" class="x-want" v-else>想要</button>
+						</view>
+						<view class="x-head u-flex" v-else>
 							<view class="x-headLeft u-flex">
 								<image src="/static/common/image/tab-chat.png" mode="" class="x-headIcon">
 								</image>
@@ -14,19 +21,26 @@
 							</view>
 							<button type="default" class="x-want">想要</button>
 						</view>
-						<text
-							class="x-details">去年十月购入的机械手表。比较复古的风格，适合上班族朋友去年十月购入的机械手表。比较复古的风格，适合上班族朋友去年十月购入的机械手表。比较复古的风格，适合上班族朋友</text>
+
+						<text class="x-details">{{item.desc}}</text>
 
 					</view>
 				</view>
 			</template>
 			<template v-slot:right="{rightList}">
 				<view class="x-goodsItem" v-for="(item, index) in rightList" :key="index" @click="goDetail(item)">
-					<u-lazy-load threshold="-300" border-radius="10" :image="item.image" :index="index">
+					<u-lazy-load threshold="-300" border-radius="10" :image="item.imgUrls[0]" :index="index">
 					</u-lazy-load>
 
 					<view class="describe">
-						<view class="x-head u-flex">
+						<view class="x-head u-flex" v-if="isMyHome!=null">
+							<view class="x-headLeft u-flex">
+								<text class="x-name-home">王老五</text>
+							</view>
+							<button type="default" class="x-want" v-if="isMyHome == true" @click="toEdit(item)">编辑</button>
+							<button type="default" class="x-want" v-else>想要</button>
+						</view>
+						<view class="x-head u-flex" v-else>
 							<view class="x-headLeft u-flex">
 								<image src="/static/common/image/tab-chat.png" mode="" class="x-headIcon">
 								</image>
@@ -34,9 +48,9 @@
 							</view>
 							<button type="default" class="x-want">想要</button>
 						</view>
-						<text
-							class="x-details">去年十月购入的机械手表。比较复古的风格，适合上班族朋友去年十月购入的机械手表。比较复古的风格，适合上班族朋友去年十月购入的机械手表。比较复古的风格，适合上班族朋友</text>
-
+					
+						<text class="x-details">{{item.desc}}</text>
+					
 					</view>
 				</view>
 			</template>
@@ -49,18 +63,32 @@
 <script>
 	export default {
 		name: "GoodsWaterfall",
-		props: ["goodsList"],
+		props: ["goodsList", "isMyHome"],
 		data() {
 			return {
-
+				
 			}
 		},
-		methods:{
-			goDetail(e){
+		mounted() {
+			
+
+		},
+		methods: {
+			toEdit(e){
+				this.$emit('edit')
+				this.$u.vuex('vuex_goodsInfo', e);
+				
+			},
+			goDetail(e) {
 				console.log(e);
-				uni.navigateTo({
-					url:'/pages/findPart/goodsDetail'
+				this.$u.route({
+					url: '/pages/findPart/goodsDetail',
+					params: {
+						id: e.id,
+						name: '张三'
+					}
 				})
+
 			}
 		}
 	}
@@ -104,6 +132,12 @@
 		margin-left: 20rpx;
 	}
 
+	.x-name-home {
+		font-size: 28rpx;
+		font-weight: 500;
+		color: #333333;
+	}
+
 	.x-want {
 		@extend .x-btn;
 		margin: 0;
@@ -125,5 +159,4 @@
 
 
 	}
-
 </style>

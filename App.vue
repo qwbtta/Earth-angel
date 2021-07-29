@@ -14,6 +14,9 @@
 			/**
 			 * h5，app-plus(nvue下也为app-plus)，mp-weixin，mp-alipay......
 			 */
+		},
+		onTabItemTap(e){
+			console.log(e);
 		}
 	}
 </script>
@@ -23,4 +26,7 @@
 	@import "common/demo.scss";
 	@import "common/myStyle.scss";
 	
+	button:active{
+		background-color: #21D6B9 !important;
+	}
 </style>

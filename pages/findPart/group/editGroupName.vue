@@ -1,8 +1,12 @@
 <template>
 	<view class="editGroupName">
-		
-			<input type="text" v-model="groupName" value="" class="editInput" @input="checkInput" />
-			<image src="/static/common/image/clear.png" mode="" class="clear" v-show="showClear" @click="clear"></image>
+			
+			<view class="container">
+				<input type="text" v-model="groupName" value="" class="editInput" @input="checkInput" />
+				<image src="/static/common/image/clear.png" mode="" class="clear" v-show="showClear" @click="clear"></image>
+			</view>
+			
+			
 
 
 			<view class="footer">
@@ -46,7 +50,9 @@
 	.editGroupName{
 		padding-top: 26rpx;
 		
-		
+		.container{
+			position: relative;
+		}
 		.editInput{
 			height: 88rpx;
 			padding: 0 44rpx;
@@ -57,7 +63,7 @@
 			width: 36rpx;
 			height: 36rpx;
 			position: absolute;
-			top: 50rpx;
+			top: 25rpx;
 			right: 44rpx;
 			z-index: 9999;
 		}

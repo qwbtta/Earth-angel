@@ -5,7 +5,7 @@
 				<image :src="vuex_avatar_url" mode="" class="headIcon"></image>
 				<view class="nameCon">
 					<text class="name">{{vuex_nick_name}}</text>
-					<text class="id" @longpress="copy">{{vuex_openid}}</text>
+					<text class="id" @longpress="copy">ID: {{vuex_openid}}</text>
 				</view>
 			</view>
 			<view class="main">
@@ -84,7 +84,7 @@
 			},
 			goGoodsHome(){
 				uni.navigateTo({
-					url:'./goodsHome/goodsHome' 
+					url:'./goodsHome/goodsHome?id=' + this.vuex_openid + '&name=王五'
 				})
 			},
 			goNotice(){

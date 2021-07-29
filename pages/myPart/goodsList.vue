@@ -11,12 +11,12 @@
 			<u-checkbox v-model="item.checked" shape="circle" active-color="#979797" class="checkboxItem" size="40"
 				v-for="item in goodsInfo" @change="monitor">
 				<view class="goodsItem">
-					<image src="/static/common/image/card1.png" mode="" class="itemImg"></image>
+					<image :src="item.imgUrls[0]" mode="" class="itemImg"></image>
 					<view class="right">
-
 						<view class="describe">
-							<text class="title">{{item.name}}</text>
-							<text class="who">{{item.name}}</text>
+							<text class="title">{{ item.desc}}</text>
+							<text class="who" v-if="title=='收到物品'">来自"{{item.fromUser}}"的赠送</text>
+							<text class="who" v-else>已转送给"{{item.toUser}}"</text>
 						</view>
 						<button type="default" class="btn" @click.stop="contact">联系朋友</button>
 					</view>
@@ -46,23 +46,7 @@
 			return {
 				title: "",
 				allChecked:false,
-				goodsInfo: [{
-					img: "/static/common/image/card1.png",
-					name: "叠翠峰小区闲置交流",
-					checked: false
-				}, {
-					img: "/static/common/image/card1.png",
-					name: "叠翠峰小区闲置交流",
-					checked: false
-				}, {
-					img: "/static/common/image/card1.png",
-					name: "叠翠峰小区闲置交流",
-					checked: false
-				}, {
-					img: "/static/common/image/card1.png",
-					name: "叠翠峰小区闲置交流",
-					checked: false
-				}]
+				goodsInfo: []
 			}
 		},
 		methods: {
@@ -91,13 +75,21 @@
 			}
 		},
 		onLoad(options) {
-			
-			
-			console.log(options.where);
+			let parameter = {}
+			parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
 			if (options.where == "received") {
 				this.title = "收到物品"
+				
+				this.$u.api.received_items(parameter).then(res=>{
+					console.log(res);
+					this.goodsInfo = res.data.items
+				})
 			} else if (options.where == "gave") {
 				this.title = "我的赠送"
+				this.$u.api.sent_out_items(parameter).then(res=>{
+					console.log(res);
+					this.goodsInfo = res.data.items
+				})
 			}
 		}
 	}

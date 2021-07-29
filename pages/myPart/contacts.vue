@@ -2,7 +2,7 @@
 	<view class="contacts">
 		
 		<view class="head">
-			<view :class="[index==selectedIndex?'.headItem-s':'','headItem']" v-for="(item,index) in tabs" :key="index" @click="select(index)">
+			<view :class="[index==selectedIndex?'headItem-s':'','headItem']" v-for="(item,index) in tabs" :key="index" @click="select(index)">
 				<text>{{item}}</text>
 			</view>
 			

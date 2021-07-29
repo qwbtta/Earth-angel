@@ -26,32 +26,59 @@
 	export default {
 		data() {
 			return {
-
+				seq: 0
 			}
 		},
-		methods:{
-			goChatPage(){
+		methods: {
+			getList() {
+				/* let _this = this
+				uni.request({
+					url: 'http://47.112.160.66:10000/chat/newest_seq',
+					data: {
+						"reqIdentifier": 1001,
+						"sendID": _this.vuex_openid,
+						"operationID": _this.vuex_openid + new Date().getTime(),
+						"msgIncr": 0,
+					},
+					header: {
+						'token': _this.vuex_wsToken 
+					},
+					success: (res) => {
+						console.log(res.data);
+						_this.seq = res.data.data.seq
+						
+						
+					}
+				}); */
+			},
+			goChatPage() {
 				uni.navigateTo({
-					url:'./chatPage'
+					url: './chatPage'
 				})
 			}
+			
+		},
+		mounted() {
+			// this.getList()
 		}
 	}
 </script>
 
 <style>
-	
+
 </style>
 <style lang="scss" scoped>
 	.sessionList {
 		padding: 0 40rpx;
 		border-top: 1px solid #DBDEE3;
+
 		.main {
 			.listItem {
 				height: 154rpx;
 				display: flex;
 				align-items: center;
 				border-bottom: 2rpx solid #D8D8D8;
+
 				.headIcon {
 					width: 90rpx;
 					height: 90rpx;

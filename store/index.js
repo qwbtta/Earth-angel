@@ -12,7 +12,7 @@ try{
 }
 
 // 需要永久存储，且下次APP启动需要取出的，在state中的变量名
-let saveStateKeys = ['vuex_nick_name', 'vuex_avatar_url','vuex_gender','vuex_openid','vuex_token','vuex_userId','vuex_search'];
+let saveStateKeys = ['vuex_nick_name', 'vuex_avatar_url','vuex_gender','vuex_openid','vuex_token','vuex_userId','vuex_search','vuex_wsToken','vuex_goodsInfo','vuex_releaseState'];
 
 // 保存变量到本地存储中
 const saveLifeData = function(key, value){
@@ -39,6 +39,9 @@ const store = new Vuex.Store({
 		vuex_token:  lifeData.vuex_token ? lifeData.vuex_token : '',
 		vuex_userId:  lifeData.vuex_userId ? lifeData.vuex_userId : '',
 		vuex_search:  lifeData.vuex_search ? lifeData.vuex_search : [],
+		vuex_wsToken: lifeData.vuex_wsToken ? lifeData.vuex_wsToken : '',
+		vuex_goodsInfo: lifeData.vuex_goodsInfo ? lifeData.vuex_goodsInfo : {},
+		vuex_releaseState: lifeData.vuex_releaseState ? lifeData.vuex_releaseState : 0,
 		// 自定义tabbar数据
 		vuex_tabbar:  [{
 					iconPath: "/static/common/image/release.png",
