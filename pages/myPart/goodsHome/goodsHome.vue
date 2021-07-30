@@ -50,7 +50,7 @@
 		methods: {
 			getList() {
 				let parameter = {}
-				parameter.openId = this.vuex_openid
+				parameter.openId = this.id
 				parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
 				this.$u.api.get_user_items(parameter).then(res => {
 					
@@ -89,26 +89,28 @@
 					this.editShow = false
 					if (res.errCode == 0) {
 						this.getList()
-						console.log(889899);
 					} else {
-						console.log(7777);
+						this.$u.toast('删除失败');
 					}
 
 				})
 			}
 		},
 		onLoad(options) {
-			console.log(options);
 			if (options.id == this.vuex_openid) {
 				this.isMyHome = true
 				this.name = this.vuex_nick_name
 				this.id = this.vuex_openid
 				this.avatar = this.vuex_avatar_url
-
 				this.getList()
 
 			} else {
 				this.isMyHome = false
+				this.name = this.vuex_search.name
+				this.id = this.vuex_search.uid
+				this.avatar = this.vuex_search.icon
+				this.getList()
+				
 			}
 		}
 	}

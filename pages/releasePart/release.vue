@@ -49,7 +49,7 @@
 
 					<u-checkbox-group @change="monitor">
 						<u-checkbox v-model="item.checked" shape="circle" active-color="#FFDF4E"
-							v-for="item in groupInfo" class="checkboxItem">
+							v-for="(item,index) in groupInfo" :key="index" class="checkboxItem">
 							<view class="u-flex">
 								<image :src="item.img" mode="aspectFit" class="itemImg"></image>
 								<text class="itemName">{{item.name}}</text>
@@ -182,7 +182,7 @@
 							this.friendChoose = false
 							this.groupChoose = false
 							uni.navigateTo({
-								url: '../myPart/goodsHome/goodsHome'
+								url: '../myPart/goodsHome/goodsHome?id='+ this.vuex_openid
 							})
 							this.$u.toast('编辑成功');
 						}
@@ -196,7 +196,7 @@
 							this.friendChoose = false
 							this.groupChoose = false
 							uni.navigateTo({
-								url: '../myPart/goodsHome/goodsHome'
+								url: '../myPart/goodsHome/goodsHome?id='+ this.vuex_openid
 							})
 							this.$u.toast('发布成功');
 						}

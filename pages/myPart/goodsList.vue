@@ -9,14 +9,14 @@
 
 
 			<u-checkbox v-model="item.checked" shape="circle" active-color="#979797" class="checkboxItem" size="40"
-				v-for="item in goodsInfo" @change="monitor">
+				v-for="item in goodsInfo" :key="item.itemID" @change="monitor">
 				<view class="goodsItem">
 					<image :src="item.imgUrls[0]" mode="" class="itemImg"></image>
 					<view class="right">
 						<view class="describe">
-							<text class="title">{{ item.desc}}</text>
+							<text class="title">{{item.desc}}</text>
 							<text class="who" v-if="title=='收到物品'">来自"{{item.fromUser}}"的赠送</text>
-							<text class="who" v-else>已转送给"{{item.toUser}}"</text>
+							<text class="who" v-else> {{'已转送给"'+ item.toUser + '"'}} </text>
 						</view>
 						<button type="default" class="btn" @click.stop="contact">联系朋友</button>
 					</view>
@@ -79,7 +79,6 @@
 			parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
 			if (options.where == "received") {
 				this.title = "收到物品"
-				
 				this.$u.api.received_items(parameter).then(res=>{
 					console.log(res);
 					this.goodsInfo = res.data.items
@@ -162,6 +161,7 @@
 						font-weight: 500;
 						color: #2F2F2F;
 						margin-top: 6rpx;
+						word-break: break-all;
 					}
 				}
 			}

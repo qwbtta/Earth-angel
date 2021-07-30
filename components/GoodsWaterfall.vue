@@ -2,24 +2,24 @@
 	<view class="x-waterfallCon">
 		<u-waterfall v-model="goodsList">
 			<template v-slot:left="{leftList}">
-				<view class="x-goodsItem" v-for="(item, index) in leftList" :key="index">
-					<u-lazy-load threshold="-300" border-radius="10" :image="item.imgUrls[0]" :index="index"  @click="goDetail(item)">
+				<view class="x-goodsItem" v-for="item in leftList" :key="item.uid">
+					<u-lazy-load threshold="-300" border-radius="10" :image="item.imgUrls[0]"  @click="goDetail(item)">
 					</u-lazy-load>
 					<view class="describe">
 						<view class="x-head u-flex" v-if="isMyHome!=null">
 							<view class="x-headLeft u-flex">
-								<text class="x-name-home">王老五</text>
+								<text class="x-name-home">{{item.name}}</text>
 							</view>
 							<button type="default" class="x-want" v-if="isMyHome == true" @click="toEdit(item)">编辑</button>
-							<button type="default" class="x-want" v-else>想要</button>
+							<button type="default" class="x-want" v-else @click="want(item)">想要</button>
 						</view>
 						<view class="x-head u-flex" v-else>
 							<view class="x-headLeft u-flex">
-								<image src="/static/common/image/tab-chat.png" mode="" class="x-headIcon">
+								<image :src="item.icon" mode="" class="x-headIcon">
 								</image>
-								<text class="x-name">王老五</text>
+								<text class="x-name">{{item.userName}}</text>
 							</view>
-							<button type="default" class="x-want">想要</button>
+							<button type="default" class="x-want" @click="want(item)">想要</button>
 						</view>
 
 						<text class="x-details">{{item.desc}}</text>
@@ -28,25 +28,25 @@
 				</view>
 			</template>
 			<template v-slot:right="{rightList}">
-				<view class="x-goodsItem" v-for="(item, index) in rightList" :key="index" @click="goDetail(item)">
-					<u-lazy-load threshold="-300" border-radius="10" :image="item.imgUrls[0]" :index="index">
+				<view class="x-goodsItem" v-for="item in rightList" :key="item.uid">
+					<u-lazy-load threshold="-300" border-radius="10" :image="item.imgUrls[0]"   @click="goDetail(item)">
 					</u-lazy-load>
 
 					<view class="describe">
 						<view class="x-head u-flex" v-if="isMyHome!=null">
 							<view class="x-headLeft u-flex">
-								<text class="x-name-home">王老五</text>
+								<text class="x-name-home">{{item.name}}</text>
 							</view>
 							<button type="default" class="x-want" v-if="isMyHome == true" @click="toEdit(item)">编辑</button>
-							<button type="default" class="x-want" v-else>想要</button>
+							<button type="default" class="x-want" v-else @click="want(item)">想要</button>
 						</view>
 						<view class="x-head u-flex" v-else>
 							<view class="x-headLeft u-flex">
-								<image src="/static/common/image/tab-chat.png" mode="" class="x-headIcon">
+								<image :src="item.icon" mode="" class="x-headIcon">
 								</image>
-								<text class="x-name">王老五</text>
+								<text class="x-name">{{item.userName}}</text>
 							</view>
-							<button type="default" class="x-want">想要</button>
+							<button type="default" class="x-want" @click="want(item)">想要</button>
 						</view>
 					
 						<text class="x-details">{{item.desc}}</text>
@@ -74,18 +74,41 @@
 
 		},
 		methods: {
+			want(e){
+				console.log(e);
+				this.$u.api.user_want_the_item({
+					itemId: e.itemID,
+					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+				}).then(res=>{
+					console.log(res)
+					if (res.errCode == 0) {
+						this.$u.toast('请求发送成功',2000)
+					} else {
+					}
+				})
+				// this.$req('/item/user_want_the_item', {
+				// 	itemId: e.itemID,
+				// 	operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+				// }).then(res => {
+				
+				// 	console.log(res)
+				// 	if (res.errCode == 0) {
+				// 		this.$u.toast('请求发送成功')
+				// 	} else {
+				// 	}
+				// })
+			},
 			toEdit(e){
 				this.$emit('edit')
 				this.$u.vuex('vuex_goodsInfo', e);
-				
 			},
 			goDetail(e) {
 				console.log(e);
+				this.$u.vuex('vuex_goodsInfo', e);
 				this.$u.route({
 					url: '/pages/findPart/goodsDetail',
 					params: {
-						id: e.id,
-						name: '张三'
+						id: e.uid
 					}
 				})
 

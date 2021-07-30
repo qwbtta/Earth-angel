@@ -3,20 +3,20 @@
 		<view class="card">
 			<view class="head">
 
-				<image src="/static/common/image/card1.png" mode="" class="headIcon"></image>
+				<image :src="info.icon" mode="" class="headIcon"></image>
 
 
 				<view class="headRight">
 					<view class="info">
-						<text class="name">九尺板鸭爱好者</text>
-						<text class="id">ID：526878657899</text>
+						<text class="name">{{info.name}}</text>
+						<text class="id">ID：{{info.uid}}</text>
 					</view>
-					<button type="default" class="add">加为好友</button>
+					<button type="default" class="add" @click="addFriend">加为好友</button>
 				</view>
 
 			</view>
 			<u-divider half-width="240" color="#333333" fontSize="20" border-color="#D8D8D8">TA的闲置</u-divider>
-			
+
 			<view class="footer">
 				<view class="item" v-for="item in [1,1,1,1]">
 					<image src="/static/common/image/card1.png" mode="aspectFit" class="goodsImg"></image>
@@ -31,8 +31,26 @@
 	export default {
 		data() {
 			return {
+				info: {}
+			}
+		},
+		methods: {
+			addFriend() {
+				this.$req('/friend/add_friend', {
+					uid: this.info.uid,
+					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+				}).then(res => {
+					console.log(res)
+					if (res.errCode == 0) {
+						this.$u.toast('好友申请发送成功',2500);
+					}
+				})
 
 			}
+		},
+		onShow() {
+			this.info = this.vuex_search
+			console.log(this.info);
 		}
 	}
 </script>
@@ -59,20 +77,24 @@
 				align-items: center;
 				justify-content: space-between;
 				margin-bottom: 20rpx;
+
 				.headIcon {
 					width: 122rpx;
 					height: 122rpx;
+					border-radius: 122rpx;
 					flex-shrink: 0;
 				}
 
 				.headRight {
 					width: 100%;
-						display: flex;
-						justify-content: space-between;
-						margin-left: 24rpx;
+					display: flex;
+					justify-content: space-between;
+					margin-left: 24rpx;
+
 					.info {
 						display: flex;
 						flex-direction: column;
+						width: 66%;
 
 						.name {
 							font-size: 36rpx;
@@ -84,6 +106,7 @@
 							font-size: 24rpx;
 							font-weight: 400;
 							color: #666666;
+							word-break: break-all;
 						}
 
 					}
@@ -103,19 +126,23 @@
 					}
 				}
 			}
-			.footer{
+
+			.footer {
 				display: flex;
 				justify-content: space-between;
 				margin-top: 24rpx;
-				.item{
+
+				.item {
 					display: flex;
 					flex-direction: column;
 					align-items: center;
-					.goodsImg{
+
+					.goodsImg {
 						width: 126rpx;
 						height: 126rpx;
 					}
-					.title{
+
+					.title {
 						font-size: 22rpx;
 						font-weight: 500;
 						color: #333333;

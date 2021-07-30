@@ -1,5 +1,7 @@
 import Vue from 'vue';
 import App from './App';
+import request from 'common/uni_request.js'
+
 
 Vue.config.productionTip = false;
 
@@ -7,6 +9,7 @@ App.mpType = 'app';
 
 // 此处为演示Vue.prototype使用，非uView的功能部分
 Vue.prototype.vuePrototype = '枣红';
+Vue.prototype.$req = request
 
 // 引入全局uView
 import uView from 'uview-ui';

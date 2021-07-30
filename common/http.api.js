@@ -11,15 +11,17 @@ const install = (Vue, vm) => {
 	let getcosCredentials = (params = {}) => vm.$u.post('/third_service/tencent_cloud_storage_credential',params);
 	let wxLogin = (params = {}) => vm.$u.post('/third_service/login',params);
 	let release = (params = {}) => vm.$u.post('/item/release_item',params);
-	let get_user_items = (params = {}) => vm.$u.post('/item/get_user_items',params);
+	let get_user_items = (params = {}) => vm.$u.post('/item/get_users_items',params);
 	let delete_item = (params = {}) => vm.$u.post('/item/delete_item',params);
 	let sent_out_items = (params = {}) => vm.$u.post('/item/get_self_sent_out_items',params);
 	let received_items = (params = {}) => vm.$u.post('/item/get_self_received_items',params);
 	let update_item_info = (params = {}) => vm.$u.post('/item/update_item_info',params);
+	let user_want_the_item = (params = {}) => vm.$u.post('/item/user_want_the_item',params);
+	let gift_item = (params = {}) => vm.$u.post('/item/gift_item',params);
 
 	
 	// 将各个定义的接口名称，统一放进对象挂载到vm.$u.api(因为vm就是this，也即this.$u.api)下
-	vm.$u.api = {getcosCredentials,wxLogin,release,get_user_items,delete_item,sent_out_items,received_items,update_item_info};
+	vm.$u.api = {getcosCredentials,wxLogin,release,get_user_items,delete_item,sent_out_items,received_items,update_item_info,user_want_the_item,gift_item};
 }
 
 export default {

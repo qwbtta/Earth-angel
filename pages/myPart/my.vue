@@ -84,7 +84,7 @@
 			},
 			goGoodsHome(){
 				uni.navigateTo({
-					url:'./goodsHome/goodsHome?id=' + this.vuex_openid + '&name=王五'
+					url:'./goodsHome/goodsHome?id=' + this.vuex_openid
 				})
 			},
 			goNotice(){

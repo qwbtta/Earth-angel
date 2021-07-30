@@ -11,16 +11,31 @@
 	// 	}]
 	// },
 	"pages": [{
-			"path": "pages/myPart/my",
+			"path": "pages/findPart/find",
 			"style": {
-				"navigationBarTitleText": "我的",
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "",
 				"enablePullDownRefresh": false
 			}
 
 		},{
-			"path": "pages/login/login",
+			"path": "pages/myPart/notice",
 			"style": {
-				"navigationBarTitleText": "",
+				"navigationBarTitleText": "通知",
+				"enablePullDownRefresh": false
+			}
+
+		},{
+			"path": "pages/myPart/my",
+			"style": {
+				"navigationBarTitleText": "我的",
 				"enablePullDownRefresh": false
 			}
 
@@ -54,14 +69,6 @@
 			}
 
 		}, {
-			"path": "pages/findPart/find",
-			"style": {
-				"navigationStyle": "custom",
-				"navigationBarTitleText": "",
-				"enablePullDownRefresh": false
-			}
-
-		},{
 			"path": "pages/myPart/goodsList",
 			"style": {
 				"navigationStyle": "custom",
@@ -152,18 +159,10 @@
 			}
 
 		}, {
-			"path": "pages/findPart/group/eidtMemberNumber",
+			"path": "pages/findPart/group/editMemberNumber",
 			"style": {
 				"navigationStyle": "custom",
 				"navigationBarTitleText": "",
-				"enablePullDownRefresh": false
-			}
-
-		},  
-		{
-			"path": "pages/myPart/notice",
-			"style": {
-				"navigationBarTitleText": "通知",
 				"enablePullDownRefresh": false
 			}
 
@@ -196,13 +195,13 @@
 			{
 				"pagePath": "pages/myPart/my",
 				"iconPath": "static/common/image/tab-my.png",
-				"selectedIconPath": "static/common/image/tab-my-seleted.png",
+				"selectedIconPath": "static/common/image/tab-my-selected.png",
 				"text": "我的"
 			},
 			{
 				"pagePath": "pages/releasePart/release",
 				"iconPath": "static/common/image/tab-release.png",
-				"selectedIconPath": "static/common/image/tab-release.png",
+				"selectedIconPath": "static/common/image/tab-release-selected.png",
 				"text": "发布"
 			}
 		]

@@ -8,8 +8,15 @@
 		</u-navbar>
 		<view class="main">
 			<view class="searchCon">
-				<input type="text" placeholder="搜索用户或群组名称" class="search" />
-				<button type="default" class="createGroup">创建群组</button>
+				<view class="inputFather">
+					<input type="text" placeholder="搜索用户或群组名称" v-model="search" class="search" />
+					<image src="/static/common/image/search.png" mode="" class="searchIcon" v-if="search.length==0">
+					</image>
+					<image src="/static/common/image/searchShow.png" mode="" class="searchIcon"
+						@click.stop="searchFriend" v-else></image>
+				</view>
+
+				<button type="default" class="createGroup" @click="goNewGroup">创建群组</button>
 			</view>
 
 			<view class="swiperCon">
@@ -31,7 +38,7 @@
 
 				</view>
 
-				<GoodsWaterfall :goodsList="goodsList"  v-if="selected==1" />
+				<GoodsWaterfall :goodsList="goodsList" v-if="selected==1" />
 
 				<view class="group" v-if="selected==2">
 					<view class="group-item" v-for="item in [1, 2, 3, 4, 5, 6]" :key="item">
@@ -106,36 +113,33 @@
 					}
 				],
 				selected: 1,
-				goodsList: [{
-					id:1,
-					image: 'http://pic.sc.chinaz.com/Files/pic/pic9/202002/zzpic23327_s.jpg',
-					title: '谁念西风独自凉',
-					detail: '谁念西'
-				}, {
-					id:1,
-					image: '/static/common/image/kk.jpg',
-					title: '谁念西风独自凉',
-					detail: '谁念西'
-				}, {
-					id:1,
-					image: '/static/common/image/kk.jpg',
-					title: '谁念西风独自凉',
-					detail: '谁念西风独的'
-				}, {
-					id:1,
-					image: '/static/common/image/kk.jpg',
-					title: '谁念西风独自凉',
-					detail: '谁念西风独'
-				}, {
-					id:1,
-					image: 'http://pic.sc.chinaz.com/Files/pic/pic9/202002/zzpic23327_s.jpg',
-					title: '谁念西风独自凉',
-					detail: '谁念西风独'
-				}]
+				goodsList: []
 			}
 		},
 		methods: {
-		
+			searchFriend() {
+				this.$req('/friend/get_friends_info', {
+					uid: this.search,
+					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+				}).then(res => {
+
+					console.log(res)
+					if (res.errCode == 0) {
+						this.$u.vuex('vuex_search', res.data);
+						uni.navigateTo({
+							url: './search'
+						})
+					} else {
+						this.$u.toast('该ID不存在');
+					}
+				})
+
+			},
+			goNewGroup() {
+				uni.navigateTo({
+					url: 'group/newGroup'
+				})
+			},
 			select(e) {
 				console.log(e);
 				if (e === 1) {
@@ -146,21 +150,51 @@
 			},
 			goMore() {
 				uni.navigateTo({
-					url: './group/group'
+					url: 'group/group'
 				})
 			},
 			swiperClick(e) {
 				console.log(e);
 			}
 		},
-		// onLoad() {
-		// 	uni.login({
-		// 		provider: 'weixin',
-		// 		success: function(loginRes) {
-		// 			console.log("登录", loginRes)
-		// 		}
-		// 	})
-		// }
+		onShow() {
+			this.$req('/friend/get_friend_list', {
+				operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+			}).then(res => {
+
+				if (res.errCode == 0) {
+					let friendList = res.data
+					let ids = res.data.map(item => item.uid)
+					let parameter = {}
+					parameter.openIdList = ids
+					parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
+					this.$u.api.get_user_items(parameter).then(res => {
+
+						//接口问题，所以需要多重循环拼接处理数据，全部使用for
+						for (let i = 0; i < friendList.length; i++) {
+							for (let e = 0; e < res.data.length; e++) {
+								if (friendList[i].uid == res.data[e].openId) {
+									for(let m =0; m<res.data[e].items.length;m++){
+										res.data[e].items[m].icon =friendList[i].icon
+										res.data[e].items[m].userName =friendList[i].name
+										this.goodsList.push(res.data[e].items[m])
+									}
+									
+								}
+							}
+						}
+						console.log(this.goodsList,"6666");
+					})
+
+
+
+
+
+				} else {}
+			})
+
+		}
+
 	}
 </script>
 
@@ -196,18 +230,29 @@
 				align-items: center;
 				margin-top: 28rpx;
 
-				.search {
-					margin-left: 48rpx;
-					width: 54.8%;
-					height: 60rpx;
-					border-radius: 30rpx;
-					box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.2);
-					background-image: url(../../static/common/image/search.png);
-					background-size: 32rpx 32rpx;
-					background-repeat: no-repeat;
-					background-position: 5% 50%;
-					padding-left: 70rpx;
+				.inputFather {
+					width: 70%;
+					position: relative;
+
+					.search {
+						margin-left: 48rpx;
+						height: 60rpx;
+						border-radius: 30rpx;
+						box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.2);
+						padding-left: 30rpx;
+						padding-right: 74rpx;
+					}
+
+					.searchIcon {
+						width: 32rpx;
+						height: 32rpx;
+						position: absolute;
+						top: 14rpx;
+						right: 28rpx;
+						z-index: 99;
+					}
 				}
+
 
 				.createGroup {
 					@extend .btn;
@@ -222,7 +267,7 @@
 
 			.swiperCon {
 				margin-top: 60rpx;
-				padding: 0 48rpx;
+
 			}
 
 			.goodsCon {

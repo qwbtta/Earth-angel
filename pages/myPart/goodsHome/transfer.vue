@@ -4,12 +4,12 @@
 			<text>该物品有以下朋友想要：</text>
 		</view>
 		<view class="main">
-			<view class="item" v-for="item in [1,1,1,1,1,1,1]">
+			<view class="item" v-for="item in list" :key="item.uid">
 				<view class="itemLeft u-flex">
-					<image src="/static/common/image/card1.png" mode="" class="itemImg"></image>
-					<text class="name">隔壁阿花</text>
+					<image :src="item.icon" mode="" class="itemImg"></image>
+					<text class="name">{{item.name}}</text>
 				</view>
-				<button type="default" class="btn">赠送</button>
+				<button type="default" class="btn" @click="give(item)">赠送</button>
 			</view>
 		</view>
 
@@ -20,8 +20,33 @@
 	export default {
 		data() {
 			return {
-
+				list:[]
 			}
+		},
+		methods:{
+			give(e){
+				let parameter ={}
+				parameter.itemId = this.vuex_goodsInfo.itemID
+				parameter.openId = e.uid
+				parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
+				this.$u.api.gift_item(parameter).then(res => {
+					console.log(res);
+					if(res.errCode==0){
+					this.$u.toast('赠送成功',2000)
+					}
+				})
+			}
+		},
+		onShow() {
+			this.$req('/user/get_user_info', {
+					uidList: this.vuex_wantedUid,
+					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+				}).then(res => {
+					console.log(res)
+					if(res.errCode==0){
+					this.list = res.data
+					}
+				})
 		}
 	}
 </script>

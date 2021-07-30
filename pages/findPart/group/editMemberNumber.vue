@@ -8,10 +8,10 @@
 			<text>{{state==1?'通讯录':'群成员'}}</text>
 		</view>
 		<view class="main">
-			<u-checkbox v-model="item.checked" v-for="(item, index) in list" :key="index" shape="circle" size="44"
+			<u-checkbox v-model="item.checked" v-for="item in list" :key="item.uid" shape="circle" size="44"
 				active-color="#25EFCF" icon-size="30">
 				<view class="checkboxItem u-flex">
-					<image :src="item.image" mode="" class="headIcon"></image>
+					<image :src="item.icon" mode="" class="headIcon"></image>
 					
 					<view class="name">
 						<text >隔壁阿花</text>
@@ -22,7 +22,7 @@
 				</u-checkbox>
 		</view>
 		<view class="footer">
-			<button type="default" v-if="state==1" class="btn">添加</button>
+			<button type="default" v-if="state==1" class="btn" @click="addMember">添加</button>
 			<button type="default" v-else class="btn">删除</button>
 		</view>
 	</view>
@@ -34,19 +34,25 @@
 			return {
 				title: "",
 				state: 1,
-				list: [{
-					image: '/static/common/image/card1.png',
-					name: "隔壁阿花",
-					checked: false
-				},{
-					image: '/static/common/image/card1.png',
-					name: "隔壁阿花",
-					checked: false
-				}, {
-					image: '/static/common/image/card1.png',
-					name: "隔壁阿花",
-					checked: false
-				},  ]
+				list: []
+			}
+		},
+		methods:{
+			addMember(){
+				let choose = []
+				this.list.forEach(item => {
+					if (item.checked == true) {
+						choose.push(item)
+					}
+				})
+				if(choose.length!=0){
+					this.$u.vuex('vuex_memberNum',choose)
+				}
+				
+				console.log(choose);
+				uni.navigateBack({
+				    delta: 1
+				});
 			}
 		},
 		onLoad(options) {
@@ -54,6 +60,26 @@
 			if (options.do == "add") {
 				this.title = "添加"
 				this.state = 1
+				
+				this.$req('/friend/get_friend_list', {
+					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+				}).then(res => {
+					console.log(res)
+					if (res.errCode == 0) {
+							for(let i =0; i<res.data.length;i++){
+								res.data[i].checked = false 
+							}
+							this.list =  res.data
+							console.log(this.list);
+							
+					} else {
+					}
+				})
+				
+				
+				
+				
+				
 			} else if (options.do == "delete") {
 				this.title = "删除"
 				this.state = 2
@@ -110,6 +136,7 @@
 				.headIcon{
 					width: 84rpx;
 					height: 84rpx;
+					border-radius: 84rpx;
 					margin-left: 34rpx;
 				}
 				.name{

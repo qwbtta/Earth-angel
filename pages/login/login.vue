@@ -39,7 +39,6 @@
 					desc: "test",
 					lang: "zh_CN",
 					success: async (res) => {
-						console.log(that.code);
 						const reqData = {
 							avatarUrl: res.userInfo.avatarUrl,
 							city: res.userInfo.city,
@@ -50,6 +49,7 @@
 							code: that.code,
 							operationId: that.code + JSON.stringify(new Date().getTime())
 						}
+						
 						// console.log(reqData);
 						that.$u.api.wxLogin(reqData).then(loginRes=>{
 							console.log(loginRes,"后台返回");
@@ -57,8 +57,11 @@
 							that.$u.vuex('vuex_avatar_url', res.userInfo.avatarUrl);
 							that.$u.vuex('vuex_gender', res.userInfo.gender);
 							that.$u.vuex('vuex_openid', loginRes.data.openid);
-							that.$u.vuex('vuex_token', loginRes.data.token);
-							// that.$u.vuex('vuex_userId', loginRes.data.uid);
+							that.$u.vuex('vuex_token', loginRes.data.earthAngelToken);
+							that.$u.vuex('vuex_wsToken', loginRes.data.openIMToken);
+							
+							
+							
 							
 							this.loading = false
 							that.$refs.uToast.show({

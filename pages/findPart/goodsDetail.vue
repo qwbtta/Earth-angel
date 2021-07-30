@@ -4,12 +4,12 @@
 		<view class="main">
 			<view class="head">
 				<view class="headLeft">
-					<image src="/static/common/image/card1.png" mode="" class="headIcon"></image>
+					<image :src="icon" mode="" class="headIcon"></image>
 					<view class="nameCon">
-						<text class="name">隔壁阿花</text>
+						<text class="name">{{name}}</text>
 						<view class="titleCon u-flex">
 							<view class="goodStitle">
-								全新重工棉T全新重
+								{{describe}}
 							</view>
 							<button type="default" class="share">分享</button>
 						</view>
@@ -17,8 +17,8 @@
 				</view>
 				
 				<view class="headRight" v-if="isMine">
-					<text class="people">已有20人想要</text>
-					<button type="default" class="want">转送</button>
+					<text class="people">已有{{peopleNum}}人想要</text>
+					<button type="default" class="want" @click="goTransfer">转送</button>
 				</view>
 				<view class="headRight" v-else>
 					<button type="default" class="want">想要</button>
@@ -53,19 +53,12 @@
 		data() {
 			return {
 				isMine:true,
-				swiperList: [{
-						image: 'https://cdn.uviewui.com/uview/swiper/1.jpg',
-						title: '昨夜星辰昨夜风，画楼西畔桂堂东'
-					},
-					{
-						image: 'https://cdn.uviewui.com/uview/swiper/2.jpg',
-						title: '身无彩凤双飞翼，心有灵犀一点通'
-					},
-					{
-						image: 'https://cdn.uviewui.com/uview/swiper/3.jpg',
-						title: '谁念西风独自凉，萧萧黄叶闭疏窗，沉思往事立残阳'
-					}
-				],
+				swiperList: [],
+				name:"",
+				icon:"",
+				describe:"",
+				peopleNum: 0,
+				wantedUid:[],
 				goodsList: [{
 					image: 'http://pic.sc.chinaz.com/Files/pic/pic9/202002/zzpic23327_s.jpg',
 					title: '谁念西风独自凉',
@@ -90,16 +83,36 @@
 			}
 		},
 		methods: {
-
+			goTransfer(){
+				this.$u.vuex('vuex_wantedUid',this.wantedUid)
+				uni.navigateTo({
+					url:'../myPart/goodsHome/transfer'
+				})
+			}
 		},
-		onLoad(options) {
-			console.log(options);
-			if(options.id == this.vuex_openid){
+		onShow() {
+			if(this.vuex_goodsInfo.fromUser == this.vuex_openid){
 				this.isMine = true
-			}else{
+				this.peopleNum = this.vuex_goodsInfo.wantedUid.length
+				this.wantedUid = this.vuex_goodsInfo.wantedUid
+			} else{
 				this.isMine = false
 			}
+			this.swiperList = this.vuex_goodsInfo.imgUrls
+			this.describe = this.vuex_goodsInfo.desc
+			this.$req('/user/get_user_info', {
+					uidList:[this.vuex_goodsInfo.fromUser],
+					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+				}).then(res => {
+					console.log(res)
+					if(res.errCode==0){
+					this.icon = res.data[0].icon
+					this.name = res.data[0].name
+					}
+				})
+			
 		}
+		
 		
 	}
 </script>
@@ -129,6 +142,7 @@
 					.headIcon {
 						width: 94rpx;
 						height: 94rpx;
+						border-radius: 94rpx;
 					}
 
 					.nameCon {
