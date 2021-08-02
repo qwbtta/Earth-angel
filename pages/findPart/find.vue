@@ -113,11 +113,16 @@
 					}
 				],
 				selected: 1,
-				goodsList: []
+				goodsList: [],
+				groupGoodsList: []
 			}
 		},
 		methods: {
 			searchFriend() {
+				if (this.search == this.vuex_openid) {
+					this.$u.toast('不可以搜索自己哟');
+					return false
+				}
 				this.$req('/friend/get_friends_info', {
 					uid: this.search,
 					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
@@ -125,6 +130,7 @@
 
 					console.log(res)
 					if (res.errCode == 0) {
+						this.search = ""
 						this.$u.vuex('vuex_search', res.data);
 						uni.navigateTo({
 							url: './search'
@@ -140,13 +146,88 @@
 					url: 'group/newGroup'
 				})
 			},
-			select(e) {
+			async select(e) {
 				console.log(e);
 				if (e === 1) {
 					this.selected = 1
 				} else {
 					this.selected = 2
+					let groupListId = []
+					//信息分布在两套接口 所以流程繁杂 
+					await this.$req('/group/get_joined_group_list', {
+						operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+					}).then(res => {
+						groupListId = res.data
+						console.log(res.data, "群列表");
+						for (let i = 0; i < res.data.length; i++) {
+							let userItem = {}
+							this.$req('/group/get_group_member_list', {
+								groupID: res.data[i].groupId,
+								nextSeq: 0,
+								operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+							}).then(res => {
+								console.log(res, "群成员");
+
+								let ids = res.data.map(item => item.userId)
+								this.$req('/user/get_user_info', {
+									uidList: ids,
+									operationID: this.vuex_openid + JSON.stringify(new Date()
+										.getTime())
+								}).then(res => {
+
+
+									var userList = []
+									for (let t = 0; t < res.data.length; t++) {
+										let userInfo = {}
+										userInfo.name = res.data[t].name
+										userInfo.imgUrl = res.data[t].icon
+										userInfo.openId = res.data[t].uid
+
+										userList.push(userInfo)
+
+									}
+									console.log(userList, "拼接");
+
+									// console.log(groupListId, "99999999999999999");
+									let parameter = {}
+									parameter.usersInfoList = userList
+									parameter.operationId = this.vuex_openid + JSON.stringify(
+										new Date().getTime())
+									this.$u.api.get_group_users_items(parameter).then(res => {
+										console.log(res.data, "44444");
+										// 		for(let m=0;m<res.data.length;m++){
+
+										// 			// for( let c = 0; c<res.data[m].items.groupVisible;c++){
+
+
+										// 			// 		if(res.data[m].items.groupVisible[c]==groupListId){
+
+										// 			// 			console.log(res.data[m].items,"44454545555");
+										// 			// 		}
+										// 			// }
+										// 		}
+										// this.groupGoodsList[i].domList = res.data
+										// console.log(this.groupGoodsList,"55555555");
+
+
+									})
+
+
+
+
+								})
+							})
+
+						}
+
+
+
+
+					})
+
 				}
+
+
 			},
 			goMore() {
 				uni.navigateTo({
@@ -158,6 +239,9 @@
 			}
 		},
 		onShow() {
+			console.log(this.vuex_wsToken, "tytttttttttt");
+			//清创建群组的页面的一个数据
+			this.$u.vuex('vuex_memberNum', [])
 			this.$req('/friend/get_friend_list', {
 				operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
 			}).then(res => {
@@ -168,22 +252,22 @@
 					let parameter = {}
 					parameter.openIdList = ids
 					parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
-					this.$u.api.get_user_items(parameter).then(res => {
-
+					this.$u.api.get_users_items(parameter).then(res => {
+						this.goodsList = []
 						//接口问题，所以需要多重循环拼接处理数据，全部使用for
 						for (let i = 0; i < friendList.length; i++) {
 							for (let e = 0; e < res.data.length; e++) {
 								if (friendList[i].uid == res.data[e].openId) {
-									for(let m =0; m<res.data[e].items.length;m++){
-										res.data[e].items[m].icon =friendList[i].icon
-										res.data[e].items[m].userName =friendList[i].name
+									for (let m = 0; m < res.data[e].items.length; m++) {
+										res.data[e].items[m].icon = friendList[i].icon
+										res.data[e].items[m].userName = friendList[i].name
 										this.goodsList.push(res.data[e].items[m])
 									}
-									
+
 								}
 							}
 						}
-						console.log(this.goodsList,"6666");
+						console.log(this.goodsList, "物品列表");
 					})
 
 

@@ -5,7 +5,6 @@
 
 				<image :src="info.icon" mode="" class="headIcon"></image>
 
-
 				<view class="headRight">
 					<view class="info">
 						<text class="name">{{info.name}}</text>
@@ -18,9 +17,9 @@
 			<u-divider half-width="240" color="#333333" fontSize="20" border-color="#D8D8D8">TA的闲置</u-divider>
 
 			<view class="footer">
-				<view class="item" v-for="item in [1,1,1,1]">
-					<image src="/static/common/image/card1.png" mode="aspectFit" class="goodsImg"></image>
-					<text class="title">北欧复古沙发</text>
+				<view class="item" v-for="item in goodsList" :key = "item.itemId" @click="showInfo">
+					<image :src="item.imgUrls[0]" mode="aspectFit" class="goodsImg"></image>
+					<text class="title">{{item.name}}</text>
 				</view>
 			</view>
 		</view>
@@ -31,7 +30,8 @@
 	export default {
 		data() {
 			return {
-				info: {}
+				info: {},
+				goodsList:[]
 			}
 		},
 		methods: {
@@ -46,11 +46,29 @@
 					}
 				})
 
+			},
+			showInfo(){
+				this.$u.toast('请添加好友后查看更多详情')
 			}
 		},
 		onShow() {
 			this.info = this.vuex_search
-			console.log(this.info);
+			console.log(this.info,"用户信息");
+			
+			let parameter = {}
+			parameter.openIdList = [this.info.uid]
+			parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
+			this.$u.api.get_users_items(parameter).then(res => {
+					
+					if(res.data[0].items.length>4){
+						this.goodsList=res.data[0].items.slice(0,4)
+					}else{
+						this.goodsList=res.data[0].items
+					}
+					console.log(this.goodsList,"物品");
+				
+			})
+			
 		}
 	}
 </script>

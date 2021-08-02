@@ -9,7 +9,7 @@
 		<view class="main">
 			<text class="add">添加群成员</text>
 			<view class="memberCon">
-				<view class="memberItem" v-for="item in memberList">
+				<view class="memberItem" v-for="item in memberList" :key="item.uid" >
 					<image :src="item.icon" mode="" class="member"></image>
 					<text>{{item.name}}</text>
 				</view>
@@ -21,18 +21,20 @@
 		</view>
 		<view class="main">
 			<text class="setName">设置群组名称</text>
-			<input type="text" value="" class="setInput" />
+			<input type="text" v-model="groupName" class="setInput" />
 		</view>
-		<button type="default" class="finish">完成</button>
+		<button type="default" class="finish" @click="finish">完成</button>
 	</view>
 </template>
 
 <script>
+	let cosUpload = require('../../../common/cos/upload.js')
 	export default {
 		data() {
 			return {
 				groupIcon: "",
-				memberList: []
+				memberList: [],
+				groupName:""
 			}
 		},
 		methods: {
@@ -57,16 +59,60 @@
 				uni.navigateTo({
 					url: './editMemberNumber?do=add'
 				})
+			},
+			async finish(){
+				if (this.groupIcon == "") {
+					this.$u.toast('请设置群头像')
+					return false
+				} 
+				else if (this.memberList.length == 0) {
+					this.$u.toast('请添加至少一名群成员')
+					return false
+				} else if (this.$u.trim(this.groupName).length == 0) {
+					this.$u.toast('请设置群组名称')
+					return false
+				}
+				let that = this
+				let photos = await cosUpload.uploadFile([this.groupIcon],that)
+				
+				let chooseMemberList = []
+				for(let i =0;i<this.memberList.length;i++){
+					let item = {}
+					item.uid = this.memberList[i].uid
+					item.setRole = 0
+					chooseMemberList.push(item)
+				}
+				this.$req('/group/create_group', {
+					memberList:chooseMemberList,
+					groupName:this.groupName,
+					faceUrl:photos[0],
+					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+				}).then(res=>{
+					console.log(res.data);
+					let groupID = res.data.groupID
+					let uidList = this.memberList.map(item=>item.uid)
+					// this.$req('/group/invite_user_to_group', {
+					// 	groupID:groupID,
+					// 	uidList:uidList,
+					// 	reason:'邀请进群',
+					// 	operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+					// }).then(res=>{
+					// 	console.log(res,"邀请进群");
+					// })
+					
+					
+					if(res.errCode == 0){
+						uni.switchTab({
+							url:'../find'
+						})
+						this.$u.toast('创建群组成功')
+					}
+				})
 			}
 		},
 		onShow() {
 			this.memberList = this.vuex_memberNum
-		},
-		onBackPress(event) {
-			if(this.vuex_memberNum.length>0){
-				this.$u.vuex('vuex_memberNum', [])
-				return true
-			}
+			console.log(this.memberList,"已选中");
 		}
 
 	}

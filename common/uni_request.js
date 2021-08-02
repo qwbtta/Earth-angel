@@ -1,6 +1,7 @@
 import store from '@/store';
 
-const baseUrl = 'http://47.112.160.66:10000'   
+const baseUrl = 'http://47.112.160.66:10000'
+// const baseUrl = 'https://open-im.rentsoft.cn'   
 
 
 const request = (url = '', date = {}, type = 'POST', header = { 'token':store.state.vuex_wsToken}) => {

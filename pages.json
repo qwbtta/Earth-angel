@@ -11,14 +11,34 @@
 	// 	}]
 	// },
 	"pages": [{
+			"path": "pages/myPart/my",
+			"style": {
+				"navigationBarTitleText": "我的",
+				"enablePullDownRefresh": false
+			}
+
+		},{
+			"path": "pages/chatPart/chatPage",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false
+			}
+		
+		}, {
+			"path": "pages/myPart/contacts",
+			"style": {
+				"navigationBarTitleText": "联系人",
+				"enablePullDownRefresh": false
+			}
+		}, {
 			"path": "pages/findPart/find",
 			"style": {
 				"navigationStyle": "custom",
 				"navigationBarTitleText": "",
 				"enablePullDownRefresh": false
 			}
-
-		}, {
+		},{
 			"path": "pages/login/login",
 			"style": {
 				"navigationBarTitleText": "",
@@ -26,16 +46,15 @@
 			}
 
 		},{
+			"path": "pages/findPart/group/newGroup",
+			"style": {
+				"navigationBarTitleText": "创建群组",
+				"enablePullDownRefresh": false
+			}
+		},{
 			"path": "pages/myPart/notice",
 			"style": {
 				"navigationBarTitleText": "通知",
-				"enablePullDownRefresh": false
-			}
-
-		},{
-			"path": "pages/myPart/my",
-			"style": {
-				"navigationBarTitleText": "我的",
 				"enablePullDownRefresh": false
 			}
 
@@ -54,15 +73,7 @@
 			}
 
 		},{
-			"path": "pages/chatPart/chatPage",
-			"style": {
-				"navigationStyle": "custom",
-				"navigationBarTitleText": "",
-				"enablePullDownRefresh": false
-			}
-		
-		},{
-			"path": "pages/chatPart/sessioList",
+			"path": "pages/chatPart/sessionList",
 			"style": {
 				"navigationBarTitleText": "消息",
 				"enablePullDownRefresh": false
@@ -125,18 +136,6 @@
 				"enablePullDownRefresh": false
 			}
 
-		}, {
-			"path": "pages/findPart/group/newGroup",
-			"style": {
-				"navigationBarTitleText": "创建群组",
-				"enablePullDownRefresh": false
-			}
-		},{
-			"path": "pages/myPart/contacts",
-			"style": {
-				"navigationBarTitleText": "联系人",
-				"enablePullDownRefresh": false
-			}
 		},{
 			"path": "pages/myPart/goodsHome/transfer",
 			"style": {
@@ -187,7 +186,7 @@
 				"text": "发现"
 			},
 			{
-				"pagePath": "pages/chatPart/sessioList",
+				"pagePath": "pages/chatPart/sessionList",
 				"iconPath": "static/common/image/tab-chat.png",
 				"selectedIconPath": "static/common/image/tab-chat-selected.png",
 				"text": "消息"

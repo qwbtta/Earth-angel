@@ -50,12 +50,13 @@
 		methods: {
 			getList() {
 				let parameter = {}
-				parameter.openId = this.id
+				parameter.openIdList = [this.id]
 				parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
-				this.$u.api.get_user_items(parameter).then(res => {
-					
-					this.goodsList = res.data.items
+				this.$u.api.get_users_items(parameter).then(res => {
+					console.log(res.data[0].items);
+					this.goodsList = res.data[0].items
 					console.log(this.goodsList,"6666");
+					
 				})
 			},
 			copy() {
@@ -80,12 +81,9 @@
 			},
 			deleteGoods() {
 				let parameter = {}
-				parameter.itemIdList = [this.vuex_goodsInfo.itemID]
+				parameter.itemIdList = [this.vuex_goodsInfo.itemId]
 				parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
-
-				console.log(parameter);
 				this.$u.api.delete_item(parameter).then(res => {
-					console.log(res.errCode);
 					this.editShow = false
 					if (res.errCode == 0) {
 						this.getList()

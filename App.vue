@@ -5,7 +5,7 @@
 			username: '白居易'
 		},
 		onLaunch() {
-			
+
 			// 1.1.0版本之前关于http拦截器代码，已平滑移动到/common/http.interceptor.js中
 			// 注意，需要在/main.js中实例化Vue之后引入如下(详见文档说明)：
 			// import httpInterceptor from '@/common/http.interceptor.js'
@@ -14,9 +14,23 @@
 			/**
 			 * h5，app-plus(nvue下也为app-plus)，mp-weixin，mp-alipay......
 			 */
+
+			uni.connectSocket({
+				url: 'wss://open-im.rentsoft.cn/wss?sendID=' + this.vuex_openid + '&token=' + this.vuex_wsToken +
+					'&platformID=6'
+			});
+			uni.onSocketOpen(function(res) {
+				console.log('WebSocket连接已打开！');
+			});
+			uni.onSocketError(function(res) {
+				console.log('WebSocket连接打开失败，请检查！');
+			});
+			uni.onSocketMessage(function(res) {
+				console.log('收到服务器内容：' + res);
+			});
 		},
-		onTabItemTap(e){
-			console.log(e);
+		onLoad() {
+
 		}
 	}
 </script>
@@ -25,8 +39,8 @@
 	@import "uview-ui/index.scss";
 	@import "common/demo.scss";
 	@import "common/myStyle.scss";
-	
-	button:active{
+
+	button:active {
 		background-color: #21D6B9 !important;
 	}
 </style>

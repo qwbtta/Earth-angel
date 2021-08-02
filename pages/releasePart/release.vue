@@ -32,7 +32,7 @@
 			<view :class="['friend',friendChoose==true?'checked':''] " @click="friendChoose = !friendChoose">
 				关注可见
 			</view>
-			<view :class="['friend',groupChoose==true?'checked':''] " @click="groupShow=true">
+			<view :class="['friend',groupChoose==true?'checked':''] " @click="showPopup">
 				群组
 			</view>
 
@@ -49,10 +49,10 @@
 
 					<u-checkbox-group @change="monitor">
 						<u-checkbox v-model="item.checked" shape="circle" active-color="#FFDF4E"
-							v-for="(item,index) in groupInfo" :key="index" class="checkboxItem">
+							v-for="item in groupInfo" :key="item.groupId" class="checkboxItem">
 							<view class="u-flex">
-								<image :src="item.img" mode="aspectFit" class="itemImg"></image>
-								<text class="itemName">{{item.name}}</text>
+								<image :src="item.faceUrl" mode="aspectFit" class="itemImg"></image>
+								<text class="itemName">{{item.groupName}}</text>
 							</view>
 						</u-checkbox>
 					</u-checkbox-group>
@@ -117,6 +117,21 @@
 			clearImg(index){
 				this.photoList.splice(index,1)
 			},
+			showPopup(){
+				this.groupShow = true
+				if(this.groupInfo.length==0){
+					this.$req('/group/get_joined_group_list', {
+						operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+					}).then(res=>{
+						
+						for(let i=0;i<res.data.length;i++){
+							res.data[i].checked = false
+						}
+						this.groupInfo = res.data
+						console.log(this.groupInfo,"群列表");
+					})
+				}
+			},
 			async release() {
 				
 				
@@ -176,11 +191,7 @@
 					console.log(parameter,"更新");
 					this.$u.api.update_item_info(parameter).then(res => {
 						if (res.errCode == 0) {
-							this.goodsName = ''
-							this.goodsDescribe = ''
-							this.photoList = []
-							this.friendChoose = false
-							this.groupChoose = false
+							Object.assign(this.$data, this.$options.data())
 							uni.navigateTo({
 								url: '../myPart/goodsHome/goodsHome?id='+ this.vuex_openid
 							})
@@ -190,11 +201,7 @@
 				} else {
 					this.$u.api.release(parameter).then(res => {
 						if (res.errCode == 0) {
-							this.goodsName = ''
-							this.goodsDescribe = ''
-							this.photoList = []
-							this.friendChoose = false
-							this.groupChoose = false
+							Object.assign(this.$data, this.$options.data())
 							uni.navigateTo({
 								url: '../myPart/goodsHome/goodsHome?id='+ this.vuex_openid
 							})
@@ -229,12 +236,16 @@
 				}
 			},
 			groupConfirm() {
+				if(this.groupInfo.length==0){
+					this.groupShow = false
+					return
+				}
 				this.groupShow = false
 				this.groupChecked = []
 				//用filter()有问题
 				this.groupInfo.forEach(item => {
 					if (item.checked == true) {
-						this.groupChecked.push(JSON.stringify(item.id))
+						this.groupChecked.push(item.groupId)
 					}
 				})
 
@@ -253,7 +264,7 @@
 				this.goodsName = this.vuex_goodsInfo.name
 				this.goodsDescribe = this.vuex_goodsInfo.desc
 				this.photoList = this.vuex_goodsInfo.imgUrls
-				this.itemId = this.vuex_goodsInfo.itemID
+				this.itemId = this.vuex_goodsInfo.itemId
 				if (this.vuex_goodsInfo.followVisible == "1") {
 					this.friendChoose = true
 				} else {
@@ -264,6 +275,7 @@
 				this.$u.vuex('vuex_goodsInfo', {});
 				
 			}
+			
 		},
 		
 		onTabItemTap(e){

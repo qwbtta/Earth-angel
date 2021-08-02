@@ -25,8 +25,9 @@
 		},
 		methods:{
 			give(e){
+				console.log(e,"5555555");
 				let parameter ={}
-				parameter.itemId = this.vuex_goodsInfo.itemID
+				parameter.itemId = this.vuex_goodsInfo.itemId
 				parameter.openId = e.uid
 				parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
 				this.$u.api.gift_item(parameter).then(res => {
@@ -74,6 +75,7 @@
 					.itemImg {
 						width: 84rpx;
 						height: 84rpx;
+						border-radius: 84rpx;
 					}
 
 					.name {

@@ -4,12 +4,12 @@
 		<view class="main">
 			<view class="head">
 				<view class="headLeft">
-					<image :src="icon" mode="" class="headIcon"></image>
+					<image :src="userInfo.icon" mode="" class="headIcon"></image>
 					<view class="nameCon">
-						<text class="name">{{name}}</text>
+						<text class="name">{{userInfo.name}}</text>
 						<view class="titleCon u-flex">
 							<view class="goodStitle">
-								{{describe}}
+								{{goodsName}}
 							</view>
 							<button type="default" class="share">分享</button>
 						</view>
@@ -22,23 +22,23 @@
 				</view>
 				<view class="headRight" v-else>
 					<button type="default" class="want">想要</button>
-					<button type="default" class="want">联系他</button>
+					<button type="default" class="want" @click="goChat">联系他</button>
 				</view>
 			</view>
 			<view class="detail">
-				<text>重工棉体桖全新的，保暖性佳、吸湿性强、柔软性好并且棉花纤维不存在静电作用等不良反应。现在送给需要的朋友们。点击想要吧。</text>
+				<text>{{describe}}</text>
 			</view>
 		</view>
 		<view class="footer">
 			<view class="footerTitle">
-				<text>我的其他闲置</text>
-				<text>查看更多</text>
+				<text>{{isMine?'我':'Ta'}}的其他闲置</text>
+				<text @click="goHomePage">查看更多</text>
 			</view>
 			<scroll-view class="scrollArea" scroll-x="true">
 				<view class="container">
-					<view class="item" v-for="(item,index) in goodsList" :key="index">
-						<image :src="item.image" mode="aspectFit" class="itemImg"></image>
-						<text class="itemTitle">{{item.title}}</text>
+					<view class="item" v-for="item in goodsList" :key="itemId">
+						<image :src="item.imgUrls[0]" mode="aspectFit" class="itemImg"></image>
+						<text class="itemTitle">{{item.name}}</text>
 					</view>
 				</view>
 				
@@ -54,32 +54,12 @@
 			return {
 				isMine:true,
 				swiperList: [],
-				name:"",
-				icon:"",
+				goodsName:"",
 				describe:"",
 				peopleNum: 0,
 				wantedUid:[],
-				goodsList: [{
-					image: 'http://pic.sc.chinaz.com/Files/pic/pic9/202002/zzpic23327_s.jpg',
-					title: '谁念西风独自凉',
-					detail: '谁念西'
-				}, {
-					image: '/static/common/image/kk.jpg',
-					title: '谁念西风独自凉',
-					detail: '谁念西'
-				}, {
-					image: '/static/common/image/kk.jpg',
-					title: '谁念西风独自凉',
-					detail: '谁念西风独的'
-				}, {
-					image: '/static/common/image/kk.jpg',
-					title: '谁念西风独自凉',
-					detail: '谁念西风独'
-				}, {
-					image: 'http://pic.sc.chinaz.com/Files/pic/pic9/202002/zzpic23327_s.jpg',
-					title: '谁念西风独自凉',
-					detail: '谁念西风独'
-				}]
+				goodsList: [],
+				userInfo:{}
 			}
 		},
 		methods: {
@@ -88,6 +68,18 @@
 				uni.navigateTo({
 					url:'../myPart/goodsHome/transfer'
 				})
+			},
+			goHomePage(){
+				this.$u.vuex('vuex_search', this.userInfo);
+				uni.navigateTo({
+					url:'../myPart/goodsHome/goodsHome?id='+this.userInfo.uid
+				})
+			},
+			goChat(){
+				uni.navigateTo({
+					url:'../chatPart/chatPage?where=detail'
+				})
+				console.log(this.vuex_goodsInfo)	
 			}
 		},
 		onShow() {
@@ -99,17 +91,34 @@
 				this.isMine = false
 			}
 			this.swiperList = this.vuex_goodsInfo.imgUrls
+			this.goodsName = this.vuex_goodsInfo.name
 			this.describe = this.vuex_goodsInfo.desc
-			this.$req('/user/get_user_info', {
-					uidList:[this.vuex_goodsInfo.fromUser],
+			this.$req('/friend/get_friends_info', {
+					uid:this.vuex_goodsInfo.fromUser,
 					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
 				}).then(res => {
-					console.log(res)
+					console.log(res.data,"获取用户信息")
+					
 					if(res.errCode==0){
-					this.icon = res.data[0].icon
-					this.name = res.data[0].name
+					this.userInfo = res.data
 					}
 				})
+				
+			let parameter = {}
+			parameter.openIdList = [this.vuex_goodsInfo.fromUser]
+			parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
+			this.$u.api.get_users_items(parameter).then(res=>{
+				console.log(res.data[0].items,"其他闲置");
+				console.log(this.vuex_goodsInfo.itemId );
+				for(let i = 0; i<res.data[0].items.length;i++){
+					if(this.vuex_goodsInfo.itemId == res.data[0].items[i].itemId){
+						res.data[0].items.splice(i,1)
+						this.goodsList =  res.data[0].items
+						console.log(this.goodsList);
+						return
+					}
+				}
+			})
 			
 		}
 		
@@ -231,6 +240,7 @@
 				.item{
 					display: flex;
 					flex-direction: column;
+					align-items: center;
 					margin-right: 28rpx;
 					.itemImg{
 						width: 168rpx;

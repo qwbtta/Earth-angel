@@ -9,13 +9,18 @@
 
 		</view>
 		<view class="main">
-			<view class="mainItem u-flex" v-for="item in friends" :key="item.uid" v-if="selectedIndex==0" @click="goHomePage(item)">
+			<view class="mainItem u-flex" v-for="item in friends" :key="item.uid" v-if="selectedIndex==0"
+				@click="goHomePage(item)">
 				<image :src="item.icon" mode="" class="itemImg"></image>
 				<text class="name">{{item.name}}</text>
 			</view>
-			<view class="mainItem u-flex" v-for="item in [1,2,2,3,1,1]" v-if="selectedIndex==1">
-				<image src="/static/common/image/card1.png" mode="" class="itemImg"></image>
-				<text class="name">叠翠峰小区闲置交流群</text>
+			<view class="mainItem u-flex" v-for="item in manageGroup" :key="item.groupId" v-if="selectedIndex==1">
+				<image :src="item.faceUrl" mode="" class="itemImg"></image>
+				<text class="name">{{item.groupName}}</text>
+			</view>
+			<view class="mainItem u-flex" v-for="item in joinGroup" :key="item.groupId" v-if="selectedIndex==2">
+				<image :src="item.faceUrl" mode="" class="itemImg"></image>
+				<text class="name">{{item.groupName}}</text>
 			</view>
 
 		</view>
@@ -27,30 +32,65 @@
 		data() {
 			return {
 				tabs: ["我的关注", "我管理的群组", "我加入的群组"],
-				selectedIndex: 1,
-				friends:[]
+				selectedIndex: 0,
+				friends: [],
+				manageGroup: [],
+				joinGroup: []
 			}
 		},
 		methods: {
 			select(index) {
+				console.log(index);
 				this.selectedIndex = index
 				if (this.selectedIndex == 0) {
 					this.$req('/friend/get_friend_list', {
 						operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
 					}).then(res => {
 						console.log(res)
-						if(res.errCode==0){
+						if (res.errCode == 0) {
 							this.friends = res.data
 						}
 					})
+				} else if (this.selectedIndex == 1) {
+					this.$req('/group/get_joined_group_list', {
+						operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+					}).then(res => {
+						console.log(res);
+						this.manageGroup = res.data.filter(item => item.ownerId == this.vuex_openid)
+
+					})
+				} else if (this.selectedIndex == 2) {
+					this.$req('/group/get_joined_group_list', {
+						operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+					}).then(res => {
+						console.log(res);
+						this.joinGroup = res.data
+
+					})
 				}
+
+
+
+
+
+
 			},
-			goHomePage(e){
+			goHomePage(e) {
 				this.$u.vuex('vuex_search', e);
 				uni.navigateTo({
-					url:'./goodsHome/goodsHome'
+					url: './goodsHome/goodsHome?id=' + e.uid
 				})
 			}
+		},
+		mounted() {
+			this.$req('/friend/get_friend_list', {
+				operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+			}).then(res => {
+				console.log(res)
+				if (res.errCode == 0) {
+					this.friends = res.data
+				}
+			})
 		}
 	}
 </script>

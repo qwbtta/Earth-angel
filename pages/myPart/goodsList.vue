@@ -9,7 +9,7 @@
 
 
 			<u-checkbox v-model="item.checked" shape="circle" active-color="#979797" class="checkboxItem" size="40"
-				v-for="item in goodsInfo" :key="item.itemID" @change="monitor">
+				v-for="item in goodsInfo" :key="item.itemId" @change="monitor">
 				<view class="goodsItem">
 					<image :src="item.imgUrls[0]" mode="" class="itemImg"></image>
 					<view class="right">

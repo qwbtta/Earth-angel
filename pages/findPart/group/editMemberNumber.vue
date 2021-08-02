@@ -14,7 +14,7 @@
 					<image :src="item.icon" mode="" class="headIcon"></image>
 					
 					<view class="name">
-						<text >隔壁阿花</text>
+						<text >{{item.name}}</text>
 					</view>
 					
 					
