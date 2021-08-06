@@ -6,17 +6,13 @@
 					<u-lazy-load threshold="100" border-radius="10" :image="item.imgUrls[0]" @click="goDetail(item)">
 					</u-lazy-load>
 					<view class="describe">
-						<view class="x-head u-flex">
+						<view class="x-head u-flex" >
 							<view class="x-headLeft u-flex">
-								<image :src="item.icon || item.userImgUrl" mode="" class="x-headIcon">
-								</image>
-								<text class="x-name">{{item.userName || item.UserName}}</text>
+								<text class="x-name-home">{{item.name}}</text>
 							</view>
 							<button type="default" class="x-want" 
-								@click="goDetail(item)" v-if="item.fromUser==vuex_openid">查看</button>
-								<button type="default" class="x-want" @click="want(item)" v-else>想要</button>
+								@click="toEdit(item)">编辑</button>
 						</view>
-					
 						<text class="x-details">{{item.desc}}</text>
 
 					</view>
@@ -27,17 +23,13 @@
 					<u-lazy-load threshold="100" border-radius="10" :image="item.imgUrls[0]" @click="goDetail(item)">
 					</u-lazy-load>
 					<view class="describe">
-						<view class="x-head u-flex">
+						<view class="x-head u-flex" >
 							<view class="x-headLeft u-flex">
-								<image :src="item.icon || item.userImgUrl" mode="" class="x-headIcon">
-								</image>
-								<text class="x-name">{{item.userName || item.UserName}}</text>
+								<text class="x-name-home">{{item.name}}</text>
 							</view>
 							<button type="default" class="x-want" 
-								@click="goDetail(item)" v-if="item.fromUser==vuex_openid">查看</button>
-								<button type="default" class="x-want" @click="want(item)" v-else>想要</button>
+								@click="toEdit(item)">编辑</button>
 						</view>
-					
 						<text class="x-details">{{item.desc}}</text>
 					
 					</view>
@@ -54,8 +46,8 @@
 
 <script>
 	export default {
-		name: "GoodsWaterfall",
-		props: ["goodsList", "isMyHome"],
+		name: "GoodsWaterfallS",
+		props: ["goodsList"],
 		data() {
 			return {
 			}

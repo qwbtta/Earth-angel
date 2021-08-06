@@ -1,18 +1,15 @@
 <template>
-	<view class="editGroupName">
-			
-			<view class="container">
-				<input type="text" v-model="groupName" value="" class="editInput" @input="checkInput" />
-				<image src="/static/common/image/clear.png" mode="" class="clear" v-show="showClear" @click="clear"></image>
-			</view>
-			
-			
-
-
-			<view class="footer">
-				<button type="default" class="btn" @click="confirm">发布</button>
-			</view>
-	
+	<view class="editNickName">
+		
+		<view class="container">
+			<input type="text" v-model="nickName" class="editInput" @input="checkInput" />
+			<image src="/static/common/image/clear.png" mode="" class="clear" v-show="showClear" @click="clear"></image>
+		</view>
+		
+		
+		<view class="footer">
+			<button type="default" class="btn" @click="confirm">修改</button>
+		</view>
 	</view>
 </template>
 
@@ -20,50 +17,53 @@
 	export default{
 		data(){
 			return{
-				groupName:'',
+				nickName:'',
 				showClear:false
 			}
 		},
 		methods:{
 			checkInput(){
-				if(this.groupName.length>0){
+				if(this.nickName.length>0){
 					this.showClear = true
 				}else{
 					this.showClear = false
 				}
 			},
 			clear(){
-				this.groupName = '',
+				this.nickName = '',
 				this.showClear = false
 			},
 			confirm(){
-				this.$req('/group/set_group_info', {
-					groupID: this.vuex_groupid,
-					groupName: this.groupName,
+				this.$req('/user/update_user_info', {
+					name: this.nickName,
 					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
 				}).then(res => {
 					console.log(res);
 					if(res.errCode==0){
-						
+						this.$u.vuex('vuex_nick_name',this.nickName)
 						uni.navigateBack({
 						    delta: 1
 						});
-						this.$u.toast('修改成功',2000)
+						this.$u.toast('修改成功')
 					}
 				})
 			}
+		},
+		onShow() {
+			this.nickName = this.vuex_nick_name
+			
 		}
 	}
 </script>
+
 <style>
 	page{
 		height: 100%;
 		background: #F6F6F6;
 	}
 </style>
-
 <style lang="scss" scoped>
-	.editGroupName{
+	.editNickName{
 		padding-top: 26rpx;
 		
 		.container{

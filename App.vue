@@ -4,7 +4,18 @@
 		globalData: {
 			username: '白居易'
 		},
-		onLaunch() {
+		onLaunch(options) {
+			console.log(options, "onlaunch获取");
+			if (options.query.uid != undefined) {
+				let share = {}
+				share.uid = options.query.uid
+				share.goodsid = options.query.goodsid
+				share.shareName = options.query.shareName
+				share.shareUid = options.query.shareUid
+				this.$u.vuex('vuex_shareInfo', share)
+			}
+
+
 
 			// 1.1.0版本之前关于http拦截器代码，已平滑移动到/common/http.interceptor.js中
 			// 注意，需要在/main.js中实例化Vue之后引入如下(详见文档说明)：
@@ -15,23 +26,60 @@
 			 * h5，app-plus(nvue下也为app-plus)，mp-weixin，mp-alipay......
 			 */
 
-			uni.connectSocket({
-				url: 'wss://open-im.rentsoft.cn/wss?sendID=' + this.vuex_openid + '&token=' + this.vuex_wsToken +
-					'&platformID=6'
-			});
-			uni.onSocketOpen(function(res) {
-				console.log('WebSocket连接已打开！');
-			});
-			uni.onSocketError(function(res) {
-				console.log('WebSocket连接打开失败，请检查！');
-			});
-			uni.onSocketMessage(function(res) {
-				console.log('收到服务器内容：' + res);
-			});
+			if (this.vuex_token == '' || this.vuex_wsToken == '') {
+				uni.navigateTo({
+					url: 'pages/login/login'
+				})
+			} else {
+				uni.reLaunch({
+					url: 'pages/findPart/find'
+				})
+			}
+
+
 		},
-		onLoad() {
+		onShow() {
+			let infoNumber = 0
+			this.$req('/friend/get_friend_apply_list', {
+				operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+			}).then(res => {
+				if (res.errCode == 0) {
+					let list = res.data.filter(item => item.flag == 0)
+					infoNumber = list.length + infoNumber
+				}
+				this.$req('/group/get_group_applicationList', {
+					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+				}).then(res => {
+					let list = res.data.user.filter(item => item.handleStatus  == 0)
+					console.log(list, "list");
+					infoNumber = list.length + infoNumber
+					console.log(infoNumber, "infoNumber");
+					if (infoNumber > 0) {
+						uni.showTabBarRedDot({
+							index:3
+						})
+
+						this.$u.vuex('vuex_noticeNumber', infoNumber)
+					} else if (infoNumber == 0) {
+						uni.hideTabBarRedDot({
+							index: 3
+						})
+						this.$u.vuex('vuex_noticeNumber', 0)
+					}
+				})
+
+
+			})
+
+
+
+
+
+
+
 
 		}
+
 	}
 </script>
 

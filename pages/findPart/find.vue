@@ -9,8 +9,8 @@
 		<view class="main">
 			<view class="searchCon">
 				<view class="inputFather">
-					<input type="text" placeholder="搜索用户或群组名称" v-model="search" class="search" />
-					<image src="/static/common/image/search.png" mode="" class="searchIcon" v-if="search.length==0">
+					<input type="text" placeholder="搜索用户或群组名称" v-model="search" class="search"/>
+					<image src="/static/common/image/search.png" mode="" class="searchIcon" v-if="search==''">
 					</image>
 					<image src="/static/common/image/searchShow.png" mode="" class="searchIcon"
 						@click.stop="searchFriend" v-else></image>
@@ -37,29 +37,49 @@
 					</view>
 
 				</view>
-
-				<GoodsWaterfall :goodsList="goodsList" v-if="selected==1" />
-
-				<view class="group" v-if="selected==2">
-					<view class="group-item" v-for="item in [1, 2, 3, 4, 5, 6]" :key="item">
+				
+				<view class="remind" v-if="selected==1 && flowList.length==0" @click="focous">
+					<image src="/static/common/image/horn.png" mode="" class="horn"></image>
+					<view class="remindInfo">
+						<text>您关注的地球天使中还没有发布物品哦,</text><text >快去添加更多地球天使吧~</text>
+						
+					</view>
+					
+				</view>
+				<GoodsWaterfall :goodsList="flowList" v-if="selected==1 && flowList.length!=0" />
+				
+				
+				
+				<view class="remind" v-if="selected==2 && groupGoodsList.length==0">
+					<image src="/static/common/image/horn.png" mode="" class="horn"></image>
+					<view class="remindInfo">
+						<text>您还没有加入任何群组哦</text>
+						
+					</view>
+					
+				</view>
+				
+				
+				<view class="group" v-if="selected==2 && groupGoodsList.length!=0">
+					<view class="group-item" v-for="(item,index) in groupGoodsList" :key="index">
 						<view class="head u-flex">
 							<view class="headLeft u-flex">
-								<image src="/static/common/image/tab-chat.png" mode="" class="headIcon">
+								<image :src="item.groupInfo.faceUrl" mode="" class="headIcon">
 								</image>
-								<text class="groupName">颜控大学闲置物品交流群</text>
+								<text class="groupName">{{item.groupInfo.groupName}}</text>
 							</view>
 
-							<button type="default" class="more" @click="goMore">查看更多</button>
+							<button type="default" class="more" @click="goMore(item)">查看更多</button>
 						</view>
 						<view class="main">
 							<scroll-view class="scrollArea" scroll-x="true">
 
-								<view class="item" v-for="(item,index) in goodsList" :key="index">
+								<view class="item" v-for="(user,index) in item.goodsList" :key="index">
 									<view class="itemFlex">
-										<image :src="item.image" mode="aspectFit" class="itemImg"></image>
-										<text class="title">{{item.title}}</text>
+										<image :src="user.imgUrls[0]" mode="aspectFit" class="itemImg"></image>
+										<text class="title">{{user.name}}</text>
 										<text class="detail">来自<text
-												class="user">{{item.detail.length>5?item.detail.slice(0,5)+"...":item.detail}}</text>
+												class="user">{{user.userName.length>5?user.userName.slice(0,5)+"...":user.userName}}</text>
 											的闲置物品</text>
 									</view>
 
@@ -73,16 +93,16 @@
 			</view>
 		</view>
 		<u-popup v-model="shareShow" mode="center" border-radius="20">
-			<text class="popupTitle">大张伟给你分享的闲置物品</text>
-			<image src="../../static/common/image/kk.jpg" mode="aspectFit" class="popupImg"></image>
+			<text class="popupTitle">{{shareInfo.shareName}}给你分享的闲置物品</text>
+			<image :src="shareInfo.imgUrls[0]" mode="aspectFit" class="popupImg"></image>
 			<view class="popupInfo">
 				<view class="popupInfoLeft u-flex">
-					<image src="/static/common/image/card1.png" mode="" class="popupHeadIcon"></image>
-					<text class="popupName">九尺板鸭爱好者</text>
+					<image :src="shareInfo.icon" mode="" class="popupHeadIcon"></image>
+					<text class="popupName">{{shareInfo.userName}}</text>
 				</view>
-				<button type="default" class="apply">发送好友申请</button>
+				<button type="default" class="apply" @click="shareMore">查看详情</button>
 			</view>
-			<text class="popupDetail">日本设计大师经典之作，放置在家中增加品味，彰显高格调</text>
+			<text class="popupDetail">{{shareInfo.desc}}</text>
 		</u-popup>
 
 	</view>
@@ -100,21 +120,20 @@
 				search: "",
 				shareShow: false,
 				swiperList: [{
-						image: 'https://cdn.uviewui.com/uview/swiper/1.jpg',
-						title: '昨夜星辰昨夜风，画楼西畔桂堂东'
+						image: "https://earth-angel-1302656840.cos.ap-chengdu.myqcloud.com/oG0xUPaAeFLt9a266210615d867291d7fbed30b3f958.png",
 					},
 					{
-						image: 'https://cdn.uviewui.com/uview/swiper/2.jpg',
-						title: '身无彩凤双飞翼，心有灵犀一点通'
+						image: "https://earth-angel-1302656840.cos.ap-chengdu.myqcloud.com/oc6pBUNa7UR1749094ec0b50e3c5f784905f52f4584a.png",
 					},
 					{
-						image: 'https://cdn.uviewui.com/uview/swiper/3.jpg',
-						title: '谁念西风独自凉，萧萧黄叶闭疏窗，沉思往事立残阳'
+						image: "https://earth-angel-1302656840.cos.ap-chengdu.myqcloud.com/5g13X69ne3C15b4c5fd030aaad98877d1699c9c25877.png",
 					}
 				],
 				selected: 1,
 				goodsList: [],
-				groupGoodsList: []
+				groupGoodsList: [],
+				flowList: [],
+				shareInfo: {}
 			}
 		},
 		methods: {
@@ -123,23 +142,52 @@
 					this.$u.toast('不可以搜索自己哟');
 					return false
 				}
-				this.$req('/friend/get_friends_info', {
-					uid: this.search,
-					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
-				}).then(res => {
 
-					console.log(res)
-					if (res.errCode == 0) {
-						this.search = ""
-						this.$u.vuex('vuex_search', res.data);
-						uni.navigateTo({
-							url: './search'
-						})
-					} else {
-						this.$u.toast('该ID不存在');
-					}
+
+				if (this.search.slice(0, 3) == "o0q") {
+					this.$req('/friend/get_friends_info', {
+						uid: this.search,
+						operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+					}).then(res => {
+						console.log(res)
+						if (res.errCode == 0) {
+							this.search = ""
+							this.$u.vuex('vuex_searchGroup', {});
+							this.$u.vuex('vuex_search', res.data);
+							uni.navigateTo({
+								url: './search'
+							})
+						} else {
+							this.$u.toast('该ID不存在');
+						}
+					})
+
+				} else {
+					this.$req('/group/get_groups_info', {
+						groupIDList: [this.search],
+						operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+					}).then(res => {
+						console.log(res, "55555555555");
+						if (res.errCode == 0) {
+							this.search = ""
+							this.$u.vuex('vuex_searchGroup', res.data[0]);
+							this.$u.vuex('vuex_search', {});
+							uni.navigateTo({
+								url: './search'
+							})
+						} else {
+							this.$u.toast('该ID不存在');
+						}
+					})
+				}
+
+
+			},
+			shareMore(){
+				this.$u.vuex('vuex_goodsInfo',this.shareInfo)
+				uni.navigateTo({
+					url:'./goodsDetail'
 				})
-
 			},
 			goNewGroup() {
 				uni.navigateTo({
@@ -152,6 +200,7 @@
 					this.selected = 1
 				} else {
 					this.selected = 2
+					this.groupGoodsList = []
 					let groupListId = []
 					//信息分布在两套接口 所以流程繁杂 
 					await this.$req('/group/get_joined_group_list', {
@@ -160,7 +209,7 @@
 						groupListId = res.data
 						console.log(res.data, "群列表");
 						for (let i = 0; i < res.data.length; i++) {
-							let userItem = {}
+							
 							this.$req('/group/get_group_member_list', {
 								groupID: res.data[i].groupId,
 								nextSeq: 0,
@@ -175,18 +224,18 @@
 										.getTime())
 								}).then(res => {
 
-
 									var userList = []
 									for (let t = 0; t < res.data.length; t++) {
 										let userInfo = {}
 										userInfo.name = res.data[t].name
-										userInfo.imgUrl = res.data[t].icon
-										userInfo.openId = res.data[t].uid
-
+										userInfo.icon = res.data[t].icon
+										userInfo.uid = res.data[t].uid
+										userInfo.groupId = groupListId[i].groupId
 										userList.push(userInfo)
 
 									}
 									console.log(userList, "拼接");
+
 
 									// console.log(groupListId, "99999999999999999");
 									let parameter = {}
@@ -194,26 +243,19 @@
 									parameter.operationId = this.vuex_openid + JSON.stringify(
 										new Date().getTime())
 									this.$u.api.get_group_users_items(parameter).then(res => {
-										console.log(res.data, "44444");
-										// 		for(let m=0;m<res.data.length;m++){
+										let trans = res.data
+										let item = {}
+										item.groupInfo = groupListId[i]
+										item.goodsList = []
+										res.data.forEach(val => {
+											item.goodsList = [...item
+												.goodsList, ...val.items
+											]
+										})
 
-										// 			// for( let c = 0; c<res.data[m].items.groupVisible;c++){
-
-
-										// 			// 		if(res.data[m].items.groupVisible[c]==groupListId){
-
-										// 			// 			console.log(res.data[m].items,"44454545555");
-										// 			// 		}
-										// 			// }
-										// 		}
-										// this.groupGoodsList[i].domList = res.data
-										// console.log(this.groupGoodsList,"55555555");
-
+										this.groupGoodsList.push(item)
 
 									})
-
-
-
 
 								})
 							})
@@ -221,15 +263,15 @@
 						}
 
 
-
-
 					})
-
+					console.log(this.groupGoodsList, "列表列表");
 				}
 
 
 			},
-			goMore() {
+			goMore(e) {
+				console.log(e, "eeeeeeeeeeeeeeee");
+				this.$u.vuex('vuex_groupList', e)
 				uni.navigateTo({
 					url: 'group/group'
 				})
@@ -239,25 +281,65 @@
 			}
 		},
 		onShow() {
-			console.log(this.vuex_wsToken, "tytttttttttt");
+			
+			if (JSON.stringify(this.vuex_shareInfo) != '{}') {
+
+				let sInfo = this.vuex_shareInfo
+				
+				this.$req('/friend/add_friend', {
+					uid:sInfo.shareUid,
+					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+				}).then(res => {
+					
+				})
+	
+				console.log(sInfo,"vuex分享分享xxxxx");
+				this.$req('/user/get_user_info', {
+					uidList: [sInfo.uid],
+					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+				}).then(res => {
+					let uinfo = res.data[0]
+
+					let parameter = {}
+					parameter.uidList = [uinfo.uid]
+					parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
+					this.$u.api.get_users_items(parameter).then(res => {
+						res.data[0].items[0].icon = uinfo.icon
+						res.data[0].items[0].userName = uinfo.name
+						res.data[0].items[0].uid = uinfo.uid
+						this.shareInfo = res.data[0].items[0]
+						this.shareInfo.shareName = sInfo.shareName
+						this.shareShow = true
+						this.$u.vuex('vuex_shareInfo',{})
+						
+						console.log(this.shareInfo,"分享分享");
+						
+					})
+
+
+				})
+
+
+			}
+			this.selected = 1
 			//清创建群组的页面的一个数据
 			this.$u.vuex('vuex_memberNum', [])
 			this.$req('/friend/get_friend_list', {
 				operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
 			}).then(res => {
-
 				if (res.errCode == 0) {
 					let friendList = res.data
 					let ids = res.data.map(item => item.uid)
 					let parameter = {}
-					parameter.openIdList = ids
+					parameter.uidList = ids
 					parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
 					this.$u.api.get_users_items(parameter).then(res => {
+						console.log(res, "444");
 						this.goodsList = []
 						//接口问题，所以需要多重循环拼接处理数据，全部使用for
 						for (let i = 0; i < friendList.length; i++) {
 							for (let e = 0; e < res.data.length; e++) {
-								if (friendList[i].uid == res.data[e].openId) {
+								if (friendList[i].uid == res.data[e].uid) {
 									for (let m = 0; m < res.data[e].items.length; m++) {
 										res.data[e].items[m].icon = friendList[i].icon
 										res.data[e].items[m].userName = friendList[i].name
@@ -267,7 +349,13 @@
 								}
 							}
 						}
-						console.log(this.goodsList, "物品列表");
+						this.flowList = []
+						for (let i = 0; i < this.goodsList.length; i++) {
+							let item = JSON.parse(JSON.stringify(this.goodsList[i]))
+							this.flowList.push(item)
+						}
+
+						console.log(this.flowList, "物品列表");
 					})
 
 
@@ -278,7 +366,6 @@
 			})
 
 		}
-
 	}
 </script>
 
@@ -333,7 +420,7 @@
 						position: absolute;
 						top: 14rpx;
 						right: 28rpx;
-						z-index: 99;
+						z-index: 999;
 					}
 				}
 
@@ -369,6 +456,7 @@
 						font-size: 28rpx;
 						font-weight: 500;
 						color: #999999;
+						min-width: 160rpx;
 					}
 
 					.tab-item-slected {
@@ -385,7 +473,32 @@
 					}
 
 				}
-
+				
+				.remind{
+					padding: 30rpx;
+					margin: 0 48rpx;
+					box-shadow: 0px 0px 8px 2px rgba(0, 0, 0, 0.12);
+					border-radius: 20rpx;
+					display: flex;
+					.horn{
+						width: 32rpx;
+						height: 32rpx;
+						flex-shrink: 0;
+						
+					}
+					
+					.remindInfo{
+						font-size: 26rpx;
+						font-weight: 500;
+						color: #666666;
+						margin-left: 30rpx;
+						display: flex;
+						flex-direction: column;
+						
+						
+					}
+				}
+				
 				.group {
 					margin-left: 48rpx;
 
@@ -515,6 +628,7 @@
 				.popupHeadIcon {
 					width: 72rpx;
 					height: 72rpx;
+					border-radius: 72rpx;
 				}
 
 				.popupName {
@@ -536,7 +650,7 @@
 				line-height: 48rpx;
 				background: #25EFCF;
 				border-radius: 8rpx;
-				border: 2px solid #000000;
+				border: 2rpx solid #000000;
 			}
 
 		}

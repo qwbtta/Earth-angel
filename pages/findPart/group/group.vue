@@ -1,29 +1,29 @@
 <template>
 	<view class="group">
 		<view class="head">
-			
-			<image src="/static/common/image/tab-chat.png" mode="" class="headIcon"></image>
+
+			<image :src="groupInfo.faceUrl" mode="" class="headIcon"></image>
 			<view class="headRight">
 				<view class="nameCon">
-					<text class="groupName">颜控大学闲置物品交流群</text>
-					<text class="Id">ID: 484848484848</text>
+					<text class="groupName">{{groupInfo.groupName}}</text>
+					<text class="Id" @longpress="copy">ID: {{groupInfo.groupId}}</text>
 				</view>
 				<view class="buttonCon">
-					<button type="default" class="share">分享</button>
+					<button type="default" class="share" open-type="share">分享</button>
 					<button type="default" class="manage" @click="goManage" v-if="isAdmin">群管理</button>
-					<button type="default" class="manage" v-else>退出群组</button>
+					<button type="default" class="manage" v-else @click="exitGroup">退出群组</button>
 				</view>
 			</view>
-			
-			
+
+
 		</view>
-		<view class="bulletin-board">
+		<view class="bulletin-board" >
 			<image src="/static/common/image/horn.png" mode="" class="horn"></image>
-			<text class="boardText">大家可以在群内互相交流，互帮互助，共同发展，共同进步，为确保群良性发展。</text>
+			<text class="boardText">{{groupInfo.notification.length>0?groupInfo.notification:'暂无公告'}}</text>
 		</view>
 
 
-		<GoodsWaterfall :goodsList="goodsList"  v-if="showWaterfall"/>
+		<GoodsWaterfall :goodsList="flowList" v-if="showWaterfall" />
 
 	</view>
 </template>
@@ -36,37 +36,73 @@
 		},
 		data() {
 			return {
-				showWaterfall:true,
-				isAdmin:true,
-				goodsList: [{
-					image: 'http://pic.sc.chinaz.com/Files/pic/pic9/202002/zzpic23327_s.jpg',
-					title: '谁念西风独自凉',
-					detail: '谁念西'
-				}, {
-					image: '/static/common/image/kk.jpg',
-					title: '谁念西风独自凉',
-					detail: '谁念西'
-				}, {
-					image: '/static/common/image/kk.jpg',
-					title: '谁念西风独自凉',
-					detail: '谁念西风独的'
-				}, {
-					image: '/static/common/image/kk.jpg',
-					title: '谁念西风独自凉',
-					detail: '谁念西风独'
-				}, {
-					image: 'http://pic.sc.chinaz.com/Files/pic/pic9/202002/zzpic23327_s.jpg',
-					title: '谁念西风独自凉',
-					detail: '谁念西风独'
-				}]
+				showWaterfall: true,
+				isAdmin: true,
+				flowList:[],
+				goodsList: [],
+				groupInfo:{}
 			}
 		},
-		methods:{
-			goManage(){
+		methods: {
+			copy(){
+				let _this = this
+				uni.setClipboardData({
+				    data: _this.groupInfo.groupId,
+				    success: function () {
+						uni.hideToast()
+						uni.showToast({
+				           title: '复制成功',
+				           duration: 2000
+				       });
+				    }
+				});
+			},
+			goManage() {
+				this.$u.vuex('vuex_groupid',this.groupInfo.groupId)
 				uni.navigateTo({
-					url:'./groupManage'
+					url: './groupManage'
+				})
+			},
+			exitGroup(){
+				this.$req('/group/quit_group', {
+					groupID: this.groupInfo.groupId,
+					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+				}).then(res => {
+					console.log(res);
+					if(res.errCode==0){
+						uni.navigateBack({
+						    delta: 1
+						});
+						this.$u.toast('退出群组成功',2000)
+					}
+				
 				})
 			}
+		},
+		onShow() {
+			console.log(this.vuex_groupList,"4444444444444");
+			
+			if(this.vuex_groupList.goodsList.length!=0){
+				this.goodsList = this.vuex_groupList.goodsList
+				this.flowList = []
+				for (let i = 0; i < this.goodsList.length; i++) {
+					let item = JSON.parse(JSON.stringify(this.goodsList[i]))
+					this.flowList.push(item)
+				}
+				
+				
+			}
+			
+			
+			console.log(this.flowList, "物品列表");
+			
+			this.groupInfo = this.vuex_groupList.groupInfo
+			if (this.vuex_groupList.groupInfo.ownerId == this.vuex_openid) {
+				this.isAdmin = true
+			} else {
+				this.isAdmin = false
+			}
+			
 		}
 	}
 </script>
@@ -75,6 +111,7 @@
 	.group {
 		border-top: 1px solid #DBDEE3;
 		padding-top: 34rpx;
+
 		.btn {
 			padding: 0;
 			background: #25EFCF;
@@ -86,41 +123,47 @@
 			display: flex;
 			align-items: center;
 			margin: 0 48rpx;
+
 			.headIcon {
 				flex-shrink: 0;
 				width: 72rpx;
 				height: 72rpx;
 				border-radius: 72rpx;
 			}
-			.headRight{
+
+			.headRight {
 				width: 100%;
 				margin-left: 16rpx;
 				display: flex;
 				justify-content: space-between;
-				
-				.nameCon{
+
+				.nameCon {
 					flex-shrink: 0;
 					display: flex;
 					flex-direction: column;
-					
+
 					.groupName {
 						font-size: 32rpx;
 						font-weight: 500;
 						color: #000000;
 					}
-					.Id{
+
+					.Id {
+						max-width: 330rpx;
 						font-size: 20rpx;
 						font-weight: 400;
 						color: #333333;
+						word-break: break-all;
 					}
 				}
-				
-				.buttonCon{
+
+				.buttonCon {
 					display: flex;
 					align-items: flex-start;
 					justify-content: space-between;
 					width: 100%;
 					margin-left: 14rpx;
+
 					.share {
 						margin: 0;
 						@extend .btn;
@@ -130,8 +173,8 @@
 						border-radius: 8rpx;
 						line-height: 40rpx;
 					}
-					
-					
+
+
 					.manage {
 						margin: 0;
 						@extend .btn;
@@ -144,8 +187,8 @@
 					}
 				}
 			}
-		
-			
+
+
 		}
 
 		.bulletin-board {
@@ -155,7 +198,7 @@
 			background: #FEFFF0;
 			border-radius: 8rpx;
 			border: 1px solid #000000;
-			
+
 			.horn {
 				flex-shrink: 0;
 				width: 44rpx;
@@ -174,9 +217,10 @@
 			display: block;
 			margin: 0 auto;
 			margin-top: 36rpx;
-			
+
 			.goodsItem {
 				margin: 0 20rpx;
+
 				.describe {
 					.goodsHead {
 						margin-top: 20rpx;

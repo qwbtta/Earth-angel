@@ -4,7 +4,6 @@ export const shareMixins = {
             shareData: {
                 title: '',
                 path: '/pages/release/release',
-                imageUrl: '',
             }
         }
     },
@@ -13,9 +12,8 @@ export const shareMixins = {
     onShareAppMessage () {
 		console.log(this.shareData);
         return {
-            title: this.shareData.title,
+            title: '来看看这件物品吧~',
             path: this.shareData.path,
-            imageUrl: this.shareData.imageUrl,
             success: res => {
                 console.info(res)
             }

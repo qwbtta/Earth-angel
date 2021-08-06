@@ -13,7 +13,7 @@
 					</view>
 					<view class="list-main-bottom">
 						<text
-							class="info">{{item.latest.content.length>20?item.latest.content.slice(0,20)+'...':item.latest.content}}</text>
+							class="info">{{item.latest.content.length>35?item.latest.content.slice(0,35)+'...':item.latest.content}}</text>
 						<text class="time"> {{item.latest.serverMsgID.slice(11,16)}}</text>
 					</view>
 				</view>
@@ -33,7 +33,6 @@
 		},
 		methods: {
 			getList() {
-				let _this = this
 				this.$req('/chat/newest_seq', {
 
 					reqIdentifier: 1001,
@@ -69,8 +68,10 @@
 							friends = res.data
 							for (let i = 0; i < chatlist.length; i++) {
 								let latest = this.$u.deepClone(chatlist[i].list[chatlist[i].list.length - 1]);
-								if (latest.msgFrom == 200) {
-									latest.content = JSON.parse(latest.content)
+								console.log(latest,"latestlatestlatest");
+								if (latest.msgFrom == 200 && latest.contentType != 204) {
+									let transfer = JSON.parse(latest.content)
+									latest.content = transfer.text
 								}else if(latest.contentType == 102){
 									latest.content = '[图片]'
 								}

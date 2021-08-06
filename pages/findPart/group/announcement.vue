@@ -1,8 +1,8 @@
 <template>
 	<view class="announcement">
-		<textarea class="inputArea" maxlength="300" />
+		<textarea class="inputArea" maxlength="300" v-model="announcement"/>
 		<view class="footer">
-			<button type="default" class="btn">发布</button>
+			<button type="default" class="btn" @click="confirm">发布</button>
 		</view>
 	</view>
 </template>
@@ -11,7 +11,24 @@
 	export default{
 		data(){
 			return{
-				
+				announcement:""
+			}
+		},
+		methods:{
+			confirm(){
+				this.$req('/group/set_group_info', {
+					groupID: this.vuex_groupid,
+					notification: this.announcement,
+					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+				}).then(res => {
+					console.log(res);
+					if(res.errCode==0){
+						uni.navigateBack({
+						    delta: 1
+						});
+						this.$u.toast('修改成功',2000)
+					}
+				})
 			}
 		}
 	}

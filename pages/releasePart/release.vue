@@ -133,8 +133,6 @@
 				}
 			},
 			async release() {
-				
-				
 				if (this.$u.trim(this.goodsName).length == 0) {
 					this.$u.toast('请输入物品名称')
 					return false
@@ -183,14 +181,13 @@
 					parameter.groupVisible = this.groupChecked
 				}
 
-
-				console.log(parameter);
-
 				if (this.vuex_releaseState==1) {
 					parameter.itemId = this.itemId
 					console.log(parameter,"更新");
 					this.$u.api.update_item_info(parameter).then(res => {
+						console.log(res,"ggggggggggggg");
 						if (res.errCode == 0) {
+							this.$u.vuex('vuex_releaseState',0)
 							Object.assign(this.$data, this.$options.data())
 							uni.navigateTo({
 								url: '../myPart/goodsHome/goodsHome?id='+ this.vuex_openid
@@ -206,6 +203,8 @@
 								url: '../myPart/goodsHome/goodsHome?id='+ this.vuex_openid
 							})
 							this.$u.toast('发布成功');
+						}else{
+							this.$u.toast('发布失败');
 						}
 					})
 				}
@@ -261,15 +260,18 @@
 		onShow() {
 			
 			if (JSON.stringify(this.vuex_goodsInfo) != "{}" && this.vuex_releaseState == 1) {
+				this.$u.toast("发布位置需重新选择哟",2000)
+				console.log(this.vuex_goodsInfo,"编辑");
 				this.goodsName = this.vuex_goodsInfo.name
 				this.goodsDescribe = this.vuex_goodsInfo.desc
 				this.photoList = this.vuex_goodsInfo.imgUrls
 				this.itemId = this.vuex_goodsInfo.itemId
-				if (this.vuex_goodsInfo.followVisible == "1") {
-					this.friendChoose = true
-				} else {
-					this.friendChoose = false
-				}
+				this.friendChoose = false
+				// if (this.vuex_goodsInfo.followVisible == "1") {
+				// 	this.friendChoose = true
+				// } else {
+				// 	this.friendChoose = false
+				// }
 					
 				this.groupChoose = false
 				this.$u.vuex('vuex_goodsInfo', {});

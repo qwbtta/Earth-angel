@@ -4,23 +4,27 @@
 			<text>群物品</text>
 		</view>
 		<view class="main">
-			<u-checkbox v-model="item.checked" v-for="(item, index) in list" :key="index" shape="circle" size="44"
-				active-color="#25EFCF" icon-size="30">
-				<view class="checkboxItem u-flex">
-					<image :src="item.image" mode="" class="goodsImg"></image>
-					
-					<view class="info">
-						<text class="title">{{item.title}}</text>
-						<view class="nameCon u-flex">
-							<image src="/static/common/image/card2.png" mode="" class="headIcon"></image>
-							<text class="name">{{item.name}}</text>
+				<u-checkbox v-model="item.checked"  v-for="item in list" :key="item.itemId" shape="circle" size="44"
+					active-color="#25EFCF" icon-size="30">
+					<view class="checkboxItem u-flex">
+						<image :src="item.imgUrls[0]" mode="aspectFit" class="goodsImg"></image>
+				
+						<view class="info">
+							<text class="title">{{item.name}}</text>
+							<view class="nameCon u-flex">
+								<image :src="item.icon" mode="" class="headIcon"></image>
+								<text class="name">{{item.userName}}</text>
+							</view>
 						</view>
+				
+				
 					</view>
-					
-					
-				</view>
 				</u-checkbox>
+
 		</view>
+
+
+
 		<view class="footer">
 			<button type="default" class="btn" @click="deleteGoods">删除</button>
 		</view>
@@ -28,52 +32,77 @@
 </template>
 
 <script>
-	export default{
-		data(){
-			return{
-				list: [{
-					image: '/static/common/image/card1.png',
-					name: "隔壁阿花",
-					title: "全新重工新疆棉T恤",
-					checked: false
-				},{
-					image: '/static/common/image/card1.png',
-					name: "隔壁阿花",
-					title: "全新重工新疆棉T恤",
-					checked: false
-				}, {
-					image: '/static/common/image/card1.png',
-					name: "隔壁阿花",
-					title: "全新重工新疆棉T恤",
-					checked: false
-				},  ]
+	export default {
+		data() {
+			return {
+				list: []
 			}
 		},
-		methods:{
-			deleteGoods(){
-				let chooseList = this.list.filter(item=>item.checked == true)
-					
+		methods: {
+			getList(){
+				this.list = []
+				console.log(this.vuex_groupList);
+				let myList = this.vuex_groupList.goodsList
+				let showList = this.$u.deepClone(myList);
+				if (showList.length > 0) {
+					showList.forEach(item => {
+						item.checked = false
+						this.list.push(item)
+					})
+					console.log(this.list);
+				}
+				
+				
+			},
+			deleteGoods() {
+				let choose = []
+				this.list.forEach(item => {
+					if (item.checked == true) {
+						choose.push(item.itemId)
+					}
+				})
+				console.log(choose, "choose");
+				
+				this.$u.api.group_owner_delete_item({
+					itemIdList:choose,
+					groupId: this.vuex_groupList.groupInfo.groupId,
+					groupOwner:true,
+					operationId:this.vuex_openid + JSON.stringify(new Date().getTime())
+				}).then(res=>{
+					console.log(res,"444444444");
+					if(res.errCode==0){
+						this.$u.toast('删除成功,群内显示会有延迟')
+						this.list = this.list.filter(item=>item.checked==false)
+						let groupList = this.vuex_groupList
+						groupList.goodsList = this.list
+						this.$u.vuex('vuex_groupList', groupList)
+					}
+				})
 			}
+		},
+		onShow() {
+			this.getList()
 		}
-		
+
 	}
 </script>
 
 <style lang="scss" scoped>
-	.deleteGoods{
+	.deleteGoods {
 		padding-top: 12rpx;
-		border-top:2rpx solid  rgba(0, 0, 0, 0.1);
-		
+		padding-bottom: 100rpx;
+		border-top: 2rpx solid rgba(0, 0, 0, 0.1);
+
 		/deep/ .u-checkbox__icon-wrap {
 			border: 4rpx solid #999999 !important;
 		}
-		
+
 		/deep/ .u-checkbox__icon-wrap-checked {
 			border: 4rpx solid #000000 !important;
-		
-		
+
+
 		}
-		
+
 		.mainTitle {
 			width: 100%;
 			height: 46rpx;
@@ -85,35 +114,43 @@
 			line-height: 46rpx;
 			margin-top: 24rpx;
 		}
-		.main{
+
+		.main {
 			padding-left: 34rpx;
-			.checkboxItem{
-				
-				.goodsImg{
+			.checkboxItem {
+
+				.goodsImg {
 					width: 130rpx;
 					height: 130rpx;
+					border-radius: 130rpx;
 					margin-left: 34rpx;
 				}
-				.info{
+
+				.info {
 					height: 212rpx;
-					width: 1000rpx;//checkbox内部100%无效
+					width: 1000rpx; //checkbox内部100%无效
 					margin-left: 28rpx;
 					display: flex;
 					flex-direction: column;
 					justify-content: center;
 					border-bottom: 2rpx solid #E9E9E9;
-					.title{
+
+					.title {
 						font-size: 32rpx;
 						font-weight: 500;
 						color: #333333;
 					}
-					.nameCon{
+
+					.nameCon {
 						margin-top: 12rpx;
-						.headIcon{
+
+						.headIcon {
 							width: 48rpx;
 							height: 48rpx;
+							border-radius: 48rpx;
 						}
-						.name{
+
+						.name {
 							font-size: 24rpx;
 							font-weight: 500;
 							color: #333333;
@@ -123,8 +160,9 @@
 				}
 			}
 		}
-		.footer{
-			width:100%;
+
+		.footer {
+			width: 100%;
 			height: 96rpx;
 			background: #F1F1F1;
 			position: fixed;
@@ -133,7 +171,8 @@
 			align-items: center;
 			justify-content: flex-end;
 			padding-right: 60rpx;
-			.btn{
+
+			.btn {
 				margin: 0;
 				padding: 0;
 				width: 106rpx;

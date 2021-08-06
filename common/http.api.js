@@ -19,10 +19,11 @@ const install = (Vue, vm) => {
 	let update_item_info = (params = {}) => vm.$u.post('/item/update_item_info',params);
 	let user_want_the_item = (params = {}) => vm.$u.post('/item/user_want_the_item',params);
 	let gift_item = (params = {}) => vm.$u.post('/item/gift_item',params);
+	let group_owner_delete_item = (params = {}) => vm.$u.post('/item/group_owner_delete_item',params);
 
 	
 	// 将各个定义的接口名称，统一放进对象挂载到vm.$u.api(因为vm就是this，也即this.$u.api)下
-	vm.$u.api = {getcosCredentials,wxLogin,release,get_users_items,get_group_users_items,delete_item,sent_out_items,received_items,update_item_info,user_want_the_item,gift_item};
+	vm.$u.api = {getcosCredentials,wxLogin,release,get_users_items,get_group_users_items,delete_item,sent_out_items,received_items,update_item_info,user_want_the_item,gift_item,group_owner_delete_item};
 }
 
 export default {

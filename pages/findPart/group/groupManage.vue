@@ -1,15 +1,15 @@
 <template>
 	<view class="groupManage">
 		<view class="head">
-			<view class="item">
+			<view class="item" @click="goTransferLeader">
 				<image src="/static/common/image/card1.png" mode="" class="headImg"></image>
 				<text class="headText">移交群主</text>
 			</view>
-			<view class="item">
+			<view class="item" @click="goMemberManage">
 				<image src="/static/common/image/card2.png" mode="" class="headImg"></image>
-				<text class="headText">移除成员</text>
+				<text class="headText">成员管理</text>
 			</view>
-			<view class="item">
+			<view class="item" @click="goAnnoun">
 				<image src="/static/common/image/card3.png" mode="" class="headImg"></image>
 				<text class="headText">发布群公告</text>
 			</view>
@@ -24,7 +24,7 @@
 
 				<image src="/static/common/image/arrow.png" mode="" class="cellArrow"></image>
 			</view>
-			<view class="cell">
+			<view class="cell" @click="editIcon">
 				<view class="u-flex">
 					<image src="/static/common/image/modify-group-headIcon.png" mode="aspectFit" class="cellImg"></image>
 					<text class="title">修改群头像</text>
@@ -32,7 +32,7 @@
 
 				<image src="/static/common/image/arrow.png" mode="" class="cellArrow"></image>
 			</view>
-			<view class="cell">
+			<view class="cell" @click="goDelete">
 				<view class="u-flex">
 					<image src="/static/common/image/delete.png" mode="aspectFit" class="cellImg"></image>
 					<text class="title">删除物品</text>
@@ -40,18 +40,18 @@
 
 				<image src="/static/common/image/arrow.png" mode="" class="cellArrow"></image>
 			</view>
-			<view class="cell" @click="showUngroup = true">
+			<!-- <view class="cell" @click="showUngroup = true">
 				<view class="u-flex">
 					<image src="/static/common/image/dissolution.png" mode="aspectFit" class="cellImg"></image>
 					<text class="title">解散群</text>
 				</view>
 
 				<image src="/static/common/image/arrow.png" mode="" class="cellArrow"></image>
-			</view>
-			<view class="cell">
+			</view> -->
+			<view class="cell" @click="exitGroup">
 				<view class="u-flex">
 					<image src="/static/common/image/exit.png" mode="aspectFit" class="cellImg"></image>
-					<text class="title">退出群聊</text>
+					<text class="title">退出群组</text>
 				</view>
 
 				<image src="/static/common/image/arrow.png" mode="" class="cellArrow"></image>
@@ -79,10 +79,11 @@
 </template>
 
 <script>
+	let cosUpload = require('../../../common/cos/upload.js')
 	export default {
 		data() {
 			return {
-			showUngroup:true
+			showUngroup:false
 			}
 		},
 		methods:{
@@ -93,8 +94,70 @@
 			},
 			confirm(){
 				this.showUngroup = false
+			},
+			goTransferLeader(){
+				uni.navigateTo({
+					url:'./transferLeader'
+				})
+			},
+			goMemberManage(){
+				uni.navigateTo({
+					url:'./memberManage'
+				})
+			},
+			goAnnoun(){
+				uni.navigateTo({
+					url:'./announcement'
+				})
+			},
+			goDelete(){
+				uni.navigateTo({
+					url:'./deleteGoods'
+				})
+			},
+			exitGroup(){
+				this.$u.toast('请移交群主后退出群组',3000)
+			},
+			
+			editIcon(){
+				let that = this
+				uni.chooseImage({
+					count: 1,
+					sourceType: ['album'],
+					success(res) {
+						let local = []
+						res.tempFilePaths.forEach(item => {
+							local.push(item);
+						});
+				
+						let photos = []
+				
+						let up = new Promise(function(resolve, reject) {
+							resolve(cosUpload.uploadFile(local, that))
+						})
+						up.then(res => {
+							photos = res
+							that.$req('/group/set_group_info', {
+								groupID: that.vuex_groupid,
+								faceUrl: photos[0],
+								operationID: that.vuex_openid + JSON.stringify(new Date().getTime())
+							}).then(res => {
+								console.log(res);
+								if(res.errCode==0){
+									that.$u.toast('新头像需在"我的群组"中重新获取',3000)
+								}
+							})
+						})
+				
+				
+					},
+					fail(err) {
+						console.log('err ==>', err);
+					}
+				});
 			}
 		}
+		
 	}
 </script>
 

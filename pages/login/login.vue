@@ -2,7 +2,8 @@
 	<view>
 		<view class="platform">
 			<view class="platform-icon">
-				<u-avatar src="/static/common/image/logo.png"></u-avatar>
+				<!-- <u-avatar src="/static/common/image/logo.png"></u-avatar> -->
+				<image src="/static/common/image/logo.png" mode="aspectFit" class="avatar"></image>
 			</view>
 			<text>地球天使</text>
 		</view>
@@ -117,6 +118,11 @@
 </script>
 
 <style lang="scss">
+	.avatar{
+		width: 90rpx;
+		height: 90rpx;
+		border-radius: 90rpx;
+	}
 	.platform {
 		margin-top: 20vh;
 		display: flex;

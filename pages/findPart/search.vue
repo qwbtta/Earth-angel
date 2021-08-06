@@ -1,6 +1,6 @@
 <template>
 	<view class="search">
-		<view class="card">
+		<view class="card" v-if="state==1">
 			<view class="head">
 
 				<image :src="info.icon" mode="" class="headIcon"></image>
@@ -23,6 +23,22 @@
 				</view>
 			</view>
 		</view>
+		<view class="card" style="height: 200rpx;" v-else-if="state==2">
+			<view class="head">
+		
+				<image :src="groupInfo.faceUrl" mode="" class="headIcon"></image>
+		
+				<view class="headRight">
+					<view class="info">
+						<text class="name">{{groupInfo.groupName}}</text>
+						<text class="id">ID：{{groupInfo.groupId}}</text>
+					</view>
+					<button type="default" class="add" @click="joinGroup">申请加群</button>
+				</view>
+		
+			</view>
+
+		</view>
 	</view>
 </template>
 
@@ -31,7 +47,9 @@
 		data() {
 			return {
 				info: {},
-				goodsList:[]
+				goodsList:[],
+				groupInfo:{},
+				state:1
 			}
 		},
 		methods: {
@@ -45,29 +63,48 @@
 						this.$u.toast('好友申请发送成功',2500);
 					}
 				})
-
+			},
+			joinGroup(){
+				console.log(this.groupInfo.groupId,"44444");
+				this.$req('/group/join_group', {
+					groupID:this.groupInfo.groupId,
+					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+				}).then(res => {
+					console.log(res);
+					if(res.errCode==0){
+						this.$u.toast('申请已发送')
+					}
+				})
 			},
 			showInfo(){
 				this.$u.toast('请添加好友后查看更多详情')
 			}
 		},
 		onShow() {
-			this.info = this.vuex_search
-			console.log(this.info,"用户信息");
-			
-			let parameter = {}
-			parameter.openIdList = [this.info.uid]
-			parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
-			this.$u.api.get_users_items(parameter).then(res => {
-					
-					if(res.data[0].items.length>4){
-						this.goodsList=res.data[0].items.slice(0,4)
-					}else{
-						this.goodsList=res.data[0].items
-					}
-					console.log(this.goodsList,"物品");
+			if(JSON.stringify(this.vuex_searchGroup) =='{}'){
+				this.info = this.vuex_search
+				this.state = 1
+				console.log(this.info,"用户信息");
 				
-			})
+				let parameter = {}
+				parameter.uidList = [this.info.uid]
+				parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
+				this.$u.api.get_users_items(parameter).then(res => {
+						if(res.data[0].items.length>4){
+							this.goodsList=res.data[0].items.slice(0,4)
+						}else{
+							this.goodsList=res.data[0].items
+						}
+						console.log(this.goodsList,"物品");
+					
+				})
+			}else if(JSON.stringify(this.vuex_search) =='{}'){
+				this.groupInfo = this.vuex_searchGroup
+				this.state = 2
+				console.log(this.groupInfo,"群");
+			}
+			
+			
 			
 		}
 	}

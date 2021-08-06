@@ -1,17 +1,17 @@
 <template>
 	<view class="memberManage">
 		<view class="headCard u-flex">
-			<image src="/static/common/image/card1.png" mode="" class="cardImg"></image>
+			<image :src="groupInfo.faceUrl" mode="" class="cardImg"></image>
 			<view class="info">
-				<text class="groupName">颜控大学闲置物品交流群</text>
-				<text class="groupId">ID：5233789568990</text>
+				<text class="groupName">{{groupInfo.groupName}}</text>
+				<text class="groupId">ID：{{groupInfo.groupId}}</text>
 			</view>
 		</view>
 		
 		<view class="memberCon">
-			<view class="memberItem" v-for="item in [1,2]">
-				<image src="/static/common/image/card1.png" mode="" class="headIcon"></image>
-				<text class="userName">隔壁阿花</text>
+			<view class="memberItem" v-for="item in memberList" :key="item.uid">
+				<image :src="item.icon" mode="" class="headIcon"></image>
+				<text class="userName">{{item.name}}</text>
 			</view>
 			<view class="memberItem" @click="goEditMember('add')">
 				<image src="/static/common/image/memberAdd.png" mode="" class="headIcon"></image>
@@ -30,16 +30,67 @@
 	export default{
 		data(){
 			return{
-				
+				groupInfo:{},
+				memberList:[],
+				newMember:[],
 			}
 		},
 		methods:{
 			goEditMember(e){
 				console.log(e);
 				uni.navigateTo({
-					url:'./eidtMemberNumber?do=' + e
+					url:'./editMemberNumber?do=' + e
 				})
+				
 			}
+		},
+		onShow() {
+			
+			this.groupInfo = this.vuex_groupList.groupInfo
+			this.$req('/group/get_group_member_list', {
+				groupID:this.vuex_groupid,
+				nextSeq:0,
+				operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+			}).then(res => {
+				console.log(res, "群成员");
+				
+				let ids = res.data.map(item => item.userId)
+				this.$req('/user/get_user_info', {
+					uidList: ids,
+					operationID: this.vuex_openid + JSON.stringify(new Date()
+						.getTime())
+				}).then(res=>{
+					console.log(res,"5555");
+					this.memberList = res.data
+					
+				})
+			
+			})
+			
+			if(this.vuex_memberNum.length!=0){
+				this.newMember = []
+				for(let i =0;i<this.vuex_memberNum.length;i++){
+					for(let p = 0;p<this.memberList.length;p++){
+						if(this.vuex_memberNum[i].uid!=this.memberList[p].uid){
+							this.newMember.push(this.vuex_memberNum[i]) 
+							this.memberList.push(this.vuex_memberNum[i]) 
+						}
+					}
+				}
+				let ids = this.newMember.map(item => item.uid)
+				this.$req('/group/invite_user_to_group', {
+					groupID:this.vuex_groupid,
+					uidList:ids,
+					reason:'邀请进群',
+					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+				}).then(res => {
+					console.log(res,"进群");
+				
+				})
+				
+				
+			}
+			
 		}
 	}
 </script>
@@ -61,6 +112,7 @@
 			.cardImg{
 				width: 108rpx;
 				height: 108rpx;
+				border-radius: 108rpx;
 				margin-left: 48rpx;
 			}
 			.info{
@@ -77,6 +129,7 @@
 					font-weight: 400;
 					color: #333333;
 					margin-top: 8rpx;
+					word-break: break-all;
 				}
 			}
 		}
@@ -90,6 +143,7 @@
 			.headIcon{
 				width: 84rpx;
 				height: 84rpx;
+				border-radius: 84rpx;
 			}
 			.memberItem{
 				margin: 0 28rpx;

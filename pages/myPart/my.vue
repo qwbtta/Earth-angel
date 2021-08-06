@@ -30,7 +30,7 @@
 			</view>
 		</view>
 		<view class="body">
-			<view class="item">
+			<view class="item" @click="editName">
 				<view class="left">
 					<image src="/static/common/image/modifyMyName.png" mode="" class="bodyImg"></image>
 					<text>修改名称</text>
@@ -40,7 +40,12 @@
 			<view class="item" @click="goNotice">
 				<view class="left">
 					<image src="/static/common/image/notice.png" mode="" class="bodyImg"></image>
-					<text>通知</text>
+					<view class="myFlex">
+						<text>通知</text>
+						<view class="tips" v-if="vuex_noticeNumber>0">
+							
+						</view>
+					</view>
 				</view>
 				<image src="/static/common/image/arrow.png" mode="" class="arrow"></image>
 			</view>
@@ -51,8 +56,9 @@
 				</view>
 				<image src="/static/common/image/arrow.png" mode="" class="arrow"></image>
 			</view>
-			
 		</view>
+		
+		
 	</view>
 </template>
 
@@ -95,6 +101,11 @@
 			goGoodsList(e){
 				uni.navigateTo({
 					url:'./goodsList?where=' + e
+				})
+			},
+			editName(){
+				uni.navigateTo({
+					url:'./editNickName'
 				})
 			}
 		}
@@ -174,6 +185,19 @@
 			display: flex;
 			flex-direction: column;
 			justify-content: space-evenly;
+			.myFlex{
+				display: flex;
+				align-items: flex-start;
+				
+				.tips{
+					width: 14rpx;
+					height: 14rpx;
+					border-radius: 14rpx;
+					background-color: #FA5151;
+					margin-left: 8rpx;
+				}
+			}
+			
 			.item{
 				display: flex;
 				align-items: center;

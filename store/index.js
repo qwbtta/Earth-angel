@@ -4,20 +4,22 @@ Vue.use(Vuex)
 
 let lifeData = {};
 
-try{
+try {
 	// 尝试获取本地是否存在lifeData变量，第一次启动APP时是不存在的
 	lifeData = uni.getStorageSync('lifeData');
-}catch(e){
-	
+} catch (e) {
+
 }
 
 // 需要永久存储，且下次APP启动需要取出的，在state中的变量名
-let saveStateKeys = ['vuex_nick_name', 'vuex_avatar_url','vuex_gender','vuex_openid','vuex_token','vuex_userId','vuex_search','vuex_wsToken','vuex_goodsInfo','vuex_releaseState','vuex_wantedUid','vuex_memberNum','vuex_msgIncr'];
+let saveStateKeys = ['vuex_nick_name', 'vuex_avatar_url', 'vuex_gender', 'vuex_openid', 'vuex_token', 'vuex_userId',
+	'vuex_wsToken', 'vuex_msgIncr'
+];
 
 // 保存变量到本地存储中
-const saveLifeData = function(key, value){
+const saveLifeData = function(key, value) {
 	// 判断变量名是否在需要存储的数组中
-	if(saveStateKeys.indexOf(key) != -1) {
+	if (saveStateKeys.indexOf(key) != -1) {
 		// 获取本地存储的lifeData对象，将变量添加到对象中
 		let tmp = uni.getStorageSync('lifeData');
 		// 第一次打开APP，不存在lifeData变量，故放一个{}空对象
@@ -34,44 +36,49 @@ const store = new Vuex.Store({
 		vuex_nick_name: lifeData.vuex_nick_name ? lifeData.vuex_nick_name : '',
 		vuex_avatar_url: lifeData.vuex_avatar_url ? lifeData.vuex_avatar_url : '',
 		// 如果vuex_version无需保存到本地永久存储，无需lifeData.vuex_version方式
-		vuex_gender:  lifeData.vuex_gender ? lifeData.vuex_gender : '',
-		vuex_openid:  lifeData.vuex_openid ? lifeData.vuex_openid : '',
-		vuex_token:  lifeData.vuex_token ? lifeData.vuex_token : '',
-		vuex_userId:  lifeData.vuex_userId ? lifeData.vuex_userId : '',
-		vuex_search:  lifeData.vuex_search ? lifeData.vuex_search : {},
+		vuex_gender: lifeData.vuex_gender ? lifeData.vuex_gender : '',
+		vuex_openid: lifeData.vuex_openid ? lifeData.vuex_openid : '',
+		vuex_token: lifeData.vuex_token ? lifeData.vuex_token : '',
+		vuex_userId: lifeData.vuex_userId ? lifeData.vuex_userId : '',
+		vuex_search: {},
+		vuex_searchGroup: {},
 		vuex_wsToken: lifeData.vuex_wsToken ? lifeData.vuex_wsToken : '',
-		vuex_goodsInfo: lifeData.vuex_goodsInfo ? lifeData.vuex_goodsInfo : {},
-		vuex_releaseState: lifeData.vuex_releaseState ? lifeData.vuex_releaseState : 0,
-		vuex_wantedUid: lifeData.vuex_wantedUid ? lifeData.vuex_wantedUid : [],
-		vuex_memberNum: lifeData.vuex_memberNum ? lifeData.vuex_memberNum : [],
+		vuex_goodsInfo: {},
+		vuex_releaseState: 0,
+		vuex_wantedUid: [],
+		vuex_memberNum: [],
 		vuex_msgIncr: lifeData.vuex_msgIncr ? lifeData.vuex_msgIncr : 1,
-		vuex_chatList: lifeData.vuex_chatList ? lifeData.vuex_chatList : [],
+		vuex_chatList: [],
+		vuex_groupList: [],
+		vuex_groupid: "",
+		vuex_shareInfo: {},
+		vuex_noticeNumber: 0,
 		// 自定义tabbar数据
-		vuex_tabbar:  [{
-					iconPath: "/static/common/image/release.png",
-					selectedIconPath: "/static/common/image/release_s.png",
-					text: '发布',
-					pagePath: "/pages/release/release"
-				},
-				{
-					iconPath: "/static/common/image/concern.png",
-					selectedIconPath: "/static/common/image/concern_s.png",
-					text: '关注',
-					pagePath: "/pages/concern/concern"
-				},
-				// {
-				// 	iconPath: "/static/common/image/chat.png",
-				// 	selectedIconPath: "/static/common/image/chat_s.png",
-				// 	text: 'Chat',
-				// 	pagePath: "/pages/chat/chat"
-				// },
-				{
-					iconPath: "/static/common/image/setting.png",
-					selectedIconPath: "/static/common/image/setting_s.png",
-					text: '我的',
-					pagePath: "/pages/setting/setting"
-				},
-			]
+		vuex_tabbar: [{
+				iconPath: "/static/common/image/release.png",
+				selectedIconPath: "/static/common/image/release_s.png",
+				text: '发布',
+				pagePath: "/pages/release/release"
+			},
+			{
+				iconPath: "/static/common/image/concern.png",
+				selectedIconPath: "/static/common/image/concern_s.png",
+				text: '关注',
+				pagePath: "/pages/concern/concern"
+			},
+			// {
+			// 	iconPath: "/static/common/image/chat.png",
+			// 	selectedIconPath: "/static/common/image/chat_s.png",
+			// 	text: 'Chat',
+			// 	pagePath: "/pages/chat/chat"
+			// },
+			{
+				iconPath: "/static/common/image/setting.png",
+				selectedIconPath: "/static/common/image/setting_s.png",
+				text: '我的',
+				pagePath: "/pages/setting/setting"
+			},
+		]
 	},
 	mutations: {
 		$uStore(state, payload) {
@@ -79,9 +86,9 @@ const store = new Vuex.Store({
 			let nameArr = payload.name.split('.');
 			let saveKey = '';
 			let len = nameArr.length;
-			if(len >= 2) {
+			if (len >= 2) {
 				let obj = state[nameArr[0]];
-				for(let i = 1; i < len - 1; i ++) {
+				for (let i = 1; i < len - 1; i++) {
 					obj = obj[nameArr[i]];
 				}
 				obj[nameArr[len - 1]] = payload.value;

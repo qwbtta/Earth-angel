@@ -2,7 +2,8 @@
 // 同时，我们也可以在此使用getApp().globalData，如果你把token放在getApp().globalData的话，也是可以使用的
 const install = (Vue, vm) => {
 	Vue.prototype.$u.http.setConfig({
-		baseUrl: 'http://47.112.160.66:50000',
+		// baseUrl: 'http://47.112.160.66:50000',
+		baseUrl: 'https://earth-angel.rentsoft.cn',
 		// baseUrl: 'https://lovexuan.ink',
 		// baseUrl: 'http://172.16.8.146:50000',
 		// 如果将此值设置为true，拦截回调中将会返回服务端返回的所有数据response，而不是response.data

@@ -28,7 +28,7 @@
 				console.log(e,"5555555");
 				let parameter ={}
 				parameter.itemId = this.vuex_goodsInfo.itemId
-				parameter.openId = e.uid
+				parameter.uid = e.uid
 				parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
 				this.$u.api.gift_item(parameter).then(res => {
 					console.log(res);

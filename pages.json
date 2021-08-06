@@ -11,6 +11,20 @@
 	// 	}]
 	// },
 	"pages": [{
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false
+			}
+
+		},{
+			"path": "pages/findPart/find",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false
+			}
+		},{
 			"path": "pages/myPart/my",
 			"style": {
 				"navigationBarTitleText": "我的",
@@ -32,16 +46,9 @@
 				"enablePullDownRefresh": false
 			}
 		}, {
-			"path": "pages/findPart/find",
+			"path": "pages/findPart/group/deleteGoods",
 			"style": {
-				"navigationStyle": "custom",
-				"navigationBarTitleText": "",
-				"enablePullDownRefresh": false
-			}
-		},{
-			"path": "pages/login/login",
-			"style": {
-				"navigationBarTitleText": "",
+				"navigationBarTitleText": "删除物品",
 				"enablePullDownRefresh": false
 			}
 
@@ -88,13 +95,6 @@
 			}
 
 		},{
-			"path": "pages/findPart/group/deleteGoods",
-			"style": {
-				"navigationBarTitleText": "删除物品",
-				"enablePullDownRefresh": false
-			}
-
-		},{
 			"path": "pages/findPart/group/groupManage",
 			"style": {
 				"navigationBarTitleText": "群管理",
@@ -119,6 +119,13 @@
 			"path": "pages/myPart/goodsHome/goodsHome",
 			"style": {
 				"navigationBarTitleText": "闲置主页",
+				"enablePullDownRefresh": false
+			}
+
+		},{
+			"path": "pages/myPart/editNickName",
+			"style": {
+				"navigationBarTitleText": "修改名称",
 				"enablePullDownRefresh": false
 			}
 
@@ -164,7 +171,9 @@
 				"navigationBarTitleText": "",
 				"enablePullDownRefresh": false
 			}
-
+		},
+		{
+			"path": "pages/login/shareUse"
 		}
 
 	],
@@ -192,17 +201,18 @@
 				"text": "消息"
 			},
 			{
-				"pagePath": "pages/myPart/my",
-				"iconPath": "static/common/image/tab-my.png",
-				"selectedIconPath": "static/common/image/tab-my-selected.png",
-				"text": "我的"
-			},
-			{
 				"pagePath": "pages/releasePart/release",
 				"iconPath": "static/common/image/tab-release.png",
 				"selectedIconPath": "static/common/image/tab-release-selected.png",
 				"text": "发布"
+			},
+			{
+				"pagePath": "pages/myPart/my",
+				"iconPath": "static/common/image/tab-my.png",
+				"selectedIconPath": "static/common/image/tab-my-selected.png",
+				"text": "我的"
 			}
+			
 		]
 	}
 }

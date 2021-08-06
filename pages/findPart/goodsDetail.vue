@@ -4,14 +4,14 @@
 		<view class="main">
 			<view class="head">
 				<view class="headLeft">
-					<image :src="userInfo.icon" mode="" class="headIcon"></image>
+					<image :src="userInfo.icon" mode="" class="headIcon" @click="goHomePage"></image>
 					<view class="nameCon">
-						<text class="name">{{userInfo.name}}</text>
+						<text class="name" @click="goHomePage">{{userInfo.name}}</text>
 						<view class="titleCon u-flex">
 							<view class="goodStitle">
 								{{goodsName}}
 							</view>
-							<button type="default" class="share">分享</button>
+							<button type="default" class="share" open-type="share">分享</button>
 						</view>
 					</view>
 				</view>
@@ -21,7 +21,7 @@
 					<button type="default" class="want" @click="goTransfer">转送</button>
 				</view>
 				<view class="headRight" v-else>
-					<button type="default" class="want">想要</button>
+					<button type="default" class="want" @click="want">想要</button>
 					<button type="default" class="want" @click="goChat">联系他</button>
 				</view>
 			</view>
@@ -36,7 +36,7 @@
 			</view>
 			<scroll-view class="scrollArea" scroll-x="true">
 				<view class="container">
-					<view class="item" v-for="item in goodsList" :key="itemId">
+					<view class="item" v-for="item in goodsList" :key="item.itemId">
 						<image :src="item.imgUrls[0]" mode="aspectFit" class="itemImg"></image>
 						<text class="itemTitle">{{item.name}}</text>
 					</view>
@@ -49,7 +49,11 @@
 </template>
 
 <script>
+	import {
+		shareMixins
+	} from '@/common/mixins/share.js'
 	export default {
+		mixins: [shareMixins],
 		data() {
 			return {
 				isMine:true,
@@ -59,7 +63,8 @@
 				peopleNum: 0,
 				wantedUid:[],
 				goodsList: [],
-				userInfo:{}
+				userInfo:{},
+				
 			}
 		},
 		methods: {
@@ -71,6 +76,7 @@
 			},
 			goHomePage(){
 				this.$u.vuex('vuex_search', this.userInfo);
+				
 				uni.navigateTo({
 					url:'../myPart/goodsHome/goodsHome?id='+this.userInfo.uid
 				})
@@ -80,6 +86,17 @@
 					url:'../chatPart/chatPage?where=detail'
 				})
 				console.log(this.vuex_goodsInfo)	
+			},
+			want(){
+				this.$u.api.user_want_the_item({
+					itemId: this.vuex_goodsInfo.itemId,
+					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+				}).then(res => {
+					console.log(res)
+					if (res.errCode == 0) {
+						this.$u.toast('请求发送成功', 2000)
+					} else {}
+				})
 			}
 		},
 		onShow() {
@@ -101,11 +118,12 @@
 					
 					if(res.errCode==0){
 					this.userInfo = res.data
+					this.shareData.path = '/pages/login/shareUse?uid='+ this.userInfo.uid+'&goodsid=' + this.vuex_goodsInfo.itemId + '&shareName='+ this.vuex_nick_name + '&shareUid=' + this.vuex_openid
 					}
 				})
 				
 			let parameter = {}
-			parameter.openIdList = [this.vuex_goodsInfo.fromUser]
+			parameter.uidList = [this.vuex_goodsInfo.fromUser]
 			parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
 			this.$u.api.get_users_items(parameter).then(res=>{
 				console.log(res.data[0].items,"其他闲置");

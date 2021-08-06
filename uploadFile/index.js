@@ -18,10 +18,10 @@ const tencentCloudStorageCredential = () => {
 	return new Promise((resolve, reject) => {
 		uni.request({
 			method: "POST",
-			url: "http://47.112.160.66:10000/third/tencent_cloud_storage_credential",
+			url: "https://earth-angel.rentsoft.cn/im/third/tencent_cloud_storage_credential",
 			data: parameter,
 			success(res) {
-				console.log(res);
+				console.log(res,"ddddddd");
 				resolve(res)
 			},
 			fail(err) {

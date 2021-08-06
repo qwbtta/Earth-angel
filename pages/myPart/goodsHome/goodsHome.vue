@@ -8,7 +8,8 @@
 			</view>
 		</view>
 
-		<GoodsWaterfall :goodsList="goodsList" :isMyHome="isMyHome" @edit="editShow = true" />
+		<GoodsWaterfallS :goodsList="flowList" @edit="editShow = true" />
+
 
 		<u-popup v-model="editShow" mode="center" border-radius="20">
 			<view class="popupHead">
@@ -32,10 +33,10 @@
 </template>
 
 <script>
-	import GoodsWaterfall from '../../../components/GoodsWaterfall.vue'
+	import GoodsWaterfallS from '../../../components/GoodsWaterfallS.vue'
 	export default {
 		components: {
-			GoodsWaterfall
+			GoodsWaterfallS
 		},
 		data() {
 			return {
@@ -43,20 +44,29 @@
 				id: "",
 				avatar: "",
 				isMyHome: false,
+				isMyHomew: false,
 				editShow: false,
-				goodsList: []
+				goodsList: [],
+				flowList: [],
+				repeatId: ""
 			}
 		},
 		methods: {
 			getList() {
 				let parameter = {}
-				parameter.openIdList = [this.id]
+				parameter.uidList = [this.id]
 				parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
 				this.$u.api.get_users_items(parameter).then(res => {
 					console.log(res.data[0].items);
 					this.goodsList = res.data[0].items
-					console.log(this.goodsList,"6666");
-					
+					this.flowList = []
+					for (let i = 0; i < this.goodsList.length; i++) {
+						let item = JSON.parse(JSON.stringify(this.goodsList[i]))
+						this.flowList.push(item)
+					}
+
+					console.log(this.flowList, "6666");
+
 				})
 			},
 			copy() {
@@ -90,11 +100,11 @@
 					} else {
 						this.$u.toast('删除失败');
 					}
-
 				})
 			}
 		},
 		onLoad(options) {
+			this.repeatId = options.id
 			if (options.id == this.vuex_openid) {
 				this.isMyHome = true
 				this.name = this.vuex_nick_name
@@ -108,7 +118,24 @@
 				this.id = this.vuex_search.uid
 				this.avatar = this.vuex_search.icon
 				this.getList()
-				
+
+			}
+		},
+		onShow() {
+			if (this.repeatId == this.vuex_openid) {
+				this.isMyHome = true
+				this.name = this.vuex_nick_name
+				this.id = this.vuex_openid
+				this.avatar = this.vuex_avatar_url
+				this.getList()
+			
+			} else {
+				this.isMyHome = false
+				this.name = this.vuex_search.name
+				this.id = this.vuex_search.uid
+				this.avatar = this.vuex_search.icon
+				this.getList()
+			
 			}
 		}
 	}

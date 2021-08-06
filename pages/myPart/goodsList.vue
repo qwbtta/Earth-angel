@@ -16,9 +16,9 @@
 						<view class="describe">
 							<text class="title">{{item.desc}}</text>
 							<text class="who" v-if="title=='收到物品'">来自"{{item.fromUser}}"的赠送</text>
-							<text class="who" v-else> {{'已转送给"'+ item.toUser + '"'}} </text>
+							<text class="who" v-else> {{'已转送给"'+ item.name + '"'}} </text>
 						</view>
-						<button type="default" class="btn" @click.stop="contact">联系朋友</button>
+						<button type="default" class="btn" @click.stop="contact(item)">联系朋友</button>
 					</view>
 
 
@@ -67,8 +67,14 @@
 				}
 
 			},
-			contact(){
-				console.log(1111);
+			contact(item){
+				if(item.fromUser == this.vuex_openid){
+					item.fromUser=item.toUser
+				}
+				this.$u.vuex('vuex_goodsInfo',item)
+				uni.navigateTo({
+					url:'../chatPart/chatPage?where=detail'
+				})
 			},
 			deleteGoods(){
 				let deleteList = this.goodsInfo.filter(item=>item.checked == true)
@@ -80,14 +86,34 @@
 			if (options.where == "received") {
 				this.title = "收到物品"
 				this.$u.api.received_items(parameter).then(res=>{
-					console.log(res);
+					console.log(res,"收到");
 					this.goodsInfo = res.data.items
+					let ids =  res.data.items.map(item=>item.toUser)
+					this.$req('/user/get_user_info', {
+						uidList: ids,
+						operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+					}).then(res=>{
+						console.log(res,"ddddd");
+						for(let i =0;i<res.data.length;i++){
+							this.goodsInfo[i].name = res.data[i].name
+						}
+					})
 				})
 			} else if (options.where == "gave") {
 				this.title = "我的赠送"
 				this.$u.api.sent_out_items(parameter).then(res=>{
-					console.log(res);
+					console.log(res,"赠送");
 					this.goodsInfo = res.data.items
+					let ids =  res.data.items.map(item=>item.toUser)
+					this.$req('/user/get_user_info', {
+						uidList: ids,
+						operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+					}).then(res=>{
+						console.log(res,"ddddd");
+						for(let i =0;i<res.data.length;i++){
+							this.goodsInfo[i].name = res.data[i].name
+						}
+					})
 				})
 			}
 		}

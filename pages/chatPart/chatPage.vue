@@ -1,6 +1,6 @@
 <template>
 	<view class="chatPage">
-		<u-navbar :title="title"></u-navbar>
+		<u-navbar :title="friendInfo.name"></u-navbar>
 		<view class="head u-flex" @click="goBack" v-if="headShow">
 			<image :src="goodsInfo.imgUrls[0]" mode="aspectFit" class="goodsImg"></image>
 			<view class="info">
@@ -8,30 +8,28 @@
 				<text class="tips">赠送之前聊一聊</text>
 			</view>
 		</view>
-		<scroll-view @click="clickScroll" :scroll-into-view="listItem" :style="{height:scrollHeight+'px'}"
-		 scroll-y>
-			
-						
-			<view class="main">
+		
+			<scroll-view @click="clickScroll" :scroll-into-view="listItem"
+				:style="{height:scrollHeight+'px','margin-top':marginT+'px'}"  scroll-y>
+				<view class="main">
 				<view :class="['chatLeft',item.sendID == vuex_openid?'reverse':'']" v-for="(item,index) in chatList"
-					:key="index" v-if="item.msgFrom==100">
-					<image :src="item.sendID == vuex_openid?vuex_avatar_url:vuex_chatList.icon" mode=""
+					:key="index" v-if="item.msgFrom==100" :id="'C'+ index">
+					<image :src="item.sendID == vuex_openid?vuex_avatar_url:friendInfo.icon" mode=""
 						class="chatHeadIcon"></image>
 					<view class="triangle" v-if="item.contentType==101">
-			
+
 					</view>
 					<view class="chatMain" v-if="item.contentType==101">
 						<text class="chatText">{{item.content}}</text>
 					</view>
-					<image :src="item.content" mode="widthFix" class="imgChat"
-						v-if="item.contentType==102" @click="preview(item)"></image>
-			
-				</view>
-			
-			</view>
-		</scroll-view>
-		
+					<image :src="item.content" mode="widthFix" class="imgChat" v-if="item.contentType==102"
+						@click="preview(item)"></image>
 
+				</view>
+			</view>
+
+			</scroll-view>
+		
 		<view class="footer">
 			<image src="/static/common/image/sendPhoto.png" mode="" class="sendPhoto" @click="sendImg"></image>
 			<input type="text" v-model="myInput" class="mainInput" />
@@ -47,18 +45,28 @@
 		data() {
 			return {
 				headShow: false,
+				marginT: 0,
 				goodsInfo: {},
+				friendInfo: {},
 				receiveId: "",
-				title: "",
 				chatList: [],
 				myInput: "",
 				scrollHeight: 0,
-				listItem:null
+				listItem: null,
+				timer: null,
+				timerTimes:0,
 			}
 		},
 		methods: {
 			getScreen() {
-				this.scrollHeight = uni.getSystemInfoSync().safeArea.height - 101
+				console.log(this.headShow);
+				if (this.headShow) {
+					this.marginT = 95
+					this.scrollHeight = uni.getSystemInfoSync().safeArea.height - 228
+				} else {
+					this.scrollHeight = uni.getSystemInfoSync().safeArea.height - 160
+				}
+
 			},
 			sent() {
 				let timeNow = JSON.stringify(new Date().getTime())
@@ -122,7 +130,7 @@
 								platformID: 6,
 								sendID: that.vuex_openid,
 								operationID: that.vuex_openid + JSON.stringify(new Date()
-								.getTime()),
+									.getTime()),
 								msgIncr: that.vuex_msgIncr,
 								data: {
 									sessionType: 1,
@@ -156,37 +164,97 @@
 					}
 				});
 			},
-			preview(item){
+			preview(item) {
 				uni.previewImage({
-				            urls: [item.content],
-				        });
+					urls: [item.content],
+				});
 			},
 			goBack() {
 				uni.navigateBack({
 					delta: 1
 				});
 			},
-			
+			getList() {
+				this.timerTimes = this.timerTimes + 1 
+				this.$req('/chat/newest_seq', {
+					reqIdentifier: 1001,
+					sendID: this.vuex_openid,
+					operationID: this.vuex_openid + JSON.stringify(new Date().getTime()),
+					msgIncr: this.vuex_msgIncr,
+				}).then(res => {
+					console.log(res.data.seq, "最新seq");
+					this.seq = res.data.seq
+					this.$u.vuex('vuex_msgIncr', this.vuex_msgIncr + 1)
+					this.$req('/chat/pull_msg', {
+						reqIdentifier: 1002,
+						sendID: this.vuex_openid,
+						operationID: this.vuex_openid + JSON.stringify(new Date().getTime()),
+						msgIncr: this.vuex_msgIncr,
+						data: {
+							seqBegin: 0,
+							seqEnd: this.seq
+						}
+
+
+					}).then(res => {
+						console.log(res.data.single, "xiaoxixiaoxi");
+						this.$u.vuex('vuex_msgIncr', this.vuex_msgIncr + 1)
+						let transfer = res.data.single.filter(item => item.id == this.receiveId)
+						this.chatList = transfer[0].list
+						if(this.timerTimes == 1){
+							this.listItem = 'C'+ (this.chatList.length-1)
+						}
+						
+						console.log(this.chatList, "聊天列表");
+						this.$req('/user/get_user_info', {
+							uidList: [this.receiveId],
+							operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+						}).then(res => {
+							console.log(res.data[0], "haoyou")
+							this.friendInfo = res.data[0]
+
+						})
+
+
+
+
+
+
+					})
+
+				})
+
+
+
+			}
 		},
-		
 		onLoad(options) {
 			if (options.where == "detail") {
 				this.headShow = true
 				this.goodsInfo = this.vuex_goodsInfo
 				this.receiveId = this.vuex_goodsInfo.fromUser
-				console.log(this.goodsInfo);
-				this.getScreen()
 			} else if (options.where == "session") {
-				this.chatList = this.vuex_chatList.list
-				this.title = this.vuex_chatList.name
 				this.receiveId = this.vuex_chatList.id
-				console.log(this.vuex_chatList, "99999");
-				this.getScreen()
 			}
-
+			this.getScreen()
+			this.getList()
+			
+			
+		},
+		onShow() {
+			let _this = this
+			this.timer = setInterval(function() {
+				_this.getList()
+			}, 8000)
+		},
+		onHide() {
+			clearInterval(this.timer)
+		},
+		onUnload() {
+			clearInterval(this.timer)
 		},
 		watch: {
-			
+
 		},
 	}
 </script>
@@ -194,7 +262,6 @@
 <style lang="scss" scoped>
 	.chatPage {
 		padding-bottom: 120rpx;
-
 		.head {
 			width: 750rpx;
 			height: 176rpx;
@@ -231,7 +298,6 @@
 
 		.main {
 			padding: 54rpx 48rpx;
-
 			.chatLeft {
 				display: flex;
 				align-items: flex-start;
@@ -290,7 +356,6 @@
 					margin-top: 16rpx;
 				}
 			}
-
 			.imgChat {
 				max-width: 300rpx;
 				margin: 6rpx 24rpx 0;
@@ -307,7 +372,6 @@
 			bottom: 0;
 			padding: 0 28rpx;
 			background-color: #FFFFFF;
-
 			.sendPhoto {
 				width: 64rpx;
 				height: 64rpx;
