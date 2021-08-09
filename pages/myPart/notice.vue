@@ -135,7 +135,7 @@
 						parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
 						this.$u.api.get_users_items(parameter).then(res=>{
 							console.log(res.data[0].items,"其他闲置");
-							this.wantList = res.data[0].items.filter(item => item.wantedUid.length>0)
+							this.wantList = res.data[0].items.filter(item => item.wantedUid.length>0 && item.toUser.length==0)
 							
 							if (this.list.length == 0 && this.applyList.length == 0 && this.wantList.length==0) {
 								this.$u.vuex('vuex_noticeNumber', 0)

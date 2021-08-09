@@ -11,19 +11,19 @@
 	// 	}]
 	// },
 	"pages": [{
-			"path": "pages/login/login",
-			"style": {
-				"navigationBarTitleText": "",
-				"enablePullDownRefresh": false
-			}
-
-		},{
 			"path": "pages/findPart/find",
 			"style": {
 				"navigationStyle": "custom",
 				"navigationBarTitleText": "",
 				"enablePullDownRefresh": false
 			}
+		},{
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false
+			}
+
 		},{
 			"path": "pages/myPart/my",
 			"style": {

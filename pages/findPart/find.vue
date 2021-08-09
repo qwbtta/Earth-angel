@@ -93,17 +93,39 @@
 			</view>
 		</view>
 		<u-popup v-model="shareShow" mode="center" border-radius="20">
-			<text class="popupTitle">{{shareInfo.shareName}}给你分享的闲置物品</text>
-			<image :src="shareInfo.imgUrls[0]" mode="aspectFit" class="popupImg"></image>
-			<view class="popupInfo">
-				<view class="popupInfoLeft u-flex">
-					<image :src="shareInfo.icon" mode="" class="popupHeadIcon"></image>
-					<text class="popupName">{{shareInfo.userName}}</text>
+			<view class="shareMain">
+
+				<text class="popupTitle">{{shareInfo.shareName}}给你分享的闲置物品</text>
+				<image :src="shareInfo.imgUrls[0]" mode="aspectFit" class="popupImg"></image>
+				<view class="popupInfo">
+					<view class="popupInfoLeft u-flex">
+						<image :src="shareInfo.icon" mode="" class="popupHeadIcon"></image>
+						<text class="popupName">{{shareInfo.userName}}</text>
+					</view>
+					<button type="default" class="apply" @click="shareMore">查看详情</button>
 				</view>
-				<button type="default" class="apply" @click="shareMore">查看详情</button>
+				<text class="popupDetail">{{shareInfo.desc}}</text>
 			</view>
-			<text class="popupDetail">{{shareInfo.desc}}</text>
 		</u-popup>
+
+		<u-popup v-model="loginPopup" mode="center" border-radius="12">
+			<view class="x-popupMain">
+				<view class="x-popupHead">
+					<text>您还没有登录</text>
+				</view>
+				<view class="x-popupFooter u-flex">
+					<view class="x-popupFooterItem" @click="loginPopup = false">
+						取消
+					</view>
+					<view class="x-popupFooterItem x-confirm" @click="goLogin">
+						去登录
+					</view>
+				</view>
+			</view>
+
+		</u-popup>
+
+
 
 	</view>
 </template>
@@ -133,10 +155,17 @@
 				goodsList: [],
 				groupGoodsList: [],
 				flowList: [],
-				shareInfo: {}
+				shareInfo: {},
+				loginPopup: false
 			}
 		},
 		methods: {
+			goLogin() {
+				this.loginPopup = false
+				uni.navigateTo({
+					url: '../login/login'
+				})
+			},
 			searchFriend() {
 				if (this.search == this.vuex_openid) {
 					this.$u.toast('不可以搜索自己哟');
@@ -281,6 +310,11 @@
 			}
 		},
 		onShow() {
+			if (this.vuex_token == '' || this.vuex_wsToken == '') {
+				this.loginPopup = true
+				return
+			}
+
 			console.log(this.vuex_shareInfo, "this.vuex_shareInfothis.vuex_shareInfo");
 			if (JSON.stringify(this.vuex_shareInfo) != '{}' && this.shareInfo.itemId != this.vuex_shareInfo.goodsid) {
 
@@ -340,6 +374,7 @@
 					parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
 					this.$u.api.get_users_items(parameter).then(res => {
 						console.log(res, "444");
+
 						this.goodsList = []
 						//接口问题，所以需要多重循环拼接处理数据，全部使用for
 						for (let i = 0; i < friendList.length; i++) {
@@ -354,6 +389,7 @@
 								}
 							}
 						}
+						this.goodsList = this.goodsList.filter(item => item.toUser.length == 0)
 						this.flowList = []
 						for (let i = 0; i < this.goodsList.length; i++) {
 							let item = JSON.parse(JSON.stringify(this.goodsList[i]))
@@ -371,7 +407,7 @@
 			})
 
 		}
-		
+
 	}
 </script>
 
@@ -607,67 +643,68 @@
 
 		}
 
-		/deep/ .u-mode-center-box {
+		.shareMain {
 			width: 604rpx !important;
 			padding: 46rpx 48rpx !important;
-		}
 
-		.popupTitle {
 
-			font-size: 34rpx;
-			font-weight: 400;
-			color: #000000;
-		}
+			.popupTitle {
 
-		.popupImg {
-			width: 100%;
-			display: block;
-			margin: 42rpx auto;
-		}
+				font-size: 34rpx;
+				font-weight: 400;
+				color: #000000;
+			}
 
-		.popupInfo {
+			.popupImg {
+				width: 100%;
+				display: block;
+				margin: 42rpx auto;
+			}
 
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
+			.popupInfo {
 
-			.popupInfoLeft {
-				.popupHeadIcon {
-					width: 72rpx;
-					height: 72rpx;
-					border-radius: 72rpx;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+
+				.popupInfoLeft {
+					.popupHeadIcon {
+						width: 72rpx;
+						height: 72rpx;
+						border-radius: 72rpx;
+					}
+
+					.popupName {
+						font-size: 26rpx;
+						font-weight: 500;
+						color: #333333;
+						margin-left: 16rpx;
+					}
 				}
 
-				.popupName {
-					font-size: 26rpx;
+				.apply {
+					margin: 0;
+					padding: 0;
+					width: 174rpx;
+					height: 50rpx;
+					font-size: 24rpx;
 					font-weight: 500;
 					color: #333333;
-					margin-left: 16rpx;
+					line-height: 48rpx;
+					background: #25EFCF;
+					border-radius: 8rpx;
+					border: 2rpx solid #000000;
 				}
+
 			}
 
-			.apply {
-				margin: 0;
-				padding: 0;
-				width: 174rpx;
-				height: 50rpx;
-				font-size: 24rpx;
-				font-weight: 500;
-				color: #333333;
-				line-height: 48rpx;
-				background: #25EFCF;
-				border-radius: 8rpx;
-				border: 2rpx solid #000000;
+			.popupDetail {
+				margin-top: 26rpx;
+				display: -webkit-box;
+				-webkit-box-orient: vertical;
+				-webkit-line-clamp: 2;
+				overflow: hidden;
 			}
-
-		}
-
-		.popupDetail {
-			margin-top: 26rpx;
-			display: -webkit-box;
-			-webkit-box-orient: vertical;
-			-webkit-line-clamp: 2;
-			overflow: hidden;
 		}
 	}
 </style>

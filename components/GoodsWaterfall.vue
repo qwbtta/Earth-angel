@@ -69,7 +69,7 @@
 				}).then(res => {
 					console.log(res)
 					if (res.errCode == 0) {
-						this.$u.toast('请求发送成功', 2000)
+						this.$u.toast('申请发送成功', 2000)
 					} else {}
 				})
 
@@ -84,7 +84,6 @@
 				uni.navigateTo({
 					url: '/pages/findPart/goodsDetail'
 				})
-
 
 			}
 		}

@@ -58,6 +58,22 @@
 			</view>
 		</view>
 		
+		<u-popup v-model="loginPopup" mode="center" border-radius="12">
+			<view class="x-popupMain">
+				<view class="x-popupHead">
+					<text>您还没有登录</text>
+				</view>
+				<view class="x-popupFooter u-flex">
+					<view class="x-popupFooterItem" @click="loginPopup = false">
+						取消
+					</view>
+					<view class="x-popupFooterItem x-confirm" @click="goLogin">
+						去登录
+					</view>
+				</view>
+			</view>
+		
+		</u-popup>
 		
 	</view>
 </template>
@@ -66,10 +82,16 @@
 	export default{
 		data(){
 			return{
-				
+				loginPopup:false
 			}
 		},
 		methods:{
+			goLogin(){
+				this.loginPopup= false
+				uni.navigateTo({
+					url:'../login/login'
+				})
+			},
 			copy(){
 				let _this = this
 				uni.setClipboardData({
@@ -108,6 +130,11 @@
 					url:'./editNickName'
 				})
 			}
+		},
+		onShow() {
+			if(this.vuex_token == '' || this.vuex_wsToken == ''){
+				this.loginPopup = true
+			}			
 		}
 	}
 </script>

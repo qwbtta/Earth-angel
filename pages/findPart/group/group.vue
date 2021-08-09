@@ -79,11 +79,15 @@
 				})
 			},
 			getList(){
-				
+				this.goodsList= []
 				this.$req('/group/get_groups_info', {
 					groupIDList: [this.vuex_groupList.groupInfo.groupId],
 					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
 				}).then(res => {
+					
+					console.log(res.data,"群信息");
+					
+					
 					this.groupInfo = res.data[0]
 				
 					this.$req('/group/get_group_member_list', {
@@ -110,39 +114,40 @@
 								userList.push(userInfo)
 				
 							}
-							console.log(userList, "拼接");
 				
-				
+							this.showWaterfall = false
 							// console.log(groupListId, "99999999999999999");
 							let parameter = {}
 							parameter.usersInfoList = userList
 							parameter.operationId = this.vuex_openid + JSON.stringify(
 								new Date().getTime())
 							this.$u.api.get_group_users_items(parameter).then(res => {
+								console.log(res,"申请发送申请发送成功申请发送成功申请发送成功");
 								// let trans = res.data
 								// let item = {}
 								// item.groupInfo = groupListId[i]
 								// item.goodsList = []
 								res.data.forEach(val => {
-									this.goodsList = [...val.items]
+									let ll = []
+									ll = [...val.items]
+									this.goodsList = this.goodsList.concat(ll)
+									console.log(this.goodsList,";p;p;p;p;p;p;p;p;p;p;p;p;p;p");
 								})
-								console.log(this.goodsList,
-									"groupInfo.groupIdgroupInfo.groupIdgroupInfo.groupId");
-				
+								// console.log(this.goodsList,"this.goodsListthis.goodsListthis.goodsList");
 								if (this.goodsList != 0) {
-									this.showWaterfall = false
+									
 									this.flowList = []
 									for (let i = 0; i < this.goodsList.length; i++) {
 										let item = JSON.parse(JSON.stringify(this.goodsList[
 											i]))
 										this.flowList.push(item)
 									}
-									let _this = this
-									setTimeout(function() {
-										_this.showWaterfall = true
-									}, 300)
-									
-									
+									// let _this = this
+									// setTimeout(function() {
+									// 	this.showWaterfall = true
+									// }, 300)
+									this.showWaterfall = true
+									this.goodsList = []
 									
 									
 								}
@@ -162,10 +167,16 @@
 				
 			}
 		},
-		onShow() {
+		onLoad() {
 			this.getList()
-
-
+		},
+		onShow() {
+			//uview的瀑布流组件有问题啊
+			this.getList()
+			let _this = this
+			setTimeout(function() {
+				_this.getList()
+			}, 300)
 			// this.groupInfo = this.vuex_groupList.groupInfo
 			// if (this.vuex_groupList.groupInfo.ownerId == this.vuex_openid) {
 			// 	this.isAdmin = true
@@ -173,14 +184,11 @@
 			// 	this.isAdmin = false
 			// }
 
-
-
 			// console.log(this.vuex_groupList, "4444444444444");
 
 
-
 			// if (this.vuex_groupList.goodsList.length != 0) {
-			// 	this.showWaterfall = false
+			// 	// this.showWaterfall = false
 			// 	this.goodsList = this.vuex_groupList.goodsList
 			// 	this.flowList = []
 			// 	for (let i = 0; i < this.goodsList.length; i++) {
@@ -188,7 +196,7 @@
 			// 		this.flowList.push(item)
 			// 	}
 
-			// 	this.showWaterfall = true
+			// 	// this.showWaterfall = true
 			// }
 
 

@@ -88,14 +88,7 @@
 					console.log(res.data);
 					let groupID = res.data.groupID
 					let uidList = this.memberList.map(item=>item.uid)
-					// this.$req('/group/invite_user_to_group', {
-					// 	groupID:groupID,
-					// 	uidList:uidList,
-					// 	reason:'邀请进群',
-					// 	operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
-					// }).then(res=>{
-					// 	console.log(res,"邀请进群");
-					// })
+					
 					
 					
 					if(res.errCode == 0){

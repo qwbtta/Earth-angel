@@ -11,7 +11,7 @@
 			<u-checkbox v-model="item.checked" shape="circle" active-color="#979797" class="checkboxItem" size="40"
 				v-for="item in goodsInfo" :key="item.itemId" @change="monitor">
 				<view class="goodsItem">
-					<image :src="item.imgUrls[0]" mode="" class="itemImg"></image>
+					<image :src="item.imgUrls[0]" mode="aspectFit" class="itemImg"></image>
 					<view class="right">
 						<view class="describe">
 							<text class="title">{{item.desc}}</text>
@@ -160,6 +160,7 @@
 			.itemImg {
 				width: 132rpx;
 				height: 132rpx;
+				border-radius: 8rpx;
 				margin-left: 12rpx;
 			}
 

@@ -6,12 +6,13 @@
 					<u-lazy-load threshold="100" border-radius="10" :image="item.imgUrls[0]" @click="goDetail(item)">
 					</u-lazy-load>
 					<view class="describe">
-						<view class="x-head u-flex" >
+						<view class="x-head u-flex">
 							<view class="x-headLeft u-flex">
 								<text class="x-name-home">{{item.name}}</text>
 							</view>
-							<button type="default" class="x-want" 
-								@click="toEdit(item)">编辑</button>
+							<button type="default" class="x-want" @click="toEdit(item)"
+								v-if="item.fromUser==vuex_openid">编辑</button>
+							<button type="default" class="x-want" @click="want(item)" v-else>想要</button>
 						</view>
 						<text class="x-details">{{item.desc}}</text>
 
@@ -23,21 +24,21 @@
 					<u-lazy-load threshold="100" border-radius="10" :image="item.imgUrls[0]" @click="goDetail(item)">
 					</u-lazy-load>
 					<view class="describe">
-						<view class="x-head u-flex" >
+						<view class="x-head u-flex">
 							<view class="x-headLeft u-flex">
 								<text class="x-name-home">{{item.name}}</text>
 							</view>
-							<button type="default" class="x-want" 
-								@click="toEdit(item)">编辑</button>
+							<button type="default" class="x-want" @click="toEdit(item)"
+								v-if="item.fromUser==vuex_openid">编辑</button>
+							<button type="default" class="x-want" @click="want(item)" v-else>想要</button>
 						</view>
 						<text class="x-details">{{item.desc}}</text>
-					
+
 					</view>
 				</view>
 			</template>
-			
-			
-			
+
+
 		</u-waterfall>
 	</view>
 
@@ -47,10 +48,9 @@
 <script>
 	export default {
 		name: "GoodsWaterfallS",
-		props: ["goodsList"],
+		props: ["goodsList", "isMyHome"],
 		data() {
-			return {
-			}
+			return {}
 		},
 		methods: {
 			want(e) {
@@ -61,7 +61,7 @@
 				}).then(res => {
 					console.log(res)
 					if (res.errCode == 0) {
-						this.$u.toast('请求发送成功', 2000)
+						this.$u.toast('申请发送成功', 2000)
 					} else {}
 				})
 

@@ -15,7 +15,7 @@
 						</view>
 					</view>
 				</view>
-				
+
 				<view class="headRight" v-if="isMine">
 					<text class="people">已有{{peopleNum}}人想要</text>
 					<button type="default" class="want" @click="goTransfer">转送</button>
@@ -41,10 +41,10 @@
 						<text class="itemTitle">{{item.name}}</text>
 					</view>
 				</view>
-				
+
 			</scroll-view>
 		</view>
-		
+
 	</view>
 </template>
 
@@ -56,38 +56,38 @@
 		mixins: [shareMixins],
 		data() {
 			return {
-				isMine:true,
+				isMine: true,
 				swiperList: [],
-				goodsName:"",
-				describe:"",
+				goodsName: "",
+				describe: "",
 				peopleNum: 0,
-				wantedUid:[],
+				wantedUid: [],
 				goodsList: [],
-				userInfo:{},
-				
+				userInfo: {},
+
 			}
 		},
 		methods: {
-			goTransfer(){
-				this.$u.vuex('vuex_wantedUid',this.wantedUid)
+			goTransfer() {
+				this.$u.vuex('vuex_wantedUid', this.wantedUid)
 				uni.navigateTo({
-					url:'../myPart/goodsHome/transfer'
+					url: '../myPart/goodsHome/transfer'
 				})
 			},
-			goHomePage(){
+			goHomePage() {
 				this.$u.vuex('vuex_search', this.userInfo);
-				
+
 				uni.navigateTo({
-					url:'../myPart/goodsHome/goodsHome?id='+this.userInfo.uid
+					url: '../myPart/goodsHome/goodsHome?id=' + this.userInfo.uid
 				})
 			},
-			goChat(){
+			goChat() {
 				uni.navigateTo({
-					url:'../chatPart/chatPage?where=detail'
+					url: '../chatPart/chatPage?where=detail'
 				})
-				console.log(this.vuex_goodsInfo)	
+				console.log(this.vuex_goodsInfo)
 			},
-			want(){
+			want() {
 				this.$u.api.user_want_the_item({
 					itemId: this.vuex_goodsInfo.itemId,
 					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
@@ -100,47 +100,50 @@
 			}
 		},
 		onShow() {
-			if(this.vuex_goodsInfo.fromUser == this.vuex_openid){
+			if (this.vuex_goodsInfo.fromUser == this.vuex_openid) {
 				this.isMine = true
 				this.peopleNum = this.vuex_goodsInfo.wantedUid.length
 				this.wantedUid = this.vuex_goodsInfo.wantedUid
-			} else{
+			} else {
 				this.isMine = false
 			}
 			this.swiperList = this.vuex_goodsInfo.imgUrls
 			this.goodsName = this.vuex_goodsInfo.name
 			this.describe = this.vuex_goodsInfo.desc
 			this.$req('/friend/get_friends_info', {
-					uid:this.vuex_goodsInfo.fromUser,
-					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
-				}).then(res => {
-					console.log(res.data,"获取用户信息")
-					
-					if(res.errCode==0){
+				uid: this.vuex_goodsInfo.fromUser,
+				operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+			}).then(res => {
+				console.log(res.data, "获取用户信息")
+
+				if (res.errCode == 0) {
 					this.userInfo = res.data
-					this.shareData.path = '/pages/findPart/find?uid='+ this.userInfo.uid+'&goodsid=' + this.vuex_goodsInfo.itemId + '&shareName='+ this.vuex_nick_name + '&shareUid=' + this.vuex_openid
-					}
-				})
-				
+					this.shareData.path = '/pages/findPart/find?uid=' + this.userInfo.uid + '&goodsid=' + this
+						.vuex_goodsInfo.itemId + '&shareName=' + this.vuex_nick_name + '&shareUid=' + this
+						.vuex_openid
+				}
+			})
+
 			let parameter = {}
 			parameter.uidList = [this.vuex_goodsInfo.fromUser]
 			parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
-			this.$u.api.get_users_items(parameter).then(res=>{
-				console.log(res.data[0].items,"其他闲置");
-				console.log(this.vuex_goodsInfo.itemId );
-				for(let i = 0; i<res.data[0].items.length;i++){
-					if(this.vuex_goodsInfo.itemId == res.data[0].items[i].itemId){
-						res.data[0].items.splice(i,1)
-						this.goodsList =  res.data[0].items
+			this.$u.api.get_users_items(parameter).then(res => {
+				console.log(res.data[0].items, "其他闲置");
+				let list = res.data[0].items.filter(item=>item.toUser.length==0)
+				console.log(this.vuex_goodsInfo.itemId);
+				for (let i = 0; i < list.length; i++) {
+					if (this.vuex_goodsInfo.itemId == list[i].itemId) {
+						list.splice(i, 1)
+						this.goodsList = list
 						console.log(this.goodsList);
 						return
 					}
 				}
 			})
-			
+
 		}
-		
-		
+
+
 	}
 </script>
 
@@ -158,6 +161,7 @@
 		.main {
 			margin-top: 60rpx;
 			padding: 0 48rpx;
+
 			.head {
 				display: flex;
 				align-items: center;
@@ -166,6 +170,7 @@
 				.headLeft {
 					display: flex;
 					align-items: center;
+
 					.headIcon {
 						width: 94rpx;
 						height: 94rpx;
@@ -173,11 +178,12 @@
 					}
 
 					.nameCon {
-						height:  100rpx;
+						height: 100rpx;
 						display: flex;
 						flex-direction: column;
 						justify-content: space-between;
 						margin-left: 20rpx;
+
 						.name {
 							font-size: 30rpx;
 							font-weight: 500;
@@ -185,13 +191,13 @@
 						}
 
 						.titleCon {
-							
+
 							.goodStitle {
 								height: 44rpx;
 								background: #FFF2B8;
 								border-radius: 2px;
 								border: 1px solid #000000;
-								padding:  0 14rpx;
+								padding: 0 14rpx;
 								line-height: 44rpx;
 							}
 
@@ -208,16 +214,18 @@
 				}
 
 				.headRight {
-					height:  100rpx;
+					height: 100rpx;
 					display: flex;
 					flex-direction: column;
 					justify-content: space-between;
 					align-items: center;
-					.people{
+
+					.people {
 						font-size: 22rpx;
 						font-weight: 400;
 						color: #333333;
 					}
+
 					.want {
 						@extend .btn;
 						margin: 0;
@@ -228,19 +236,20 @@
 					}
 				}
 			}
-		
-			.detail{
+
+			.detail {
 				margin-top: 40rpx;
 				font-size: 26rpx;
 				font-weight: 400;
 				color: #333333;
 			}
 		}
-	
-		.footer{
+
+		.footer {
 			padding-left: 48rpx;
 			margin-top: 40rpx;
-			.footerTitle{
+
+			.footerTitle {
 				font-size: 28rpx;
 				font-weight: 400;
 				color: #000000;
@@ -249,30 +258,36 @@
 				justify-content: space-between;
 				margin-right: 48rpx;
 			}
-			.scrollArea{
+
+			.scrollArea {
 				margin-top: 16rpx;
 				margin-bottom: 40rpx;
-				.container{
+
+				.container {
 					display: flex;
-				
-				.item{
-					display: flex;
-					flex-direction: column;
-					align-items: center;
-					margin-right: 28rpx;
-					.itemImg{
-						width: 168rpx;
-						height: 168rpx;;
+
+					.item {
+						display: flex;
+						flex-direction: column;
+						align-items: center;
+						margin-right: 28rpx;
+
+						.itemImg {
+							width: 168rpx;
+							height: 168rpx;
+							;
+						}
+
+						.itemTitle {
+							font-size: 22rpx;
+							font-weight: 500;
+							color: #333333;
+							margin-top: 24rpx;
+						}
 					}
-					.itemTitle{
-						font-size: 22rpx;
-						font-weight: 500;
-						color: #333333;
-						margin-top: 24rpx;
-					}
-				}}
+				}
 			}
 		}
-	
+
 	}
 </style>

@@ -5,6 +5,11 @@
 			username: '白居易'
 		},
 		onLaunch(options) {
+			
+			// this.$u.vuex('vuex_token','')
+			// this.$u.vuex('vuex_wsToken','')
+			
+			
 			console.log(options, "onlaunch获取");
 			if (options.query.goodsid != undefined) {
 				let share = {}
@@ -26,15 +31,15 @@
 			 * h5，app-plus(nvue下也为app-plus)，mp-weixin，mp-alipay......
 			 */
 
-			if (this.vuex_token == '' || this.vuex_wsToken == '') {
-				uni.navigateTo({
-					url: 'pages/login/login'
-				})
-			} else {
-				uni.reLaunch({
-					url: 'pages/findPart/find'
-				})
-			}
+			// if (this.vuex_token == '' || this.vuex_wsToken == '') {
+			// 	uni.navigateTo({
+			// 		url: 'pages/login/login'
+			// 	})
+			// } else {
+			// 	uni.reLaunch({
+			// 		url: 'pages/findPart/find'
+			// 	})
+			// }
 
 
 		},
@@ -50,58 +55,67 @@
 				console.log(shareOnshow, "onshowshareshareshare");
 			}
 
-
-			let infoNumber = 0
-			this.$req('/friend/get_friend_apply_list', {
-				operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
-			}).then(res => {
-				if (res.errCode == 0) {
-					let list = res.data.filter(item => item.flag == 0)
-					infoNumber = list.length + infoNumber
-				}
-				this.$req('/group/get_group_applicationList', {
+			
+			if(this.vuex_token != '' && this.vuex_wsToken != ''){
+				
+				let infoNumber = 0
+				this.$req('/friend/get_friend_apply_list', {
 					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
 				}).then(res => {
-					let list = res.data.user.filter(item => item.handleStatus == 0)
-					console.log(list, "list");
-					infoNumber = list.length + infoNumber
-
-
-					let parameter = {}
-					parameter.uidList = [this.vuex_openid]
-					parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
-					this.$u.api.get_users_items(parameter).then(res => {
-						console.log(res.data[0].items, "其他闲置");
-						let wantList = res.data[0].items.filter(item => item.wantedUid.length > 0)
-
-						infoNumber = wantList.length + infoNumber
-
-						console.log(infoNumber, "infoNumber");
-						if (infoNumber > 0) {
-							uni.showTabBarRedDot({
-								index: 3
-							})
-
-							this.$u.vuex('vuex_noticeNumber', infoNumber)
-						} else if (infoNumber == 0) {
-							uni.hideTabBarRedDot({
-								index: 3
-							})
-							this.$u.vuex('vuex_noticeNumber', 0)
-						}
+					if (res.errCode == 0) {
+						let list = res.data.filter(item => item.flag == 0)
+						infoNumber = list.length + infoNumber
+					}
+					this.$req('/group/get_group_applicationList', {
+						operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+					}).then(res => {
+						let list = res.data.user.filter(item => item.handleStatus == 0)
+						console.log(list, "list");
+						infoNumber = list.length + infoNumber
+				
+				
+						let parameter = {}
+						parameter.uidList = [this.vuex_openid]
+						parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
+						this.$u.api.get_users_items(parameter).then(res => {
+							console.log(res.data[0].items, "其他闲置");
+							let wantList = res.data[0].items.filter(item => item.wantedUid.length > 0 && item.toUser.length==0)
+				
+							infoNumber = wantList.length + infoNumber
+				
+							console.log(infoNumber, "infoNumber");
+							if (infoNumber > 0) {
+								uni.showTabBarRedDot({
+									index: 3
+								})
+				
+								this.$u.vuex('vuex_noticeNumber', infoNumber)
+							} else if (infoNumber == 0) {
+								uni.hideTabBarRedDot({
+									index: 3
+								})
+								this.$u.vuex('vuex_noticeNumber', 0)
+							}
+						})
+				
+				
+				
+				
+				
 					})
-
-
-
-
-
+				
+				
 				})
-
-
-			})
-
-
-
+				
+				
+				
+				
+				
+				
+			}	
+			
+			
+		
 
 
 
@@ -120,4 +134,42 @@
 	button:active {
 		background-color: #21D6B9 !important;
 	}
+	
+	.x-popupMain{
+		width: 580rpx;
+		.x-popupHead{
+			padding: 0 60rpx;
+			min-height: 180rpx;
+			border-bottom: 2rpx solid rgba(151, 151, 151, 0.5);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 32rpx;
+			font-weight: 400;
+			color: #333333;
+			line-height: 44rpx;
+		}
+		.x-popupFooter{
+			
+			.x-popupFooterItem{
+				width: 290rpx;
+				height: 106rpx;
+				line-height: 106rpx;
+				text-align: center;
+				font-size: 32rpx;
+				font-weight: 500;
+				color: #333333;
+			}
+			.x-confirm{
+				border-left: 2rpx solid rgba(151, 151, 151, 0.5);
+			}
+			.x-confirm:active{
+				background-color:  #25EFCF;
+			}
+		}
+	}
+	
+	
+	
+	
 </style>

@@ -8,7 +8,7 @@
 			</view>
 		</view>
 
-		<GoodsWaterfallS :goodsList="flowList" @edit="editShow = true" v-if="waterCreate"/>
+		<GoodsWaterfallS :goodsList="flowList" :isMyHome="isMyHome"  @edit="editShow = true" v-if="waterCreate"/>
 
 		
 		<u-popup v-model="editShow" mode="center" border-radius="20">
@@ -44,7 +44,6 @@
 				id: "",
 				avatar: "",
 				isMyHome: false,
-				isMyHomew: false,
 				editShow: false,
 				goodsList: [],
 				flowList: [],
@@ -62,6 +61,7 @@
 				this.$u.api.get_users_items(parameter).then(res => {
 					console.log(res.data[0].items);
 					this.goodsList = res.data[0].items
+					this.goodsList = this.goodsList.filter(item=>item.toUser.length==0)
 					this.flowList = []
 					for (let i = 0; i < this.goodsList.length; i++) {
 						let item = JSON.parse(JSON.stringify(this.goodsList[i]))
@@ -140,7 +140,6 @@
 				this.id = this.vuex_search.uid
 				this.avatar = this.vuex_search.icon
 				this.getList()
-			
 			}
 		}
 	}
