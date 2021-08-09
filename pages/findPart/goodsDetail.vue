@@ -118,7 +118,7 @@
 					
 					if(res.errCode==0){
 					this.userInfo = res.data
-					this.shareData.path = '/pages/login/shareUse?uid='+ this.userInfo.uid+'&goodsid=' + this.vuex_goodsInfo.itemId + '&shareName='+ this.vuex_nick_name + '&shareUid=' + this.vuex_openid
+					this.shareData.path = '/pages/findPart/find?uid='+ this.userInfo.uid+'&goodsid=' + this.vuex_goodsInfo.itemId + '&shareName='+ this.vuex_nick_name + '&shareUid=' + this.vuex_openid
 					}
 				})
 				

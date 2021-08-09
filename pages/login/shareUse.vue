@@ -11,9 +11,22 @@
 				
 			}
 		},
-		onLoad() {
-			
-		}
+		// onLoad(options) {
+		// 	console.log(options, "shareuse获取");
+		// 	if (options.uid != undefined) {
+		// 		let share = {}
+		// 		share.uid = options.uid
+		// 		share.goodsid = options.goodsid
+		// 		share.shareName = options.shareName
+		// 		share.shareUid = options.shareUid
+		// 		this.$u.vuex('vuex_shareInfo', share)
+				
+
+		// 		uni.reLaunch({
+		// 			url: 'pages/findPart/find'
+		// 		})
+		// 	}
+		// }
 	}
 </script>
 

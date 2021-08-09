@@ -90,6 +90,7 @@
 			},
 		},
 		onLoad:function(options) {
+		
 			that = this
 			uni.login({
 				provider: 'weixin',
@@ -98,21 +99,7 @@
 					that.code = loginRes.code
 				},
 			})
-			// console.log(options);
-			// const fromStr = options.from
-			// if(fromStr=='setting'){
-			// 	this.fromUrl = '/pages/setting/setting'
-			// }else if(fromStr=='release'){
-			// 	this.fromUrl = '/pages/release/release'
-			// }else if(fromStr=='concern'){
-			// 	this.fromUrl = '/pages/concern/concern'
-			// }else if(fromStr.indexOf('details')!=-1){
-			// 	this.tabStatus= false
-			// 	this.fromUrl = '/pages/concern/'+fromStr+'?itemId='+options.itemId
-			// }else if(fromStr.indexOf('findOne')!=-1){
-			// 	this.tabStatus= false
-			// 	this.fromUrl = '/pages/concern/'+fromStr+'?uid='+options.uid
-			// }
+			
 		}
 	}
 </script>

@@ -17,7 +17,7 @@
 
 
 		</view>
-		<view class="bulletin-board" >
+		<view class="bulletin-board">
 			<image src="/static/common/image/horn.png" mode="" class="horn"></image>
 			<text class="boardText">{{groupInfo.notification.length>0?groupInfo.notification:'暂无公告'}}</text>
 		</view>
@@ -36,73 +36,167 @@
 		},
 		data() {
 			return {
-				showWaterfall: true,
+				showWaterfall: false,
 				isAdmin: true,
-				flowList:[],
+				flowList: [],
 				goodsList: [],
-				groupInfo:{}
+				groupInfo: {}
 			}
 		},
 		methods: {
-			copy(){
+			copy() {
 				let _this = this
 				uni.setClipboardData({
-				    data: _this.groupInfo.groupId,
-				    success: function () {
+					data: _this.groupInfo.groupId,
+					success: function() {
 						uni.hideToast()
 						uni.showToast({
-				           title: '复制成功',
-				           duration: 2000
-				       });
-				    }
+							title: '复制成功',
+							duration: 2000
+						});
+					}
 				});
 			},
 			goManage() {
-				this.$u.vuex('vuex_groupid',this.groupInfo.groupId)
+				this.$u.vuex('vuex_groupid', this.groupInfo.groupId)
 				uni.navigateTo({
 					url: './groupManage'
 				})
 			},
-			exitGroup(){
+			exitGroup() {
 				this.$req('/group/quit_group', {
 					groupID: this.groupInfo.groupId,
 					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
 				}).then(res => {
 					console.log(res);
-					if(res.errCode==0){
+					if (res.errCode == 0) {
 						uni.navigateBack({
-						    delta: 1
+							delta: 1
 						});
-						this.$u.toast('退出群组成功',2000)
+						this.$u.toast('退出群组成功', 2000)
 					}
+
+				})
+			},
+			getList(){
+				
+				this.$req('/group/get_groups_info', {
+					groupIDList: [this.vuex_groupList.groupInfo.groupId],
+					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+				}).then(res => {
+					this.groupInfo = res.data[0]
+				
+					this.$req('/group/get_group_member_list', {
+						groupID: this.groupInfo.groupId,
+						nextSeq: 0,
+						operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+					}).then(res => {
+						console.log(res, "群成员");
+				
+						let ids = res.data.map(item => item.userId)
+						this.$req('/user/get_user_info', {
+							uidList: ids,
+							operationID: this.vuex_openid + JSON.stringify(new Date()
+								.getTime())
+						}).then(res => {
+				
+							var userList = []
+							for (let t = 0; t < res.data.length; t++) {
+								let userInfo = {}
+								userInfo.name = res.data[t].name
+								userInfo.icon = res.data[t].icon
+								userInfo.uid = res.data[t].uid
+								userInfo.groupId = this.groupInfo.groupId
+								userList.push(userInfo)
+				
+							}
+							console.log(userList, "拼接");
+				
+				
+							// console.log(groupListId, "99999999999999999");
+							let parameter = {}
+							parameter.usersInfoList = userList
+							parameter.operationId = this.vuex_openid + JSON.stringify(
+								new Date().getTime())
+							this.$u.api.get_group_users_items(parameter).then(res => {
+								// let trans = res.data
+								// let item = {}
+								// item.groupInfo = groupListId[i]
+								// item.goodsList = []
+								res.data.forEach(val => {
+									this.goodsList = [...val.items]
+								})
+								console.log(this.goodsList,
+									"groupInfo.groupIdgroupInfo.groupIdgroupInfo.groupId");
+				
+								if (this.goodsList != 0) {
+									this.showWaterfall = false
+									this.flowList = []
+									for (let i = 0; i < this.goodsList.length; i++) {
+										let item = JSON.parse(JSON.stringify(this.goodsList[
+											i]))
+										this.flowList.push(item)
+									}
+									let _this = this
+									setTimeout(function() {
+										_this.showWaterfall = true
+									}, 300)
+									
+									
+									
+									
+								}
+				
+				
+								console.log(this.flowList, "物品列表");
+				
+				
+							})
+				
+						})
+					})
+				
+				
 				
 				})
+				
 			}
 		},
 		onShow() {
-			console.log(this.vuex_groupList,"4444444444444");
-			
-			if(this.vuex_groupList.goodsList.length!=0){
-				this.goodsList = this.vuex_groupList.goodsList
-				this.flowList = []
-				for (let i = 0; i < this.goodsList.length; i++) {
-					let item = JSON.parse(JSON.stringify(this.goodsList[i]))
-					this.flowList.push(item)
-				}
-				
-				
-			}
-			
-			
-			console.log(this.flowList, "物品列表");
-			
-			this.groupInfo = this.vuex_groupList.groupInfo
-			if (this.vuex_groupList.groupInfo.ownerId == this.vuex_openid) {
-				this.isAdmin = true
-			} else {
-				this.isAdmin = false
-			}
-			
+			this.getList()
+
+
+			// this.groupInfo = this.vuex_groupList.groupInfo
+			// if (this.vuex_groupList.groupInfo.ownerId == this.vuex_openid) {
+			// 	this.isAdmin = true
+			// } else {
+			// 	this.isAdmin = false
+			// }
+
+
+
+			// console.log(this.vuex_groupList, "4444444444444");
+
+
+
+			// if (this.vuex_groupList.goodsList.length != 0) {
+			// 	this.showWaterfall = false
+			// 	this.goodsList = this.vuex_groupList.goodsList
+			// 	this.flowList = []
+			// 	for (let i = 0; i < this.goodsList.length; i++) {
+			// 		let item = JSON.parse(JSON.stringify(this.goodsList[i]))
+			// 		this.flowList.push(item)
+			// 	}
+
+			// 	this.showWaterfall = true
+			// }
+
+
+			// console.log(this.flowList, "物品列表");
+
+		},
+		onPullDownRefresh(){
+			this.getList()
 		}
 	}
 </script>

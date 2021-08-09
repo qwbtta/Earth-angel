@@ -22,7 +22,17 @@
 				</view>
 				<button type="default" class="btn" @click="agree(item)">同意</button>
 			</view>
-
+			
+			<view class="noticeItem" v-for="item in wantList" :key="item.itemId">
+				<view class="left u-flex">
+					<image :src="item.imgUrls[0]" mode="" class="itemImg"></image>
+					<view class="info">
+						<text class="user">{{item.name}}</text>
+						<text class="behavior">有人想要该物品</text>
+					</view>
+				</view>
+				<button type="default" class="btn" @click="goDtail(item)">查看</button>
+			</view>
 
 		</view>
 	</view>
@@ -33,7 +43,8 @@
 		data() {
 			return {
 				list: [],
-				applyList: []
+				applyList: [],
+				wantList: [],
 			}
 		},
 		methods: {
@@ -67,12 +78,18 @@
 					handleResult: 1,
 					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
 				}).then(res => {
-					console.log(arguments, "arg");
 					console.log(res);
 					if (res.errCode == 0) {
 						this.$u.toast('同意申请成功')
 						this.getList()
 					}
+				})
+			},
+			goDtail(e){
+				console.log(e, "45455454");
+				this.$u.vuex('vuex_goodsInfo', e);
+				uni.navigateTo({
+					url: '/pages/findPart/goodsDetail'
 				})
 			},
 			getList() {
@@ -111,12 +128,32 @@
 							this.applyList = list
 							console.log(this.applyList, "this.applyList =");
 						}
-						if (this.list.length == 0 && this.applyList.length == 0) {
-							this.$u.vuex('vuex_noticeNumber', 0)
-							uni.hideTabBarRedDot({
-								index: 3
-							})
-						}
+						
+						
+						let parameter = {}
+						parameter.uidList = [this.vuex_openid]
+						parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
+						this.$u.api.get_users_items(parameter).then(res=>{
+							console.log(res.data[0].items,"其他闲置");
+							this.wantList = res.data[0].items.filter(item => item.wantedUid.length>0)
+							
+							if (this.list.length == 0 && this.applyList.length == 0 && this.wantList.length==0) {
+								this.$u.vuex('vuex_noticeNumber', 0)
+								uni.hideTabBarRedDot({
+									index: 3
+								})
+							}
+							
+							
+							
+						})
+						
+						
+						
+						
+						
+						
+						
 
 
 					})

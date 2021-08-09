@@ -71,10 +71,12 @@
 				}).then(res=>{
 					console.log(res,"444444444");
 					if(res.errCode==0){
-						this.$u.toast('删除成功,群内显示会有延迟')
+						this.$u.toast('删除成功')
 						this.list = this.list.filter(item=>item.checked==false)
 						let groupList = this.vuex_groupList
 						groupList.goodsList = this.list
+						
+						console.log(groupList,"”groupListgroupListgroupList");
 						this.$u.vuex('vuex_groupList', groupList)
 					}
 				})

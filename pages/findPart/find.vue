@@ -9,7 +9,7 @@
 		<view class="main">
 			<view class="searchCon">
 				<view class="inputFather">
-					<input type="text" placeholder="搜索用户或群组名称" v-model="search" class="search"/>
+					<input type="text" placeholder="搜索用户或群组名称" v-model="search" class="search" />
 					<image src="/static/common/image/search.png" mode="" class="searchIcon" v-if="search==''">
 					</image>
 					<image src="/static/common/image/searchShow.png" mode="" class="searchIcon"
@@ -37,29 +37,29 @@
 					</view>
 
 				</view>
-				
+
 				<view class="remind" v-if="selected==1 && flowList.length==0" @click="focous">
 					<image src="/static/common/image/horn.png" mode="" class="horn"></image>
 					<view class="remindInfo">
-						<text>您关注的地球天使中还没有发布物品哦,</text><text >快去添加更多地球天使吧~</text>
-						
+						<text>您关注的地球天使中还没有发布物品哦,</text><text>快去添加更多地球天使吧~</text>
+
 					</view>
-					
+
 				</view>
 				<GoodsWaterfall :goodsList="flowList" v-if="selected==1 && flowList.length!=0" />
-				
-				
-				
+
+
+
 				<view class="remind" v-if="selected==2 && groupGoodsList.length==0">
 					<image src="/static/common/image/horn.png" mode="" class="horn"></image>
 					<view class="remindInfo">
 						<text>您还没有加入任何群组哦</text>
-						
+
 					</view>
-					
+
 				</view>
-				
-				
+
+
 				<view class="group" v-if="selected==2 && groupGoodsList.length!=0">
 					<view class="group-item" v-for="(item,index) in groupGoodsList" :key="index">
 						<view class="head u-flex">
@@ -183,10 +183,10 @@
 
 
 			},
-			shareMore(){
-				this.$u.vuex('vuex_goodsInfo',this.shareInfo)
+			shareMore() {
+				this.$u.vuex('vuex_goodsInfo', this.shareInfo)
 				uni.navigateTo({
-					url:'./goodsDetail'
+					url: './goodsDetail'
 				})
 			},
 			goNewGroup() {
@@ -209,7 +209,7 @@
 						groupListId = res.data
 						console.log(res.data, "群列表");
 						for (let i = 0; i < res.data.length; i++) {
-							
+
 							this.$req('/group/get_group_member_list', {
 								groupID: res.data[i].groupId,
 								nextSeq: 0,
@@ -281,19 +281,19 @@
 			}
 		},
 		onShow() {
-			
-			if (JSON.stringify(this.vuex_shareInfo) != '{}') {
+			console.log(this.vuex_shareInfo, "this.vuex_shareInfothis.vuex_shareInfo");
+			if (JSON.stringify(this.vuex_shareInfo) != '{}' && this.shareInfo.itemId != this.vuex_shareInfo.goodsid) {
 
 				let sInfo = this.vuex_shareInfo
-				
+
 				this.$req('/friend/add_friend', {
-					uid:sInfo.shareUid,
+					uid: sInfo.shareUid,
 					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
 				}).then(res => {
-					
+
 				})
-	
-				console.log(sInfo,"vuex分享分享xxxxx");
+
+				console.log(sInfo, "vuex分享分享xxxxx");
 				this.$req('/user/get_user_info', {
 					uidList: [sInfo.uid],
 					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
@@ -304,16 +304,18 @@
 					parameter.uidList = [uinfo.uid]
 					parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
 					this.$u.api.get_users_items(parameter).then(res => {
-						res.data[0].items[0].icon = uinfo.icon
-						res.data[0].items[0].userName = uinfo.name
-						res.data[0].items[0].uid = uinfo.uid
-						this.shareInfo = res.data[0].items[0]
+						let t = res.data[0].items.filter(item => item.itemId == sInfo.goodsid)
+
+						this.shareInfo = t[0]
+						this.shareInfo.icon = uinfo.icon
+						this.shareInfo.userName = uinfo.name
+						this.shareInfo.uid = uinfo.uid
 						this.shareInfo.shareName = sInfo.shareName
 						this.shareShow = true
-						this.$u.vuex('vuex_shareInfo',{})
-						
-						console.log(this.shareInfo,"分享分享");
-						
+						this.$u.vuex('vuex_shareInfo', {})
+						console.log(this.vuex_shareInfo, "重置重置");
+						console.log(this.shareInfo, "分享分享");
+
 					})
 
 
@@ -321,6 +323,9 @@
 
 
 			}
+
+
+
 			this.selected = 1
 			//清创建群组的页面的一个数据
 			this.$u.vuex('vuex_memberNum', [])
@@ -366,6 +371,7 @@
 			})
 
 		}
+		
 	}
 </script>
 
@@ -473,32 +479,33 @@
 					}
 
 				}
-				
-				.remind{
+
+				.remind {
 					padding: 30rpx;
 					margin: 0 48rpx;
 					box-shadow: 0px 0px 8px 2px rgba(0, 0, 0, 0.12);
 					border-radius: 20rpx;
 					display: flex;
-					.horn{
+
+					.horn {
 						width: 32rpx;
 						height: 32rpx;
 						flex-shrink: 0;
-						
+
 					}
-					
-					.remindInfo{
+
+					.remindInfo {
 						font-size: 26rpx;
 						font-weight: 500;
 						color: #666666;
 						margin-left: 30rpx;
 						display: flex;
 						flex-direction: column;
-						
-						
+
+
 					}
 				}
-				
+
 				.group {
 					margin-left: 48rpx;
 

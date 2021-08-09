@@ -8,9 +8,9 @@
 			</view>
 		</view>
 
-		<GoodsWaterfallS :goodsList="flowList" @edit="editShow = true" />
+		<GoodsWaterfallS :goodsList="flowList" @edit="editShow = true" v-if="waterCreate"/>
 
-
+		
 		<u-popup v-model="editShow" mode="center" border-radius="20">
 			<view class="popupHead">
 				管理物品
@@ -48,11 +48,14 @@
 				editShow: false,
 				goodsList: [],
 				flowList: [],
-				repeatId: ""
+				repeatId: "",
+				waterCreate:false
 			}
 		},
 		methods: {
+			
 			getList() {
+				this.waterCreate = false
 				let parameter = {}
 				parameter.uidList = [this.id]
 				parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
@@ -64,7 +67,7 @@
 						let item = JSON.parse(JSON.stringify(this.goodsList[i]))
 						this.flowList.push(item)
 					}
-
+					this.waterCreate = true
 					console.log(this.flowList, "6666");
 
 				})
@@ -95,8 +98,10 @@
 				parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
 				this.$u.api.delete_item(parameter).then(res => {
 					this.editShow = false
+					console.log(res,"11111");
 					if (res.errCode == 0) {
 						this.getList()
+						this.$u.toast('删除成功');
 					} else {
 						this.$u.toast('删除失败');
 					}
@@ -143,6 +148,7 @@
 
 <style lang="scss" scoped>
 	.goodsHome {
+
 
 		.head {
 			display: flex;

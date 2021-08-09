@@ -65,10 +65,7 @@
 					this.$u.toast('请设置群头像')
 					return false
 				} 
-				else if (this.memberList.length == 0) {
-					this.$u.toast('请添加至少一名群成员')
-					return false
-				} else if (this.$u.trim(this.groupName).length == 0) {
+				 else if (this.$u.trim(this.groupName).length == 0) {
 					this.$u.toast('请设置群组名称')
 					return false
 				}
