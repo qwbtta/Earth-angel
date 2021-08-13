@@ -13,8 +13,9 @@
 					</view>
 					<view class="list-main-bottom">
 						<text
-							class="info">{{item.latest.content.length>35?item.latest.content.slice(0,35)+'...':item.latest.content}}</text>
-						<text class="time"> {{item.latest.serverMsgID.slice(11,16)}}</text>
+							class="info">{{item.latest.content.length>25?item.latest.content.slice(0,25)+'...':item.latest.content}}</text>
+						<!-- <text class="time"> {{item.latest.serverMsgID.slice(11,16)}}</text> -->
+						<text class="time"> {{ Number(JSON.stringify(item.latest.sendTime).slice(0,10))>today?item.latest.serverMsgID.slice(11,16):item.latest.serverMsgID.slice(5,10)}}</text>
 					</view>
 				</view>
 			</view>
@@ -34,7 +35,7 @@
 					</view>
 				</view>
 			</view>
-			
+
 		</u-popup>
 	</view>
 </template>
@@ -45,17 +46,26 @@
 			return {
 				seq: 0,
 				sessionList: [],
-				loginPopup:false
+				loginPopup: false,
+				today: 0
 			}
 		},
 		methods: {
-			goLogin(){
-				this.loginPopup= false
+			sortNumber(a, b) {
+				return b.latest.sendTime - a.latest.sendTime
+			},
+			goLogin() {
+				this.loginPopup = false
 				uni.navigateTo({
-					url:'../login/login'
+					url: '../login/login'
 				})
 			},
 			getList() {
+				let today = new Date(new Date().toLocaleDateString()).getTime()
+				this.today = Number(JSON.stringify(today).slice(0, 10))
+				
+				
+				console.log(this.today, "todaytodaytoday");
 				this.$req('/chat/newest_seq', {
 
 					reqIdentifier: 1001,
@@ -90,15 +100,16 @@
 							console.log(res, "haoyou")
 							friends = res.data
 							for (let i = 0; i < chatlist.length; i++) {
-								let latest = this.$u.deepClone(chatlist[i].list[chatlist[i].list.length - 1]);
-								console.log(latest,"latestlatestlatest");
+								let latest = this.$u.deepClone(chatlist[i].list[chatlist[i].list
+									.length - 1]);
+								console.log(latest, "latestlatestlatest");
 								if (latest.msgFrom == 200 && latest.contentType != 204) {
 									let transfer = JSON.parse(latest.content)
 									latest.content = transfer.text
-								}else if(latest.contentType == 102){
+								} else if (latest.contentType == 102) {
 									latest.content = '[图片]'
 								}
-							
+
 
 								for (let p = 0; p < friends.length; p++) {
 									if (chatlist[i].id == friends[p].uid) {
@@ -111,8 +122,10 @@
 								chatlist[i].latest = latest
 							}
 
-							console.log(chatlist);
-							this.sessionList = chatlist
+							console.log(chatlist, "ddddddddddd");
+							let sortList = chatlist.sort(this.sortNumber)
+							// console.log(dddd, "dddddddddddddddd");
+							this.sessionList = sortList
 						})
 
 
@@ -139,9 +152,9 @@
 
 		},
 		onShow() {
-			if(this.vuex_token == '' || this.vuex_wsToken == ''){
+			if (this.vuex_token == '' || this.vuex_wsToken == '') {
 				this.loginPopup = true
-			}	
+			}
 			this.getList()
 		}
 	}

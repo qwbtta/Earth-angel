@@ -1,26 +1,29 @@
 <template>
 	<view class="chatPage">
 		<u-navbar :title="friendInfo.name"></u-navbar>
-		<view class="head u-flex" @click="goBack" v-if="headShow">
+		<view class="head u-flex" @click="goDetail" v-if="headShow">
 			<image :src="goodsInfo.imgUrls[0]" mode="aspectFit" class="goodsImg"></image>
 			<view class="info">
 				<text class="title">{{goodsInfo.name}}</text>
 				<text class="tips">赠送之前聊一聊</text>
 			</view>
 		</view>
-		
-			<scroll-view @click="clickScroll" :scroll-into-view="listItem"
-				:style="{height:scrollHeight+'px','margin-top':marginT+'px'}"  scroll-y>
-				<view class="main">
+
+		<scroll-view @click="clickScroll" :scroll-into-view="listItem"
+			:style="{height:scrollHeight+'px','margin-top':marginT+'px'}" scroll-y>
+			<view class="main">
 				<view :class="['chatLeft',item.sendID == vuex_openid?'reverse':'']" v-for="(item,index) in chatList"
-					:key="index" v-if="item.msgFrom==100" :id="'C'+ index">
+					:key="index"  v-if="item.contentType!=204" :id="'C'+ index">
 					<image :src="item.sendID == vuex_openid?vuex_avatar_url:friendInfo.icon" mode=""
-						class="chatHeadIcon"></image>
-					<view class="triangle" v-if="item.contentType==101">
+						class="chatHeadIcon" @click="goHome(item.sendID)"></image>
+					<view class="triangle" v-if="item.contentType!=102">
 
 					</view>
-					<view class="chatMain" v-if="item.contentType==101">
+					<view class="chatMain" v-if="item.contentType==101 ">
 						<text class="chatText">{{item.content}}</text>
+					</view>
+					<view class="chatMain" v-if="item.contentType==202 && item.msgFrom == 200">
+						<text class="chatText">{{JSON.parse(item.content).text}}</text>
 					</view>
 					<image :src="item.content" mode="widthFix" class="imgChat" v-if="item.contentType==102"
 						@click="preview(item)"></image>
@@ -28,8 +31,8 @@
 				</view>
 			</view>
 
-			</scroll-view>
-		
+		</scroll-view>
+
 		<view class="footer">
 			<image src="/static/common/image/sendPhoto.png" mode="" class="sendPhoto" @click="sendImg"></image>
 			<input type="text" v-model="myInput" class="mainInput" />
@@ -54,7 +57,7 @@
 				scrollHeight: 0,
 				listItem: null,
 				timer: null,
-				timerTimes:0,
+				timerTimes: 0,
 			}
 		},
 		methods: {
@@ -90,7 +93,6 @@
 						offlineInfo: {},
 						ext: {}
 					}
-
 				}).then(res => {
 
 					this.$u.vuex('vuex_msgIncr', this.vuex_msgIncr + 1)
@@ -164,18 +166,28 @@
 					}
 				});
 			},
+			goHome(id){
+				this.$u.vuex('vuex_search',this.friendInfo)
+				console.log(this.friendInfo,"this.friendInfothis.friendInfothis.friendInfo");
+				uni.navigateTo({
+					url:'../myPart/goodsHome/goodsHome?id=' + id
+				})
+			},
 			preview(item) {
 				uni.previewImage({
 					urls: [item.content],
 				});
 			},
-			goBack() {
-				uni.navigateBack({
-					delta: 1
-				});
+			goDetail() {
+				this.$u.vuex('vuex_goodsInfo', this.goodsInfo);
+				uni.navigateTo({
+					url: '/pages/findPart/goodsDetail'
+				})
+			
+			
 			},
 			getList() {
-				this.timerTimes = this.timerTimes + 1 
+				this.timerTimes = this.timerTimes + 1
 				this.$req('/chat/newest_seq', {
 					reqIdentifier: 1001,
 					sendID: this.vuex_openid,
@@ -201,10 +213,11 @@
 						this.$u.vuex('vuex_msgIncr', this.vuex_msgIncr + 1)
 						let transfer = res.data.single.filter(item => item.id == this.receiveId)
 						this.chatList = transfer[0].list
-						if(this.timerTimes == 1){
-							this.listItem = 'C'+ (this.chatList.length-1)
+						console.log(transfer[0].list,"transfer[0].list");
+						if (this.timerTimes == 1) {
+							this.listItem = 'C' + (this.chatList.length - 1)
 						}
-						
+
 						console.log(this.chatList, "聊天列表");
 						this.$req('/user/get_user_info', {
 							uidList: [this.receiveId],
@@ -238,8 +251,8 @@
 			}
 			this.getScreen()
 			this.getList()
-			
-			
+
+
 		},
 		onShow() {
 			let _this = this
@@ -262,6 +275,7 @@
 <style lang="scss" scoped>
 	.chatPage {
 		padding-bottom: 120rpx;
+
 		.head {
 			width: 750rpx;
 			height: 176rpx;
@@ -298,6 +312,7 @@
 
 		.main {
 			padding: 54rpx 48rpx;
+
 			.chatLeft {
 				display: flex;
 				align-items: flex-start;
@@ -356,6 +371,7 @@
 					margin-top: 16rpx;
 				}
 			}
+
 			.imgChat {
 				max-width: 300rpx;
 				margin: 6rpx 24rpx 0;
@@ -372,6 +388,7 @@
 			bottom: 0;
 			padding: 0 28rpx;
 			background-color: #FFFFFF;
+
 			.sendPhoto {
 				width: 64rpx;
 				height: 64rpx;

@@ -1,8 +1,10 @@
 <template>
 	<view class="announcement">
-		<textarea class="inputArea" maxlength="300" v-model="announcement"/>
+		<u-navbar :title="title"></u-navbar>
+		<textarea class="inputArea" maxlength="300" v-model="announcement" :placeholder="where=='意见'?'请描述小程序的使用问题，或其他产品建议。':''"/>
 		<view class="footer">
-			<button type="default" class="btn" @click="confirm">发布</button>
+			<button type="default" class="btn" @click="confirm" v-if="where=='公告'">发布</button>
+			<button type="default" class="btn" @click="feedBack" v-if="where=='意见'">提交</button>
 		</view>
 	</view>
 </template>
@@ -11,10 +13,25 @@
 	export default{
 		data(){
 			return{
-				announcement:""
+				announcement:"",
+				title:"",
+				where:""
 			}
 		},
 		methods:{
+			feedBack(){
+				this.$u.api.feedback({
+					msg:this.announcement,
+					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+				}).then(res=>{
+					if(res.errCode==0){
+						uni.navigateBack({
+						    delta: 1
+						});
+						this.$u.toast('提交成功')
+					}
+				})
+			},
 			confirm(){
 				this.$req('/group/set_group_info', {
 					groupID: this.vuex_groupid,
@@ -26,11 +43,18 @@
 						uni.navigateBack({
 						    delta: 1
 						});
-						this.$u.toast('修改成功',2000)
+						this.$u.toast('修改成功')
 					}
 				})
 			}
+		},
+		onLoad(options) {
+			if(options.where == 'my'){
+				this.where = '意见'
+				this.title = '意见反馈'
+			}
 		}
+		
 	}
 </script>
 

@@ -5,26 +5,26 @@
 			<text>物品名称</text>
 			<image src="/static/common/image/moon.png" mode="" class="titleImg"></image>
 		</view>
-		<input type="text" class="nameInput" v-model="goodsName" />
+		<input type="text" class="nameInput" v-model="goodsName" placeholder="请输入物品的名称" />
 		<view class="titleCon">
 			<text>物品描述</text>
 			<image src="/static/common/image/moon.png" mode="" class="titleImg"></image>
 		</view>
-		<textarea class="describeInput" maxlength="320" v-model="goodsDescribe" />
+		<textarea class="describeInput" maxlength="130" v-model="goodsDescribe" placeholder="请对物品添加一些描述..."/>
 		<view class="titleCon">
 			<text>上传照片</text>
 			<image src="/static/common/image/moon.png" mode="" class="titleImg"></image>
 		</view>
 		<view class="photoCon">
 			<view class="photoItem" v-for="(item,index) in photoList" :key="index">
-				<image :src="item" mode="aspectFit" class="photo" ></image>
+				<image :src="item" mode="aspectFit" class="photo"></image>
 				<image src="/static/common/image/clear.png" mode="" class="clear" @click="clearImg(index)"></image>
 			</view>
 			<image src="/static/common/image/addPhoto.png" mode="" class="addImg" @click="addImg"
 				v-if="photoList.length<6"></image>
 
 		</view>
-		<view class="titleCon">
+		<!-- <view class="titleCon">
 			<text>选择发布的位置</text>
 			<image src="/static/common/image/moon.png" mode="" class="titleImg"></image>
 		</view>
@@ -37,9 +37,11 @@
 			</view>
 
 
+		</view> -->
+		<button type="default" class="releaseBtn" @click="release" v-if="!followLoading">发布</button>
+		<view class="loadingCon">
+			<u-loading :show="followLoading" size="200"></u-loading>
 		</view>
-		<button type="default" class="releaseBtn" @click="release">发布</button>
-
 		<u-popup v-model="groupShow" border-radius="20" mode="center" width="550">
 			<view class="popupHead">
 				<text>选择发布的群组</text>
@@ -90,7 +92,7 @@
 					</view>
 				</view>
 			</view>
-			
+
 		</u-popup>
 
 
@@ -109,19 +111,23 @@
 				groupShow: false,
 				allChecked: false,
 				groupChecked: [],
-				friendChoose: false, //选项是否选中以变色
+				friendChoose: true, //选项是否选中以变色
 				groupChoose: false, //选项是否选中以变色
 				groupInfo: [],
-				itemId:"",
-				loginPopup:false
+				itemId: "",
+				loginPopup: false,
+				followLoading: false,
 			}
 		},
-		
+
 		methods: {
-			goLogin(){
-				this.loginPopup= false
+			getStrLength(Str) {
+				return Str.replace(/[\u0391-\uFFE5]/g, "aa").length
+			},
+			goLogin() {
+				this.loginPopup = false
 				uni.navigateTo({
-					url:'../login/login'
+					url: '../login/login'
 				})
 			},
 			addImg() {
@@ -140,26 +146,30 @@
 					}
 				});
 			},
-			clearImg(index){
-				this.photoList.splice(index,1)
+			clearImg(index) {
+				this.photoList.splice(index, 1)
 			},
-			showPopup(){
+			showPopup() {
 				this.groupShow = true
-				if(this.groupInfo.length==0){
+				if (this.groupInfo.length == 0) {
 					this.$req('/group/get_joined_group_list', {
 						operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
-					}).then(res=>{
-						
-						for(let i=0;i<res.data.length;i++){
+					}).then(res => {
+
+						for (let i = 0; i < res.data.length; i++) {
 							res.data[i].checked = false
 						}
 						this.groupInfo = res.data
-						console.log(this.groupInfo,"群列表");
+						console.log(this.groupInfo, "群列表");
 					})
 				}
 			},
 			async release() {
-				if (this.$u.trim(this.goodsName).length == 0) {
+				console.log(this.getStrLength(this.goodsName));
+				if (this.getStrLength(this.goodsName) > 30) {
+					this.$u.toast('物品名称过长')
+					return false
+				} else if (this.$u.trim(this.goodsName).length == 0) {
 					this.$u.toast('请输入物品名称')
 					return false
 				} else if (this.$u.trim(this.goodsDescribe).length == 0) {
@@ -172,23 +182,25 @@
 					this.$u.toast('请选择发布位置')
 					return false
 				}
-				
+
+				this.followLoading = true
+
 				var that = this
-				
-				if (this.vuex_releaseState==1){
+
+				if (this.vuex_releaseState == 1) {
 					let Uploaded = []
 					let noUploaded = []
-					for(let i=0;i<this.photoList.length;i++){
-						if(this.photoList[i].slice(0,19) =="https://earth-angel"){
+					for (let i = 0; i < this.photoList.length; i++) {
+						if (this.photoList[i].slice(0, 19) == "https://earth-angel") {
 							Uploaded.push(this.photoList[i])
-						}else{
+						} else {
 							noUploaded.push(this.photoList[i])
 						}
 					}
-					 var newUploaded = await cosUpload.uploadFile(noUploaded,that)
-					 var photos = Uploaded.concat(newUploaded)
-				}else{
-					var photos = await cosUpload.uploadFile(this.photoList,that)
+					var newUploaded = await cosUpload.uploadFile(noUploaded, that)
+					var photos = Uploaded.concat(newUploaded)
+				} else {
+					var photos = await cosUpload.uploadFile(this.photoList, that)
 				}
 
 
@@ -207,16 +219,16 @@
 					parameter.groupVisible = this.groupChecked
 				}
 
-				if (this.vuex_releaseState==1) {
+				if (this.vuex_releaseState == 1) {
 					parameter.itemId = this.itemId
-					console.log(parameter,"更新");
+					console.log(parameter, "更新");
 					this.$u.api.update_item_info(parameter).then(res => {
-						console.log(res,"ggggggggggggg");
+						console.log(res, "ggggggggggggg");
 						if (res.errCode == 0) {
-							this.$u.vuex('vuex_releaseState',0)
+							this.$u.vuex('vuex_releaseState', 0)
 							Object.assign(this.$data, this.$options.data())
 							uni.navigateTo({
-								url: '../myPart/goodsHome/goodsHome?id='+ this.vuex_openid
+								url: '../myPart/goodsHome/goodsHome?id=' + this.vuex_openid
 							})
 							this.$u.toast('编辑成功');
 						}
@@ -224,12 +236,17 @@
 				} else {
 					this.$u.api.release(parameter).then(res => {
 						if (res.errCode == 0) {
+							this.followLoading = false
 							Object.assign(this.$data, this.$options.data())
-							uni.navigateTo({
-								url: '../myPart/goodsHome/goodsHome?id='+ this.vuex_openid
+							// uni.navigateTo({
+							// 	url: '../myPart/goodsHome/myGoodsHome?id=' + this.vuex_openid
+							// })
+							this.$u.vuex('vuex_refresh',true)
+							uni.switchTab({
+								url:'../findPart/find'
 							})
 							this.$u.toast('发布成功');
-						}else{
+						} else {
 							this.$u.toast('发布失败');
 						}
 					})
@@ -245,6 +262,9 @@
 			},
 			//为了完成UI样式，checkbox和全选字体分开绑定事件
 			textCheckedAll() {
+				console.log('sssssssssssssssssssssssssss');
+
+
 				this.allChecked = !this.allChecked
 				this.groupInfo.map(item => {
 					item.checked = this.allChecked
@@ -261,7 +281,7 @@
 				}
 			},
 			groupConfirm() {
-				if(this.groupInfo.length==0){
+				if (this.groupInfo.length == 0) {
 					this.groupShow = false
 					return
 				}
@@ -284,14 +304,14 @@
 			}
 		},
 		onShow() {
-			
-			if(this.vuex_token == '' || this.vuex_wsToken == ''){
+
+			if (this.vuex_token == '' || this.vuex_wsToken == '') {
 				this.loginPopup = true
-			}			
-			
+			}
+
 			if (JSON.stringify(this.vuex_goodsInfo) != "{}" && this.vuex_releaseState == 1) {
-				this.$u.toast("发布位置需重新选择哟",2000)
-				console.log(this.vuex_goodsInfo,"编辑");
+				// this.$u.toast("发布位置需重新选择哟", 2000)
+				console.log(this.vuex_goodsInfo, "编辑");
 				this.goodsName = this.vuex_goodsInfo.name
 				this.goodsDescribe = this.vuex_goodsInfo.desc
 				this.photoList = this.vuex_goodsInfo.imgUrls
@@ -302,16 +322,16 @@
 				// } else {
 				// 	this.friendChoose = false
 				// }
-					
+
 				this.groupChoose = false
 				this.$u.vuex('vuex_goodsInfo', {});
-				
+
 			}
-			
+
 		},
-		
-		onTabItemTap(e){
-			if(e.index==3){
+
+		onTabItemTap(e) {
+			if (e.index == 3) {
 				this.goodsName = ''
 				this.goodsDescribe = ''
 				this.photoList = []
@@ -323,14 +343,22 @@
 	}
 </script>
 
+<style>
+	page{
+		height: 100%;
+		background-color: #F1F1F1;
+	}
+</style>
 <style lang="scss" scoped>
 	.release {
 		border-top: 1px solid #DBDEE3;
 		padding: 44rpx 48rpx 100rpx;
-
+	
 		/deep/ .u-icon {
 			display: none;
 		}
+
+
 
 		.btn {
 			padding: 0;
@@ -368,6 +396,7 @@
 		}
 
 		.describeInput {
+			background-color: #FFFFFF;
 			height: 234rpx;
 			width: 96%;
 			padding: 2%;
@@ -381,7 +410,8 @@
 			align-items: center;
 			flex-wrap: wrap;
 			margin-bottom: 40rpx;
-			.photoItem{
+
+			.photoItem {
 				width: 172rpx;
 				height: 172rpx;
 				border-radius: 8rpx;
@@ -389,20 +419,24 @@
 				margin-right: 42rpx;
 				margin-bottom: 20rpx;
 				position: relative;
+
 				.photo {
 					width: 100%;
 					height: 100%;
 				}
-				.clear{
+
+				.clear {
 					width: 32rpx;
 					height: 32rpx;
 					position: absolute;
 					top: 0;
 					right: 0;
 				}
-				
+
 			}
+
 			.addImg {
+				background-color: #ffffff;
 				width: 92rpx;
 				height: 92rpx;
 				padding: 41rpx;

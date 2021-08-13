@@ -67,6 +67,8 @@
 			
 			})
 			
+			console.log(this.vuex_memberNum,"this.vuex_memberNumthis.vuex_memberNum");
+			
 			if(this.vuex_memberNum.length!=0){
 				this.newMember = []
 				for(let i =0;i<this.vuex_memberNum.length;i++){
@@ -84,6 +86,27 @@
 					reason:'邀请进群',
 					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
 				}).then(res => {
+					this.$u.vuex('vuex_memberNum',[])
+					this.groupInfo = this.vuex_groupList.groupInfo
+					this.$req('/group/get_group_member_list', {
+						groupID:this.vuex_groupid,
+						nextSeq:0,
+						operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+					}).then(res => {
+						console.log(res, "群成员");
+						
+						let ids = res.data.map(item => item.userId)
+						this.$req('/user/get_user_info', {
+							uidList: ids,
+							operationID: this.vuex_openid + JSON.stringify(new Date()
+								.getTime())
+						}).then(res=>{
+							console.log(res,"5555");
+							this.memberList = res.data
+							
+						})
+					
+					})
 					console.log(res,"进群");
 				
 				})

@@ -1,11 +1,11 @@
 <template>
 	<view class="transfer">
 		<view class="head">
-			<text>该物品有以下朋友想要：</text>
+			<text>赠送给想要该物品的朋友：</text>
 		</view>
 		<view class="main">
 			<view class="item" v-for="item in list" :key="item.uid">
-				<view class="itemLeft u-flex">
+				<view class="itemLeft u-flex" @click="goHomePage(item)">
 					<image :src="item.icon" mode="" class="itemImg"></image>
 					<text class="name">{{item.name}}</text>
 				</view>
@@ -24,6 +24,13 @@
 			}
 		},
 		methods:{
+			goHomePage(item){
+				this.$u.vuex('vuex_search',item)
+				
+				uni.navigateTo({
+					url:'./goodsHome?id=' + item.uid
+				})
+			},
 			give(e){
 				console.log(e,"5555555");
 				let parameter ={}
@@ -40,7 +47,7 @@
 		},
 		onShow() {
 			this.$req('/user/get_user_info', {
-					uidList: this.vuex_wantedUid,
+					uidList: this.vuex_goodsInfo.wantedUid,
 					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
 				}).then(res => {
 					console.log(res)

@@ -5,11 +5,11 @@
 			username: '白居易'
 		},
 		onLaunch(options) {
-			
+
 			// this.$u.vuex('vuex_token','')
 			// this.$u.vuex('vuex_wsToken','')
-			
-			
+
+
 			console.log(options, "onlaunch获取");
 			if (options.query.goodsid != undefined) {
 				let share = {}
@@ -18,6 +18,8 @@
 				share.shareName = options.query.shareName
 				share.shareUid = options.query.shareUid
 				this.$u.vuex('vuex_shareInfo', share)
+			} else if (options.query.groupId != undefined) {
+				this.$u.vuex('vuex_groupShareId', options.query.groupId)
 			}
 
 
@@ -53,69 +55,86 @@
 				shareOnshow.shareUid = op.query.shareUid
 				this.$u.vuex('vuex_shareInfo', shareOnshow)
 				console.log(shareOnshow, "onshowshareshareshare");
+			} else if (op.query.groupId != undefined) {
+				this.$u.vuex('vuex_groupShareId', op.query.groupId)
 			}
 
-			
-			if(this.vuex_token != '' && this.vuex_wsToken != ''){
-				
-				let infoNumber = 0
-				this.$req('/friend/get_friend_apply_list', {
-					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
-				}).then(res => {
-					if (res.errCode == 0) {
-						let list = res.data.filter(item => item.flag == 0)
-						infoNumber = list.length + infoNumber
-					}
-					this.$req('/group/get_group_applicationList', {
-						operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
-					}).then(res => {
-						let list = res.data.user.filter(item => item.handleStatus == 0)
-						console.log(list, "list");
-						infoNumber = list.length + infoNumber
-				
-				
-						let parameter = {}
-						parameter.uidList = [this.vuex_openid]
-						parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
-						this.$u.api.get_users_items(parameter).then(res => {
-							console.log(res.data[0].items, "其他闲置");
-							let wantList = res.data[0].items.filter(item => item.wantedUid.length > 0 && item.toUser.length==0)
-				
-							infoNumber = wantList.length + infoNumber
-				
-							console.log(infoNumber, "infoNumber");
-							if (infoNumber > 0) {
-								uni.showTabBarRedDot({
-									index: 3
-								})
-				
-								this.$u.vuex('vuex_noticeNumber', infoNumber)
-							} else if (infoNumber == 0) {
-								uni.hideTabBarRedDot({
-									index: 3
-								})
-								this.$u.vuex('vuex_noticeNumber', 0)
-							}
-						})
-				
-				
-				
-				
-				
-					})
-				
-				
-				})
-				
-				
-				
-				
-				
-				
-			}	
-			
-			
-		
+
+			// if (this.vuex_token != '' && this.vuex_wsToken != '') {
+
+			// 	let infoNumber = 0
+			// 	this.$u.api.get_users_items({
+			// 		uidList: [this.vuex_openid],
+			// 		operationId: this.vuex_openid + JSON.stringify(new Date().getTime())
+			// 	}).then(res => {
+			// 		console.log(res.data[0],"res.datares.data”res.datares.data");
+			// 		let wantGroup = res.data[0].items.filter(item => item.toUser.length == 0 && item.wantedUid
+			// 			.length > 0)
+			// 		console.log(wantGroup, "wantGroupwantGroup");
+			// 		if (wantGroup.length > 0) {
+			// 			uni.showTabBarRedDot({
+			// 				index: 3
+			// 			})
+			// 			this.$u.vuex('vuex_noticeNumber', 10)
+			// 		} else if (wantGroup.length == 0) {
+			// 			uni.hideTabBarRedDot({
+			// 				index: 3
+			// 			})
+			// 			console.log("4444444");
+			// 			this.$u.vuex('vuex_noticeNumber', 0)
+			// 		}
+			// 	})
+
+
+			// 	// this.$req('/friend/get_friend_apply_list', {
+			// 	// 	operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+			// 	// }).then(res => {
+			// 	// 	if (res.errCode == 0) {
+			// 	// 		let list = res.data.filter(item => item.flag == 0)
+			// 	// 		infoNumber = list.length + infoNumber
+			// 	// 	}
+			// 	// 	this.$req('/group/get_group_applicationList', {
+			// 	// 		operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+			// 	// 	}).then(res => {
+			// 	// 		let list = res.data.user.filter(item => item.handleStatus == 0)
+			// 	// 		console.log(list, "list");
+			// 	// 		infoNumber = list.length + infoNumber
+
+
+			// 	// 		let parameter = {}
+			// 	// 		parameter.uidList = [this.vuex_openid]
+			// 	// 		parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
+			// 	// 		this.$u.api.get_users_items(parameter).then(res => {
+			// 	// 			console.log(res.data[0].items, "其他闲置");
+			// 	// 			let wantList = res.data[0].items.filter(item => item.wantedUid.length >
+			// 	// 				0 && item.toUser.length == 0)
+
+			// 	// 			infoNumber = wantList.length + infoNumber
+
+			// 	// 			console.log(infoNumber, "infoNumber");
+			// 	// 			if (infoNumber > 0) {
+			// 	// 				uni.showTabBarRedDot({
+			// 	// 					index: 3
+			// 	// 				})
+
+			// 	// 				this.$u.vuex('vuex_noticeNumber', infoNumber)
+			// 	// 			} else if (infoNumber == 0) {
+			// 	// 				uni.hideTabBarRedDot({
+			// 	// 					index: 3
+			// 	// 				})
+			// 	// 				this.$u.vuex('vuex_noticeNumber', 0)
+			// 	// 			}
+			// 	// 		})
+
+
+			// 	// 	})
+
+			// 	// })
+
+			// }
+
+
+
 
 
 
@@ -134,10 +153,16 @@
 	button:active {
 		background-color: #21D6B9 !important;
 	}
-	
-	.x-popupMain{
+
+	.loadingCon {
+		display: flex;
+		justify-content: center;
+	}
+
+	.popupMain {
 		width: 580rpx;
-		.x-popupHead{
+
+		.popupHead {
 			padding: 0 60rpx;
 			min-height: 180rpx;
 			border-bottom: 2rpx solid rgba(151, 151, 151, 0.5);
@@ -149,9 +174,13 @@
 			color: #333333;
 			line-height: 44rpx;
 		}
-		.x-popupFooter{
-			
-			.x-popupFooterItem{
+
+		.popupFooter {
+			font-size: 32rpx;
+			font-weight: 500;
+			color: #333333;
+
+			.popupFooterItem {
 				width: 290rpx;
 				height: 106rpx;
 				line-height: 106rpx;
@@ -159,17 +188,17 @@
 				font-size: 32rpx;
 				font-weight: 500;
 				color: #333333;
+				background-color: #F1F1F1;
 			}
-			.x-confirm{
+
+			.confirm {
+				background-color: #25EFCF;
 				border-left: 2rpx solid rgba(151, 151, 151, 0.5);
 			}
-			.x-confirm:active{
-				background-color:  #25EFCF;
+
+			.confirm:active {
+				background-color: #25EFCF;
 			}
 		}
 	}
-	
-	
-	
-	
 </style>

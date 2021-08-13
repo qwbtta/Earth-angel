@@ -1,18 +1,24 @@
 <template>
 	<view class="contacts">
 
-		<view class="head">
+		<!-- <view class="head">
 			<view :class="[index==selectedIndex?'headItem-s':'','headItem']" v-for="(item,index) in tabs" :key="index"
 				@click="select(index)">
 				<text>{{item}}</text>
 			</view>
 
-		</view>
+		</view> -->
 		<view class="main">
-			<view class="mainItem u-flex" v-for="item in friends" :key="item.uid" v-if="selectedIndex==0"
-				@click="goHomePage(item)">
-				<image :src="item.icon" mode="" class="itemImg"></image>
-				<text class="name">{{item.name}}</text>
+			<view class="followItem u-flex" v-for="item in friends" :key="item.uid" v-if="selectedIndex==0"
+				>
+				<image :src="item.icon" mode="" class="itemImg" @click="goHomePage(item)"></image>
+				<view class="followItemRight">
+					<text class="name">{{item.name}}</text>
+					<view class="cancel" @click="showCancelPopup(item)">
+						取消关注
+					</view>
+				</view>
+
 			</view>
 			<view class="mainItem u-flex" v-for="item in manageGroup" :key="item.groupInfo.groupId"
 				v-if="selectedIndex==1" @click="goMore(item)">
@@ -26,6 +32,24 @@
 			</view>
 
 		</view>
+
+
+		<u-popup v-model="showPopup" mode="center" border-radius="12">
+			<view class="popupMain">
+				<view class="popupHead">
+					<text>{{'确定要取消对"'+ cancelInfo.name +'"的关注吗?'}}</text>
+				</view>
+				<view class="popupFooter u-flex">
+					<view class="popupFooterItem" @click="showPopup = false">
+						取消
+					</view>
+					<view class="popupFooterItem confirm" @click="confirm">
+						确定
+					</view>
+				</view>
+			</view>
+
+		</u-popup>
 	</view>
 </template>
 
@@ -37,23 +61,49 @@
 				selectedIndex: 0,
 				friends: [],
 				manageGroup: [],
-				joinGroup: []
+				joinGroup: [],
+				showPopup: false,
+				cancelInfo: {}
 			}
 		},
 		methods: {
+			confirm(){
+				this.$u.api.unfollow({
+					uid:this.cancelInfo.uid,
+					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+				}).then(res=>{
+					console.log(res);
+					this.getFollowList()
+					this.showPopup= false
+				})
+			},
+			showCancelPopup(e) {
+				console.log(e);
+				this.cancelInfo = e
+				this.showPopup = true
+			},
+			getFollowList(){
+				this.$u.api.get_self_follow({
+					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+				}).then(res => {
+					console.log(res, "44444444");
+					if (res.data.length > 0) {
+						this.$req('/user/get_user_info', {
+							uidList: res.data,
+							operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+						}).then(res => {
+							console.log(res, "8888888888")
+							this.friends = res.data
+						})
+					}
+				
+				})
+			},
 			select(index) {
-
 				console.log(index);
 				this.selectedIndex = index
 				if (this.selectedIndex == 0) {
-					this.$req('/friend/get_friend_list', {
-						operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
-					}).then(res => {
-						console.log(res)
-						if (res.errCode == 0) {
-							this.friends = res.data
-						}
-					})
+					this.getFollowList()
 				} else if (this.selectedIndex == 1) {
 					this.manageGroup = []
 					let groupListId = []
@@ -211,14 +261,9 @@
 
 		},
 		mounted() {
-			this.$req('/friend/get_friend_list', {
-				operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
-			}).then(res => {
-				console.log(res)
-				if (res.errCode == 0) {
-					this.friends = res.data
-				}
-			})
+			this.getFollowList()
+			
+
 		}
 	}
 </script>
@@ -250,15 +295,56 @@
 		}
 
 		.main {
-			padding: 0 48rpx;
+			padding-left: 48rpx;
+
+			.followItem {
+				margin-top: 28rpx;
+
+				.itemImg {
+					width: 84rpx;
+					height: 84rpx;
+					border-radius: 84rpx;
+					flex-shrink: 0;
+					margin-right: 28rpx;
+				}
+
+				.followItemRight {
+					display: flex;
+					align-items: center;
+					justify-content: space-between;
+					height: 132rpx;
+					width: 100%;
+					border-bottom: 2rpx solid #E9E9E9;
+
+					.name {
+						font-size: 32rpx;
+						font-weight: 500;
+						color: #333333;
+					}
+
+					.cancel {
+						text-align: center;
+						line-height: 58rpx;
+						width: 128rpx;
+						height: 58rpx;
+						border-radius: 8rpx;
+						border: 2rpx solid #999999;
+						font-size: 26rpx;
+						font-weight: 500;
+						color: #999999;
+						margin-right: 48rpx;
+					}
+				}
+
+			}
 
 			.mainItem {
 				margin-top: 28rpx;
 
 				.itemImg {
-					width: 76rpx;
-					height: 76rpx;
-					border-radius: 76rpx;
+					width: 84rpx;
+					height: 84rpx;
+					border-radius: 84rpx;
 				}
 
 				.name {

@@ -3,21 +3,22 @@
 		<view class="card" v-if="state==1">
 			<view class="head">
 
-				<image :src="info.icon" mode="" class="headIcon"></image>
+				<image :src="info.icon" mode="" class="headIcon" @click="goHome(info.uid)"></image>
 
 				<view class="headRight">
-					<view class="info">
+					<view class="info" @click="goHome(info.uid)">
 						<text class="name">{{info.name}}</text>
 						<text class="id">ID：{{info.uid}}</text>
 					</view>
-					<button type="default" class="add" @click="addFriend">加为好友</button>
+					<button type="default" class="add" @click="follow" v-if="isFollow == false">关注</button>
+					<button type="default" class="add" @click="cancelFollow" v-if="isFollow == true">取消关注</button>
 				</view>
 
 			</view>
 			<u-divider half-width="240" color="#333333" fontSize="20" border-color="#D8D8D8">TA的闲置</u-divider>
 
 			<view class="footer">
-				<view class="item" v-for="item in goodsList" :key = "item.itemId" @click="showInfo">
+				<view class="item" v-for="item in goodsList" :key="item.itemId" @click="goDetail(item)">
 					<image :src="item.imgUrls[0]" mode="aspectFit" class="goodsImg"></image>
 					<text class="title">{{item.name}}</text>
 				</view>
@@ -25,9 +26,9 @@
 		</view>
 		<view class="card" style="height: 200rpx;" v-else-if="state==2">
 			<view class="head">
-		
+
 				<image :src="groupInfo.faceUrl" mode="" class="headIcon"></image>
-		
+
 				<view class="headRight">
 					<view class="info">
 						<text class="name">{{groupInfo.groupName}}</text>
@@ -35,7 +36,7 @@
 					</view>
 					<button type="default" class="add" @click="joinGroup">申请加群</button>
 				</view>
-		
+
 			</view>
 
 		</view>
@@ -47,65 +48,111 @@
 		data() {
 			return {
 				info: {},
-				goodsList:[],
-				groupInfo:{},
-				state:1
+				goodsList: [],
+				groupInfo: {},
+				state: 1,
+				isFollow:false,
 			}
 		},
 		methods: {
-			addFriend() {
-				this.$req('/friend/add_friend', {
-					uid: this.info.uid,
+			follow() {
+				
+				this.$u.api.follow({
+					uid:this.info.uid,
 					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
-				}).then(res => {
-					console.log(res)
-					if (res.errCode == 0) {
-						this.$u.toast('好友申请发送成功',2500);
+				}).then(res=>{
+					console.log(res);
+					if(res.errCode==0){
+						this.isFollow = true
+					}
+				})
+				
+				
+			},
+			cancelFollow(){
+				this.$u.api.unfollow({
+					uid:this.info.uid,
+					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+				}).then(res=>{
+					console.log(res);
+					if(res.errCode==0){
+						this.isFollow = false
 					}
 				})
 			},
-			joinGroup(){
-				console.log(this.groupInfo.groupId,"44444");
+			joinGroup() {
+				console.log(this.groupInfo.groupId, "44444");
 				this.$req('/group/join_group', {
-					groupID:this.groupInfo.groupId,
+					groupID: this.groupInfo.groupId,
 					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
 				}).then(res => {
 					console.log(res);
-					if(res.errCode==0){
+					if (res.errCode == 0) {
 						this.$u.toast('申请已发送')
 					}
 				})
 			},
-			showInfo(){
-				this.$u.toast('请添加好友后查看更多详情')
+			goHome(id){
+				if(this.isFollow == false ){
+					this.$u.toast('请关注后查看更多详情')
+					return
+				}
+				this.$u.vuex('vuex_search',this.info)
+				console.log(this.info,"infoinfoinfoinfoinfoinfoinfo");
+				uni.navigateTo({
+					url:'../myPart/goodsHome/goodsHome?id=' + id
+				})
+			},
+			goDetail(e) {
+				if(this.isFollow == false ){
+					this.$u.toast('请关注后查看更多详情')
+					return
+				}
+				
+				console.log(e, "45455454");
+				this.$u.vuex('vuex_goodsInfo', e);
+				uni.navigateTo({
+					url: '/pages/findPart/goodsDetail'
+				})
 			}
 		},
 		onShow() {
-			if(JSON.stringify(this.vuex_searchGroup) =='{}'){
+			if (JSON.stringify(this.vuex_searchGroup) == '{}') {
 				this.info = this.vuex_search
 				this.state = 1
-				console.log(this.info,"用户信息");
-				
+				console.log(this.info, "用户信息");
+
 				let parameter = {}
 				parameter.uidList = [this.info.uid]
 				parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
 				this.$u.api.get_users_items(parameter).then(res => {
-						if(res.data[0].items.length>4){
-							this.goodsList=res.data[0].items.slice(0,4)
-						}else{
-							this.goodsList=res.data[0].items
-						}
-						console.log(this.goodsList,"物品");
-					
+					if (res.data[0].items.length > 4) {
+						this.goodsList = res.data[0].items.slice(0, 4)
+					} else {
+						this.goodsList = res.data[0].items
+					}
+					console.log(this.goodsList, "物品");
+
 				})
-			}else if(JSON.stringify(this.vuex_search) =='{}'){
+
+				this.$u.api.is_follow({
+					uid: this.info.uid,
+					operationId: this.vuex_openid + JSON.stringify(new Date().getTime())
+				}).then(res => {
+					console.log(res.data.followed, "yiyiyiyiyiyi");
+					this.isFollow = res.data.followed
+				})
+
+
+
+			} else if (JSON.stringify(this.vuex_search) == '{}') {
 				this.groupInfo = this.vuex_searchGroup
 				this.state = 2
-				console.log(this.groupInfo,"群");
+				console.log(this.groupInfo, "群");
 			}
-			
-			
-			
+
+
+
 		}
 	}
 </script>

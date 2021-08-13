@@ -20,10 +20,16 @@ const install = (Vue, vm) => {
 	let user_want_the_item = (params = {}) => vm.$u.post('/item/user_want_the_item',params);
 	let gift_item = (params = {}) => vm.$u.post('/item/gift_item',params);
 	let group_owner_delete_item = (params = {}) => vm.$u.post('/item/group_owner_delete_item',params);
+	let follow = (params = {}) => vm.$u.post('/user/follow',params);	
+	let unfollow = (params = {}) => vm.$u.post('/user/unfollow',params);	
+	let is_follow = (params = {}) => vm.$u.post('/user/is_follow',params);	
+	let get_self_follow = (params = {}) => vm.$u.post('/user/get_self_follow',params);	
+	let feedback = (params = {}) => vm.$u.post('/user/feedback',params);	
+	let want_item_list = (params = {}) => vm.$u.post('/user/want_item_list',params);	
 
 	
 	// 将各个定义的接口名称，统一放进对象挂载到vm.$u.api(因为vm就是this，也即this.$u.api)下
-	vm.$u.api = {getcosCredentials,wxLogin,release,get_users_items,get_group_users_items,delete_item,sent_out_items,received_items,update_item_info,user_want_the_item,gift_item,group_owner_delete_item};
+	vm.$u.api = {getcosCredentials,wxLogin,release,get_users_items,get_group_users_items,delete_item,sent_out_items,received_items,update_item_info,user_want_the_item,gift_item,group_owner_delete_item,follow,unfollow,is_follow,get_self_follow,feedback,want_item_list};
 }
 
 export default {

@@ -17,7 +17,7 @@
 				"navigationBarTitleText": "",
 				"enablePullDownRefresh": false
 			}
-		},{
+		}, {
 			"path": "pages/login/login",
 			"style": {
 				"navigationBarTitleText": "",
@@ -25,20 +25,34 @@
 			}
 
 		},{
+			"path": "pages/findPart/whoWants",
+			"style": {
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/myPart/iWant",
+			"style": {
+				"navigationBarTitleText": "我想要的",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
 			"path": "pages/myPart/my",
 			"style": {
 				"navigationBarTitleText": "我的",
 				"enablePullDownRefresh": false
 			}
 
-		},{
+		}, {
 			"path": "pages/chatPart/chatPage",
 			"style": {
 				"navigationStyle": "custom",
 				"navigationBarTitleText": "",
 				"enablePullDownRefresh": false
 			}
-		
+
 		}, {
 			"path": "pages/myPart/contacts",
 			"style": {
@@ -52,34 +66,34 @@
 				"enablePullDownRefresh": false
 			}
 
-		},{
+		}, {
 			"path": "pages/findPart/group/newGroup",
 			"style": {
 				"navigationBarTitleText": "创建群组",
 				"enablePullDownRefresh": false
 			}
-		},{
+		}, {
 			"path": "pages/myPart/notice",
 			"style": {
 				"navigationBarTitleText": "通知",
 				"enablePullDownRefresh": false
 			}
 
-		},{
+		}, {
 			"path": "pages/releasePart/release",
 			"style": {
 				"navigationBarTitleText": "发布",
 				"enablePullDownRefresh": false
 			}
 
-		},{
+		}, {
 			"path": "pages/findPart/group/editGroupName",
 			"style": {
 				"navigationBarTitleText": "修改群名",
 				"enablePullDownRefresh": false
 			}
 
-		},{
+		}, {
 			"path": "pages/chatPart/sessionList",
 			"style": {
 				"navigationBarTitleText": "消息",
@@ -94,42 +108,49 @@
 				"enablePullDownRefresh": false
 			}
 
-		},{
+		}, {
 			"path": "pages/findPart/group/groupManage",
 			"style": {
 				"navigationBarTitleText": "群管理",
 				"enablePullDownRefresh": false
 			}
 
-		},  {
+		}, {
 			"path": "pages/findPart/group/transferLeader",
 			"style": {
 				"navigationBarTitleText": "移交群主",
 				"enablePullDownRefresh": false
 			}
 
-		},{
+		}, {
 			"path": "pages/findPart/group/memberManage",
 			"style": {
 				"navigationBarTitleText": "成员管理",
 				"enablePullDownRefresh": false
 			}
 
-		},{
+		}, {
 			"path": "pages/myPart/goodsHome/goodsHome",
 			"style": {
 				"navigationBarTitleText": "闲置主页",
 				"enablePullDownRefresh": false
 			}
 
-		},{
+		}, {
+			"path": "pages/myPart/goodsHome/myGoodsHome",
+			"style": {
+				"navigationBarTitleText": "闲置主页",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
 			"path": "pages/myPart/editNickName",
 			"style": {
 				"navigationBarTitleText": "修改名称",
 				"enablePullDownRefresh": false
 			}
 
-		},{
+		}, {
 			"path": "pages/findPart/group/group",
 			"style": {
 				"navigationBarTitleText": "",
@@ -143,14 +164,14 @@
 				"enablePullDownRefresh": false
 			}
 
-		},{
+		}, {
 			"path": "pages/myPart/goodsHome/transfer",
 			"style": {
 				"navigationBarTitleText": "转送",
 				"enablePullDownRefresh": false
 			}
 
-		},{
+		}, {
 			"path": "pages/findPart/search",
 			"style": {
 				"navigationBarTitleText": "搜索",
@@ -160,7 +181,8 @@
 		}, {
 			"path": "pages/findPart/group/announcement",
 			"style": {
-				"navigationBarTitleText": "发布群公告",
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "",
 				"enablePullDownRefresh": false
 			}
 
@@ -212,7 +234,7 @@
 				"selectedIconPath": "static/common/image/tab-my-selected.png",
 				"text": "我的"
 			}
-			
+
 		]
 	}
 }

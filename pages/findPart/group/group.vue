@@ -30,7 +30,11 @@
 
 <script>
 	import GoodsWaterfall from '../../../components/GoodsWaterfall.vue'
+	import {
+		shareMixins
+	} from '@/common/mixins/share.js'
 	export default {
+		mixins: [shareMixins],
 		components: {
 			GoodsWaterfall
 		},
@@ -79,9 +83,17 @@
 				})
 			},
 			getList(){
+				
+				let gpid = ""
+				if(this.vuex_groupShareId.length>0){
+					gpid = this.vuex_groupShareId
+					this.$u.vuex('vuex_groupShareId', "")
+				}else{
+					gpid = this.vuex_groupList.groupInfo.groupId
+				}
 				this.goodsList= []
 				this.$req('/group/get_groups_info', {
-					groupIDList: [this.vuex_groupList.groupInfo.groupId],
+					groupIDList: [gpid],
 					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
 				}).then(res => {
 					
@@ -89,7 +101,7 @@
 					
 					
 					this.groupInfo = res.data[0]
-				
+					this.shareData.path = '/pages/findPart/group/group?groupId=' + this.groupInfo.groupId
 					this.$req('/group/get_group_member_list', {
 						groupID: this.groupInfo.groupId,
 						nextSeq: 0,
@@ -177,15 +189,19 @@
 			setTimeout(function() {
 				_this.getList()
 			}, 300)
-			// this.groupInfo = this.vuex_groupList.groupInfo
-			// if (this.vuex_groupList.groupInfo.ownerId == this.vuex_openid) {
-			// 	this.isAdmin = true
-			// } else {
-			// 	this.isAdmin = false
-			// }
+			
+			
+			
+			
+			this.groupInfo = this.vuex_groupList.groupInfo
+			if (this.vuex_groupList.groupInfo.ownerId == this.vuex_openid) {
+				this.isAdmin = true
+			} else {
+				this.isAdmin = false
+			}
 
 			// console.log(this.vuex_groupList, "4444444444444");
-
+			
 
 			// if (this.vuex_groupList.goodsList.length != 0) {
 			// 	// this.showWaterfall = false

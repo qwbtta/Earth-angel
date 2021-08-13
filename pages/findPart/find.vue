@@ -9,14 +9,14 @@
 		<view class="main">
 			<view class="searchCon">
 				<view class="inputFather">
-					<input type="text" placeholder="搜索用户或群组名称" v-model="search" class="search" />
+					<input type="text" placeholder="搜索用户ID" v-model="search" class="search" />
 					<image src="/static/common/image/search.png" mode="" class="searchIcon" v-if="search==''">
 					</image>
 					<image src="/static/common/image/searchShow.png" mode="" class="searchIcon"
 						@click.stop="searchFriend" v-else></image>
 				</view>
-
-				<button type="default" class="createGroup" @click="goNewGroup">创建群组</button>
+				<button type="default" class="createGroup" @click="searchFriend">搜索</button>
+				<!-- <button type="default" class="createGroup" @click="goNewGroup">创建群组</button> -->
 			</view>
 
 			<view class="swiperCon">
@@ -25,20 +25,41 @@
 			</view>
 			<view class="goodsCon">
 				<view class="tabCon u-flex">
+					<view :class="selected==0?'tab-item-slected':'tab-item'" @click="select(0)">
+						<text>我的发布 </text>
+						<image v-if="selected==0" src="/static/common/image/selected.png" mode="" class="imgSlected">
+						</image>
+					</view>
 					<view :class="selected==1?'tab-item-slected':'tab-item'" @click="select(1)">
 						<text>我的关注 </text>
 						<image v-if="selected==1" src="/static/common/image/selected.png" mode="" class="imgSlected">
 						</image>
 					</view>
-					<view :class="selected==2?'tab-item-slected':'tab-item'" @click="select(2)">
+					<!-- <view :class="selected==2?'tab-item-slected':'tab-item'" @click="select(2)">
 						<text class="tab2">我的群组 </text>
 						<image v-if="selected==2" src="/static/common/image/selected.png" mode="" class="imgSlected">
 						</image>
+					</view> -->
+
+				</view>
+
+				<view class="loadingCon">
+					<u-loading :show="followLoading" size="200"></u-loading>
+				</view>
+
+				<wfallsFlowNo2 :list="myList" ref="wfalls" v-show="selected==0"></wfallsFlowNo2>
+				<view class="remind" v-if="selected==0 && myList.length==0">
+					<image src="/static/common/image/horn.png" mode="" class="horn"></image>
+					<view class="remindInfo">
+						<text>你还没有发布物品</text>
+
 					</view>
 
 				</view>
 
-				<view class="remind" v-if="selected==1 && flowList.length==0" @click="focous">
+
+
+				<view class="remind" v-if="selected==1 && goodsList.length==0">
 					<image src="/static/common/image/horn.png" mode="" class="horn"></image>
 					<view class="remindInfo">
 						<text>您关注的地球天使中还没有发布物品哦,</text><text>快去添加更多地球天使吧~</text>
@@ -46,8 +67,9 @@
 					</view>
 
 				</view>
-				<GoodsWaterfall :goodsList="flowList" v-if="selected==1 && flowList.length!=0" />
-
+				<wfallsFlowNo2 :list="goodsList" ref="wfallsNo2" v-show="selected==1">
+				</wfallsFlowNo2>
+				<!-- <GoodsWaterfall :goodsList="flowList" v-if="selected==1 && flowList.length!=0" /> -->
 
 
 				<view class="remind" v-if="selected==2 && groupGoodsList.length==0">
@@ -130,11 +152,21 @@
 	</view>
 </template>
 
+
+
 <script>
 	import GoodsWaterfall from '../../components/GoodsWaterfall.vue'
+	import wfallsFlow from '@/components/wfalls-flow/wfalls-flow'
+	import wfallsFlowNo2 from '@/components/wfalls-flow/wfalls-flowNo2'
+	// import {
+	// 	shareMixins
+	// } from '@/common/mixins/share.js'
 	export default {
+		// mixins: [shareMixins],
 		components: {
-			GoodsWaterfall
+			GoodsWaterfall,
+			wfallsFlow,
+			wfallsFlowNo2
 		},
 		data() {
 			return {
@@ -151,12 +183,14 @@
 						image: "https://earth-angel-1302656840.cos.ap-chengdu.myqcloud.com/5g13X69ne3C15b4c5fd030aaad98877d1699c9c25877.png",
 					}
 				],
-				selected: 1,
+				selected: 0,
 				goodsList: [],
 				groupGoodsList: [],
+				myList: [],
 				flowList: [],
 				shareInfo: {},
-				loginPopup: false
+				loginPopup: false,
+				followLoading: false,
 			}
 		},
 		methods: {
@@ -172,43 +206,59 @@
 					return false
 				}
 
+				this.$req('/friend/get_friends_info', {
+					uid: this.search,
+					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+				}).then(res => {
+					console.log(res)
+					if (res.errCode == 0) {
+						this.search = ""
+						this.$u.vuex('vuex_searchGroup', {});
+						this.$u.vuex('vuex_search', res.data);
+						uni.navigateTo({
+							url: './search'
+						})
+					} else {
+						this.$u.toast('该ID不存在');
+					}
+				})
 
-				if (this.search.slice(0, 3) == "o0q") {
-					this.$req('/friend/get_friends_info', {
-						uid: this.search,
-						operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
-					}).then(res => {
-						console.log(res)
-						if (res.errCode == 0) {
-							this.search = ""
-							this.$u.vuex('vuex_searchGroup', {});
-							this.$u.vuex('vuex_search', res.data);
-							uni.navigateTo({
-								url: './search'
-							})
-						} else {
-							this.$u.toast('该ID不存在');
-						}
-					})
+				// if (this.search.slice(0, 3) == "o0q") {
+				// 	this.$req('/friend/get_friends_info', {
+				// 		uid: this.search,
+				// 		operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+				// 	}).then(res => {
+				// 		console.log(res)
+				// 		if (res.errCode == 0) {
+				// 			this.search = ""
+				// 			this.$u.vuex('vuex_searchGroup', {});
+				// 			this.$u.vuex('vuex_search', res.data);
+				// 			uni.navigateTo({
+				// 				url: './search'
+				// 			})
+				// 		} else {
+				// 			this.$u.toast('该ID不存在');
+				// 		}
+				// 	})
 
-				} else {
-					this.$req('/group/get_groups_info', {
-						groupIDList: [this.search],
-						operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
-					}).then(res => {
-						console.log(res, "55555555555");
-						if (res.errCode == 0) {
-							this.search = ""
-							this.$u.vuex('vuex_searchGroup', res.data[0]);
-							this.$u.vuex('vuex_search', {});
-							uni.navigateTo({
-								url: './search'
-							})
-						} else {
-							this.$u.toast('该ID不存在');
-						}
-					})
-				}
+				// } else {
+				// 	this.$req('/group/get_groups_info', {
+				// 		groupIDList: [this.search],
+				// 		operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+				// 	}).then(res => {
+				// 		console.log(res, "55555555555");
+				// 		if (res.errCode == 0) {
+				// 			this.search = ""
+				// 			this.$u.vuex('vuex_searchGroup', res.data[0]);
+				// 			this.$u.vuex('vuex_search', {});
+				// 			uni.navigateTo({
+				// 				url: './search'
+				// 			})
+				// 		} else {
+				// 			this.$u.toast('该ID不存在');
+				// 		}
+				// 	})
+				// }
 
 
 			},
@@ -223,11 +273,101 @@
 					url: 'group/newGroup'
 				})
 			},
+			sortNumber(a, b) {
+				return b.createTime - a.createTime
+			},
+			getMyList() {
+				this.followLoading = true
+				let parameter = {}
+				parameter.uidList = [this.vuex_openid]
+				parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
+				this.$u.api.get_users_items(parameter).then(res => {
+					// this.myList = res.data[0].items
+					// this.$refs.wfalls.init();
+
+						console.log(res.data, "mylist");
+					
+						this.myList = res.data[0].items
+						let _this = this
+						setTimeout(function() {
+							_this.$refs.wfalls.init();
+							_this.followLoading = false
+						}, 600)
+					
+
+
+				})
+			},
+			getFriendList() {
+				this.followLoading = true
+				
+				this.$u.api.get_self_follow({
+					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+				}).then(res => {
+					console.log(res, "44444444");
+					if (res.data.length > 0) {
+						let ids = res.data
+						this.$req('/user/get_user_info', {
+							uidList:ids,
+							operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+						}).then(res=>{
+							let friendList = res.data
+							let parameter = {}
+							parameter.uidList = ids
+							parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
+							this.$u.api.get_users_items(parameter).then(res => {
+								console.log(res, "444");
+							
+								let transfer = []
+								//接口问题，所以需要多重循环拼接处理数据，全部使用for
+								for (let i = 0; i < friendList.length; i++) {
+									for (let e = 0; e < res.data.length; e++) {
+										if (friendList[i].uid == res.data[e].uid) {
+											for (let m = 0; m < res.data[e].items.length; m++) {
+												res.data[e].items[m].icon = friendList[i].icon
+												res.data[e].items[m].userName = friendList[i].name
+												transfer.push(res.data[e].items[m])
+											}
+							
+										}
+									}
+								}
+							
+								this.goodsList = transfer.sort(this.sortNumber)
+								console.log(this.goodsList,
+									"this.goodsListthis.goodsListthis.goodsListthis.goodsList");
+								// this.goodsList = this.goodsList.filter(item => item.toUser.length == 0)
+							
+							
+								let _this = this
+								setTimeout(function() {
+									_this.$refs.wfallsNo2.init();
+									_this.followLoading = false
+								}, 600)
+							
+							
+							})
+							
+							
+	
+						})
+						
+					}
+				
+				})
+				
+				
+			},
 			async select(e) {
 				console.log(e);
-				if (e === 1) {
+				if (e === 0) {
+					this.selected = 0
+					this.getMyList()
+				} else if (e === 1) {
 					this.selected = 1
-				} else {
+					this.getFriendList()
+
+				} else if (e === 2) {
 					this.selected = 2
 					this.groupGoodsList = []
 					let groupListId = []
@@ -310,6 +450,21 @@
 			}
 		},
 		onShow() {
+			if(this.vuex_refresh == true){
+				this.getMyList()
+				this.$u.vuex('vuex_refresh',false)
+			}
+			
+			// this.getMyList()
+			// this.getFriendList()
+			
+			
+			// if (this.selected == 0) {
+			// 	this.getMyList()
+			// } else if (this.selected == 1) {
+			// 	this.getFriendList()
+			// }
+
 			if (this.vuex_token == '' || this.vuex_wsToken == '') {
 				this.loginPopup = true
 				return
@@ -320,12 +475,22 @@
 
 				let sInfo = this.vuex_shareInfo
 
-				this.$req('/friend/add_friend', {
+				// this.$req('/friend/add_friend', {
+				// 	uid: sInfo.shareUid,
+				// 	operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+				// }).then(res => {
+
+				// })
+
+				this.$u.api.follow({
 					uid: sInfo.shareUid,
+					mutualFollow: true,
 					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
 				}).then(res => {
-
+					console.log(res);
 				})
+
+
 
 				console.log(sInfo, "vuex分享分享xxxxx");
 				this.$req('/user/get_user_info', {
@@ -359,53 +524,10 @@
 			}
 
 
-
-			this.selected = 1
-			//清创建群组的页面的一个数据
-			this.$u.vuex('vuex_memberNum', [])
-			this.$req('/friend/get_friend_list', {
-				operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
-			}).then(res => {
-				if (res.errCode == 0) {
-					let friendList = res.data
-					let ids = res.data.map(item => item.uid)
-					let parameter = {}
-					parameter.uidList = ids
-					parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
-					this.$u.api.get_users_items(parameter).then(res => {
-						console.log(res, "444");
-
-						this.goodsList = []
-						//接口问题，所以需要多重循环拼接处理数据，全部使用for
-						for (let i = 0; i < friendList.length; i++) {
-							for (let e = 0; e < res.data.length; e++) {
-								if (friendList[i].uid == res.data[e].uid) {
-									for (let m = 0; m < res.data[e].items.length; m++) {
-										res.data[e].items[m].icon = friendList[i].icon
-										res.data[e].items[m].userName = friendList[i].name
-										this.goodsList.push(res.data[e].items[m])
-									}
-
-								}
-							}
-						}
-						this.goodsList = this.goodsList.filter(item => item.toUser.length == 0)
-						this.flowList = []
-						for (let i = 0; i < this.goodsList.length; i++) {
-							let item = JSON.parse(JSON.stringify(this.goodsList[i]))
-							this.flowList.push(item)
-						}
-
-						console.log(this.flowList, "物品列表");
-					})
-
-
-
-
-
-				} else {}
-			})
-
+		},
+		onLoad() {
+			this.getMyList()
+			// this.getFriendList()
 		}
 
 	}
@@ -413,6 +535,8 @@
 
 <style lang="scss" scoped>
 	.home {
+		
+
 		.btn {
 			padding: 0;
 			background: #25EFCF;
@@ -462,7 +586,7 @@
 						position: absolute;
 						top: 14rpx;
 						right: 28rpx;
-						z-index: 999;
+						z-index: 2;
 					}
 				}
 

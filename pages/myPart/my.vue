@@ -13,9 +13,12 @@
 					<image src="/static/common/image/contacts.png" mode="" class="mainImg"></image>
 					<text>联系人</text>
 				</view>
-				<view class="item" @click="goGoodsHome">
+				<view class="item rela" @click="goGoodsHome">
 					<image src="/static/common/image/home.png" mode="" class="mainImg"></image>
 					<text>闲置主页</text>
+					<view class="tips" v-if="vuex_noticeNumber>0">
+						
+					</view>
 				</view>
 				<view class="item"  @click="goGoodsList('received')">
 					<image src="/static/common/image/received.png" mode="" class="mainImg"></image>
@@ -33,26 +36,32 @@
 			<view class="item" @click="editName">
 				<view class="left">
 					<image src="/static/common/image/modifyMyName.png" mode="" class="bodyImg"></image>
-					<text>修改名称</text>
+					<text>修改昵称</text>
 				</view>
 				<image src="/static/common/image/arrow.png" mode="" class="arrow"></image>
 			</view>
-			<view class="item" @click="goNotice">
+			<!-- <view class="item" @click="goNotice">
 				<view class="left">
 					<image src="/static/common/image/notice.png" mode="" class="bodyImg"></image>
 					<view class="myFlex">
 						<text>通知</text>
-						<view class="tips" v-if="vuex_noticeNumber>0">
-							
-						</view>
+					</view>
+				</view>
+				<image src="/static/common/image/arrow.png" mode="" class="arrow"></image>
+			</view> -->
+			<view class="item" @click="goIWant">
+				<view class="left">
+					<image src="/static/common/image/iWant.png" mode="" class="bodyImg"></image>
+					<view class="myFlex">
+						<text>我想要的</text>
 					</view>
 				</view>
 				<image src="/static/common/image/arrow.png" mode="" class="arrow"></image>
 			</view>
-			<view class="item">
+			<view class="item" @click="feedBack">
 				<view class="left">
 					<image src="/static/common/image/help.png" mode="" class="bodyImg"></image>
-					<text>帮助与反馈</text>
+					<text>意见反馈</text>
 				</view>
 				<image src="/static/common/image/arrow.png" mode="" class="arrow"></image>
 			</view>
@@ -82,7 +91,8 @@
 	export default{
 		data(){
 			return{
-				loginPopup:false
+				loginPopup:false,
+				redDot: false
 			}
 		},
 		methods:{
@@ -90,6 +100,11 @@
 				this.loginPopup= false
 				uni.navigateTo({
 					url:'../login/login'
+				})
+			},
+			goIWant(){
+				uni.navigateTo({
+					url:'./iWant'
 				})
 			},
 			copy(){
@@ -112,7 +127,7 @@
 			},
 			goGoodsHome(){
 				uni.navigateTo({
-					url:'./goodsHome/goodsHome?id=' + this.vuex_openid
+					url:'./goodsHome/myGoodsHome'
 				})
 			},
 			goNotice(){
@@ -129,12 +144,25 @@
 				uni.navigateTo({
 					url:'./editNickName'
 				})
+			},
+			feedBack(){
+				uni.navigateTo({
+					url:'../findPart/group/announcement?where=my'
+				})
 			}
 		},
 		onShow() {
 			if(this.vuex_token == '' || this.vuex_wsToken == ''){
 				this.loginPopup = true
-			}			
+			}		
+			
+			if(this.vuex_noticeNumber > 0){
+				this.redDot = true
+			}else{
+				this.redDot = false
+			}
+			
+			console.log(this.vuex_noticeNumber,"vuex_noticeNumbervuex_noticeNumbervuex_noticeNumber");
 		}
 	}
 </script>
@@ -198,6 +226,18 @@
 						width: 84rpx;
 						height: 84rpx;
 						margin-bottom: 16rpx;
+					}
+				}
+				.rela{
+					position: relative;
+					.tips{
+						width: 22rpx;
+						height: 22rpx;
+						border-radius: 22rpx;
+						background-color: #FA5151;
+						position: absolute;
+						right: 10%;
+						top: 0;
 					}
 				}
 			}
