@@ -8,23 +8,26 @@
 						<view class="goodStitle">
 							{{goodsName}}
 						</view>
-						<button type="default" class="share" open-type="share">分享</button>
+						<button type="default" :class="['share',vuex_goodsInfo.toUser.length==0?'':'dis']"
+							open-type="share" :disabled="vuex_goodsInfo.toUser.length != 0">分享</button>
 					</view>
-					
+
 					<view class="nameCon" @click="goHomePage">
-						<image :src="userInfo.icon" mode="" class="headIcon" ></image>
-						<text class="name" >{{userInfo.name}}</text>
-						
+						<image :src="userInfo.icon" mode="" class="headIcon"></image>
+						<text class="name">{{userInfo.name}}</text>
+
 					</view>
 				</view>
 
 				<view class="headRight" v-if="isMine">
 					<text class="people" @click="goWhoWants">已有{{peopleNum}}人想要</text>
-					<button type="default" class="want" @click="goTransfer">赠送</button>
+					<button type="default" :class="['want',vuex_goodsInfo.toUser.length==0?'':'dis']"
+						@click="goTransfer" :disabled="vuex_goodsInfo.toUser.length != 0">赠送</button>
 				</view>
-				<view class="headRight" v-else>
+				<view class="headRight" v-if="!isMine">
 					<button type="default" class="want" v-if="wanted">我已想要</button>
-					<button type="default" class="want" @click="want" v-else>想要</button>
+					<button type="default" :class="['want',vuex_goodsInfo.toUser.length==0?'':'dis']" @click="want"
+						v-else :disabled="vuex_goodsInfo.toUser.length != 0">想要</button>
 					<button type="default" class="want" @click="goChat">联系对方</button>
 				</view>
 			</view>
@@ -77,29 +80,33 @@
 					url: '../myPart/goodsHome/transfer'
 				})
 			},
-			goWhoWants(){
-				if(this.peopleNum == 0){
+			goWhoWants() {
+				if (this.vuex_goodsInfo.toUser.length != 0) {
+					this.$u.toast('该物品已送出')
+					return
+				}
+				if (this.peopleNum == 0) {
 					this.$u.toast('还没有人想要该物品哦，快去分享给更多人吧~')
 					return
 				}
 				uni.navigateTo({
-					url:'./whoWants'
+					url: './whoWants'
 				})
-				
+
 			},
 			goHomePage() {
-				if(this.userInfo.uid == this.vuex_openid){
+				if (this.userInfo.uid == this.vuex_openid) {
 					uni.navigateTo({
-						url:'../myPart/goodsHome/myGoodsHome'
+						url: '../myPart/goodsHome/myGoodsHome'
 					})
-				}else{
+				} else {
 					this.$u.vuex('vuex_search', this.userInfo);
-					
+
 					uni.navigateTo({
 						url: '../myPart/goodsHome/goodsHome?id=' + this.userInfo.uid
 					})
 				}
-				
+
 			},
 			goChat() {
 				uni.navigateTo({
@@ -119,13 +126,13 @@
 					} else {}
 				})
 			},
-			async goOther(item){
-				await this.$u.vuex('vuex_goodsInfo',item)
+			async goOther(item) {
+				await this.$u.vuex('vuex_goodsInfo', item)
 				this.getDetail()
 			},
-			getDetail(){
+			getDetail() {
 				console.log(this.vuex_goodsInfo.wantedUid, " this.vuex_goodsInfo this.vuex_goodsInfo this.vuex_goodsInfo");
-				
+
 				if (this.vuex_goodsInfo.fromUser == this.vuex_openid) {
 					this.isMine = true
 					this.peopleNum = this.vuex_goodsInfo.wantedUid.length
@@ -147,7 +154,7 @@
 					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
 				}).then(res => {
 					console.log(res.data, "获取用户信息")
-				
+
 					if (res.errCode == 0) {
 						this.userInfo = res.data
 						this.shareData.path = '/pages/findPart/find?uid=' + this.userInfo.uid + '&goodsid=' + this
@@ -155,7 +162,7 @@
 							.vuex_openid
 					}
 				})
-				
+
 				let parameter = {}
 				parameter.uidList = [this.vuex_goodsInfo.fromUser]
 				parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
@@ -178,7 +185,7 @@
 		},
 		onShow() {
 			this.getDetail()
-
+			console.log(this.vuex_goodsInfo,"vuex_goodsInfovuex_goodsInfovuex_goodsInfo");
 		}
 
 
@@ -196,6 +203,10 @@
 			font-weight: 500;
 		}
 
+		.dis {
+			background-color: #F7F7F7 !important;
+		}
+
 		.main {
 			margin-top: 60rpx;
 			padding: 0 48rpx;
@@ -208,8 +219,9 @@
 				.headLeft {
 					display: flex;
 					flex-direction: column;
+
 					.titleCon {
-					
+
 						.goodStitle {
 							height: 50rpx;
 							background: #FFF2B8;
@@ -218,7 +230,7 @@
 							padding: 0 14rpx;
 							line-height: 50rpx;
 						}
-					
+
 						.share {
 							@extend .btn;
 							width: 88rpx;
@@ -227,19 +239,22 @@
 							line-height: 44rpx;
 							margin-left: 24rpx;
 						}
+
 					}
-					
-					
+
+
 
 					.nameCon {
 						display: flex;
 						align-items: center;
 						margin-top: 16rpx;
+
 						.headIcon {
 							width: 50rpx;
 							height: 50rpx;
 							border-radius: 50rpx;
 						}
+
 						.name {
 							font-size: 24rpx;
 							font-weight: 500;
@@ -247,7 +262,7 @@
 							margin-left: 10rpx;
 						}
 
-						
+
 					}
 				}
 

@@ -8,13 +8,12 @@
 			<image :src="item.imgUrls[0]" mode="aspectFit" class="itemImg"></image>
 			<view class="right">
 				<view class="describe">
-					<text class="title">{{item.desc}}</text>
+					<text class="title">{{item.name}}</text>
 					<text class="who" v-if="title=='收到物品'">{{'来自"'+item.userName+'"的赠送'}}</text>
 					<text class="who" v-else> {{'已转送给"'+ item.userName + '"'}} </text>
 				</view>
 				<button type="default" class="btn" @click.stop="contact(item)">联系朋友</button>
 			</view>
-
 
 
 

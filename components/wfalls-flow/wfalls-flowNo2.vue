@@ -3,7 +3,8 @@
 		<view id="wf-list" class="list" v-for="(list,listIndex) of viewList" :key="listIndex">
 			<view class="item" v-for="(item,index) of list.list" :key="index">
 				<image @load="handleViewRender(listIndex,index)" @error="handleViewRender(listIndex,index)"
-					:src="item.imgUrls[0]" mode="widthFix" @click="goDetail(item)" :class="item.toUser.length>0?'x-Img':'x-orinImg'"></image>
+					:src="item.imgUrls[0]" mode="widthFix" @click="goDetail(item)"
+					:class="item.toUser.length>0?'x-Img':'x-orinImg'"></image>
 				<view class="describe">
 					<view class="x-head u-flex">
 						<view class="x-headLeft u-flex" @click="goHome(item)">
@@ -12,9 +13,9 @@
 							</image>
 							<text class="x-name">{{item.fromUser==vuex_openid?vuex_nick_name:item.userName}}</text>
 						</view>
-						<button type="default" class="x-want" open-type="share" v-if="item.fromUser==vuex_openid"
-							@click="shareGoods(item)">分享</button>
-						<button type="default" class="x-want" @click="want(item)" v-else>想要</button>
+						<button type="default" class="x-want" open-type="share" v-if="item.fromUser==vuex_openid" :disabled="item.toUser.length!=0"
+							 :data-item="item">分享</button>
+						<button type="default" class="x-want" @click="want(item)" v-if="item.fromUser!=vuex_openid" :disabled="item.toUser.length!=0">想要</button>
 					</view>
 
 					<text class="x-details">{{item.fromUser==vuex_openid?item.name:item.desc}}</text>
@@ -34,11 +35,11 @@
 		},
 		data() {
 			return {
-				shareInfo:{},
+				shareInfo: {},
 				shareData: {
-				    title: '',
-				    path: '/pages/release/release',
-					imageUrl:''
+					title: '',
+					path: '/pages/release/release',
+					imageUrl: ''
 				},
 				viewList: [{
 					list: []
@@ -48,20 +49,9 @@
 				everyNum: 2
 			}
 		},
+		
 		methods: {
-			//#ifdef MP-WEIXIN
-			onShareAppMessage () {
-				
-			    return {
-			        title: '来看看这件物品吧~',
-			        path: this.shareData.path,
-					imageUrl:'',
-			        success: res => {
-			            console.info(res,"onShareAppMessageRESRES")
-			        }
-			    }
-			},
-			//#endif
+
 			want(e) {
 				console.log(e);
 				this.$u.api.user_want_the_item({
@@ -73,34 +63,34 @@
 						this.$u.toast('申请发送成功', 2000)
 					} else {}
 				})
-			
+
 			},
-			shareGoods(e) {
-				console.log(e, "sssssssssssssss");
-				this.shareInfo = e
-				this.shareData.path = '/pages/findPart/find?uid=' + e.fromUser + '&goodsid=' + e.itemId + '&shareName=' +
-					this.vuex_nick_name + '&shareUid=' + this.vuex_openid
-				this.shareData.imageUrl= e.imgUrls[0]
-				
-			},
+			// shareGoods(e) {
+			// 	console.log(e, "sssssssssssssss");
+			// 	this.shareInfo = e
+			// 	this.shareData.path = '/pages/findPart/find?uid=' + e.fromUser + '&goodsid=' + e.itemId + '&shareName=' +
+			// 		this.vuex_nick_name + '&shareUid=' + this.vuex_openid
+			// 	this.shareData.imageUrl = e.imgUrls[0]
+
+			// },
 			goHome(item) {
-				if(item.fromUser==this.vuex_openid){
+				if (item.fromUser == this.vuex_openid) {
 					uni.navigateTo({
-						url:'../../pages/myPart/goodsHome/myGoodsHome'
+						url: '../../pages/myPart/goodsHome/myGoodsHome'
 					})
-				}else{
+				} else {
 					let userInfo = {}
 					userInfo.name = item.userName
 					userInfo.uid = item.fromUser
 					userInfo.icon = item.icon
-					
+
 					this.$u.vuex('vuex_search', userInfo)
 					console.log(userInfo, "userInfo");
 					uni.navigateTo({
 						url: '../myPart/goodsHome/goodsHome?id=' + item.fromUser
 					})
 				}
-				
+
 			},
 			goDetail(e) {
 				console.log(e, "45455454");
@@ -161,33 +151,36 @@
 		border: 1px solid #000000;
 		font-weight: 500;
 	}
-	
-	.x-orinImg{
+
+	.x-orinImg {
 		border-radius: 20rpx;
 		width: 100%;
 		position: relative;
 	}
+
 	.x-Img {
 		border-radius: 20rpx;
 		width: 100%;
 		position: relative;
 	}
+
 	.x-Img::before {
-	    content: "已送出";
+		content: "已送出";
 		font-size: 52rpx;
 		font-weight: 600;
 		color: #FFFFFF;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-	    position: absolute;
-	    left: 0;
-	    right: 0;
-	    bottom: 0;
-	    top: 0;
-	    background-color: rgba(196, 196, 196, 0.7);
-	    z-index: 2;
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		top: 0;
+		background-color: rgba(196, 196, 196, 0.7);
+		z-index: 2;
 	}
+
 	.x-waterfallCon {
 		padding: 0 24rpx;
 
@@ -248,22 +241,23 @@
 </style>
 
 <style lang="stylus" scoped>
-	.list-container
-	    display flex
-	    justify-content space-between
-	    align-items:flex-start
-	    padding 0 48rpx
-	    padding-top 30rpx
-	    .list
-	        width calc(50% - 16rpx)
-	        display flex
-	        flex-direction column
-	        .item
-	            margin-bottom 18rpx
-	            // border 1px solid red
-	            // image
-	            //     width 100%
-	            .desc
-	                padding 16rpx
-	                font-size 28rpx
+	
+    .list-container
+        display flex
+        justify-content space-between
+        align-items:flex-start
+        padding 0 48rpx
+        padding-top 30rpx
+        .list
+            width calc(50% - 16rpx)
+            display flex
+            flex-direction column
+            .item
+                margin-bottom 18rpx
+                // border 1px solid red
+                // image
+                //     width 100%
+                .desc
+                    padding 16rpx
+                    font-size 28rpx
 </style>

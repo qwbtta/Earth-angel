@@ -16,11 +16,11 @@
 				<view class="item rela" @click="goGoodsHome">
 					<image src="/static/common/image/home.png" mode="" class="mainImg"></image>
 					<text>闲置主页</text>
-					<view class="tips" v-if="vuex_noticeNumber>0">
-						
+					<view class="tips" v-if="redDot">
+
 					</view>
 				</view>
-				<view class="item"  @click="goGoodsList('received')">
+				<view class="item" @click="goGoodsList('received')">
 					<image src="/static/common/image/received.png" mode="" class="mainImg"></image>
 					<text>收到物品</text>
 				</view>
@@ -28,8 +28,8 @@
 					<image src="/static/common/image/give.png" mode="" class="mainImg"></image>
 					<text>我的赠送</text>
 				</view>
-				
-				
+
+
 			</view>
 		</view>
 		<view class="body">
@@ -66,7 +66,7 @@
 				<image src="/static/common/image/arrow.png" mode="" class="arrow"></image>
 			</view>
 		</view>
-		
+
 		<u-popup v-model="loginPopup" mode="center" border-radius="12">
 			<view class="x-popupMain">
 				<view class="x-popupHead">
@@ -81,156 +81,190 @@
 					</view>
 				</view>
 			</view>
-		
+
 		</u-popup>
-		
+
 	</view>
 </template>
 
 <script>
-	export default{
-		data(){
-			return{
-				loginPopup:false,
+	export default {
+		data() {
+			return {
+				loginPopup: false,
 				redDot: false
 			}
 		},
-		methods:{
-			goLogin(){
-				this.loginPopup= false
+		methods: {
+			goLogin() {
+				this.loginPopup = false
 				uni.navigateTo({
-					url:'../login/login'
+					url: '../login/login'
 				})
 			},
-			goIWant(){
+			goIWant() {
 				uni.navigateTo({
-					url:'./iWant'
+					url: './iWant'
 				})
 			},
-			copy(){
+			copy() {
 				let _this = this
 				uni.setClipboardData({
-				    data: _this.vuex_openid,
-				    success: function () {
+					data: _this.vuex_openid,
+					success: function() {
 						uni.hideToast()
 						uni.showToast({
-				           title: '复制成功',
-				           duration: 2000
-				       });
-				    }
+							title: '复制成功',
+							duration: 2000
+						});
+					}
 				});
 			},
-			goContacts(){
+			goContacts() {
 				uni.navigateTo({
-					url:'./contacts' 
+					url: './contacts'
 				})
 			},
-			goGoodsHome(){
+			goGoodsHome() {
 				uni.navigateTo({
-					url:'./goodsHome/myGoodsHome'
+					url: './goodsHome/myGoodsHome'
 				})
 			},
-			goNotice(){
+			goNotice() {
 				uni.navigateTo({
-					url:'./notice' 
+					url: './notice'
 				})
 			},
-			goGoodsList(e){
+			goGoodsList(e) {
 				uni.navigateTo({
-					url:'./goodsList?where=' + e
+					url: './goodsList?where=' + e
 				})
 			},
-			editName(){
+			editName() {
 				uni.navigateTo({
-					url:'./editNickName'
+					url: './editNickName'
 				})
 			},
-			feedBack(){
+			feedBack() {
 				uni.navigateTo({
-					url:'../findPart/group/announcement?where=my'
+					url: '../findPart/group/announcement?where=my'
 				})
 			}
 		},
 		onShow() {
-			if(this.vuex_token == '' || this.vuex_wsToken == ''){
+			if (this.vuex_token == '' || this.vuex_wsToken == '') {
 				this.loginPopup = true
-			}		
-			
-			if(this.vuex_noticeNumber > 0){
-				this.redDot = true
-			}else{
-				this.redDot = false
+
+			} else {
+				let infoNumber = 0
+				this.$u.api.get_users_items({
+					uidList: [this.vuex_openid],
+					operationId: this.vuex_openid + JSON.stringify(new Date().getTime())
+				}).then(res => {
+					console.log(res.data[0], "res.datares.data”res.datares.data");
+					let wantGroup = res.data[0].items.filter(item => item.toUser.length == 0 && item.wantedUid
+						.length > 0)
+					console.log(wantGroup, "wantGroupwantGroup");
+					if (wantGroup.length > 0) {
+						this.redDot = true
+						uni.showTabBarRedDot({
+							index: 3
+						})
+						this.$u.vuex('vuex_noticeNumber', 10)
+					} else if (wantGroup.length == 0) {
+						this.redDot = false
+						uni.hideTabBarRedDot({
+							index: 3
+						})
+						console.log("4444444");
+						this.$u.vuex('vuex_noticeNumber', 0)
+					}
+
+				})
 			}
-			
-			console.log(this.vuex_noticeNumber,"vuex_noticeNumbervuex_noticeNumbervuex_noticeNumber");
+
+
+
+			console.log(this.vuex_noticeNumber, "vuex_noticeNumbervuex_noticeNumbervuex_noticeNumber");
 		}
 	}
 </script>
 
 <style>
-	page{
+	page {
 		height: 100%;
 		background: #F4FFFD;
 	}
 </style>
 <style lang="scss" scoped>
-	.my{
+	.my {
 		padding: 0 40rpx;
 		border-top: 1px solid #DBDEE3;
-		.top{
+
+		.top {
 			height: 416rpx;
 			background: #FFFFFF;
 			box-shadow: 0px 0px 8rpx 6rpx rgba(0, 0, 0, 0.08);
 			border-radius: 20rpx;
 			margin-top: 42rpx;
 			padding-top: 60rpx;
-			.head{
+
+			.head {
 				margin-left: 7%;
-				.headIcon{
-					width:120rpx;
+
+				.headIcon {
+					width: 120rpx;
 					height: 120rpx;
 					border-radius: 120rpx;
 				}
-				.nameCon{
+
+				.nameCon {
 					margin-left: 40rpx;
 					display: flex;
 					flex-direction: column;
-					.name{
+
+					.name {
 						font-size: 36rpx;
 						font-weight: 500;
 						color: #333333;
-						
+
 					}
-					.id{
+
+					.id {
 						font-size: 24rpx;
 						font-weight: 400;
 						color: #666666;
 						margin-top: 6rpx;
 					}
 				}
-				
+
 			}
-			.main{
+
+			.main {
 				display: flex;
 				align-items: center;
 				justify-content: space-evenly;
 				margin-top: 48rpx;
-				.item{
+
+				.item {
 					display: flex;
 					flex-direction: column;
 					align-items: center;
 					font-size: 26rpx;
 					font-weight: 500;
 					color: #333333;
-					.mainImg{
+
+					.mainImg {
 						width: 84rpx;
 						height: 84rpx;
 						margin-bottom: 16rpx;
 					}
 				}
-				.rela{
+
+				.rela {
 					position: relative;
-					.tips{
+
+					.tips {
 						width: 22rpx;
 						height: 22rpx;
 						border-radius: 22rpx;
@@ -242,7 +276,8 @@
 				}
 			}
 		}
-		.body{
+
+		.body {
 			height: 350rpx;
 			background: #FFFFFF;
 			box-shadow: 0px 0px 8rpx 6rpx rgba(0, 0, 0, 0.08);
@@ -252,11 +287,12 @@
 			display: flex;
 			flex-direction: column;
 			justify-content: space-evenly;
-			.myFlex{
+
+			.myFlex {
 				display: flex;
 				align-items: flex-start;
-				
-				.tips{
+
+				.tips {
 					width: 14rpx;
 					height: 14rpx;
 					border-radius: 14rpx;
@@ -264,25 +300,27 @@
 					margin-left: 8rpx;
 				}
 			}
-			
-			.item{
+
+			.item {
 				display: flex;
 				align-items: center;
 				justify-content: space-between;
-				.left{
+
+				.left {
 					display: flex;
 					align-items: center;
 					font-size: 28rpx;
 					font-weight: 400;
 					color: #333333;
-					.bodyImg{
+
+					.bodyImg {
 						width: 44rpx;
 						height: 44rpx;
 						margin-right: 20rpx;
 					}
 				}
-				
-				.arrow{
+
+				.arrow {
 					width: 20rpx;
 					height: 34rpx;
 				}

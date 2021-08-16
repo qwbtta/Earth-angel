@@ -1,6 +1,11 @@
 <template>
 	<view class="sessionList">
 		<view class="main">
+			<view class="remind" v-if="sessionList.length==0">
+			
+				<text class="remindInfo">还没有消息哦，快去联系地球天使吧～</text>
+			
+			</view>
 			<view class="listItem" v-for="item in sessionList" :key="item.id" @click="goChatPage(item)">
 				<image :src="item.icon" mode="" class="headIcon"></image>
 

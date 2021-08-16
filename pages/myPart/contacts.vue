@@ -9,6 +9,11 @@
 
 		</view> -->
 		<view class="main">
+			<view class="remind" v-if="friends.length==0">
+			
+				<text class="remindInfo">还没有关注的人哦，快去关注更多人吧～</text>
+			
+			</view>
 			<view class="followItem u-flex" v-for="item in friends" :key="item.uid" v-if="selectedIndex==0"
 				>
 				<image :src="item.icon" mode="" class="itemImg" @click="goHomePage(item)"></image>
@@ -95,6 +100,8 @@
 							console.log(res, "8888888888")
 							this.friends = res.data
 						})
+					}else{
+						this.friends = []
 					}
 				
 				})

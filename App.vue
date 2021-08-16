@@ -60,30 +60,30 @@
 			}
 
 
-			// if (this.vuex_token != '' && this.vuex_wsToken != '') {
+			if (this.vuex_token != '' && this.vuex_wsToken != '') {
 
-			// 	let infoNumber = 0
-			// 	this.$u.api.get_users_items({
-			// 		uidList: [this.vuex_openid],
-			// 		operationId: this.vuex_openid + JSON.stringify(new Date().getTime())
-			// 	}).then(res => {
-			// 		console.log(res.data[0],"res.datares.data”res.datares.data");
-			// 		let wantGroup = res.data[0].items.filter(item => item.toUser.length == 0 && item.wantedUid
-			// 			.length > 0)
-			// 		console.log(wantGroup, "wantGroupwantGroup");
-			// 		if (wantGroup.length > 0) {
-			// 			uni.showTabBarRedDot({
-			// 				index: 3
-			// 			})
-			// 			this.$u.vuex('vuex_noticeNumber', 10)
-			// 		} else if (wantGroup.length == 0) {
-			// 			uni.hideTabBarRedDot({
-			// 				index: 3
-			// 			})
-			// 			console.log("4444444");
-			// 			this.$u.vuex('vuex_noticeNumber', 0)
-			// 		}
-			// 	})
+				let infoNumber = 0
+				this.$u.api.get_users_items({
+					uidList: [this.vuex_openid],
+					operationId: this.vuex_openid + JSON.stringify(new Date().getTime())
+				}).then(res => {
+					console.log(res.data[0],"res.datares.data”res.datares.data");
+					let wantGroup = res.data[0].items.filter(item => item.toUser.length == 0 && item.wantedUid
+						.length > 0)
+					console.log(wantGroup, "wantGroupwantGroup");
+					if (wantGroup.length > 0) {
+						uni.showTabBarRedDot({
+							index: 3
+						})
+						this.$u.vuex('vuex_noticeNumber', 10)
+					} else if (wantGroup.length == 0) {
+						uni.hideTabBarRedDot({
+							index: 3
+						})
+						console.log("4444444");
+						this.$u.vuex('vuex_noticeNumber', 0)
+					}
+				})
 
 
 			// 	// this.$req('/friend/get_friend_apply_list', {
@@ -131,7 +131,7 @@
 
 			// 	// })
 
-			// }
+			}
 
 
 
@@ -158,7 +158,19 @@
 		display: flex;
 		justify-content: center;
 	}
-
+	
+	.remind {
+		text-align: center;
+		margin-top: 200rpx;
+	
+		.remindInfo {
+			font-size: 32rpx;
+			font-weight: 400;
+			color: #999999;
+	
+		}
+	}
+	
 	.popupMain {
 		width: 580rpx;
 

@@ -13,13 +13,13 @@
 			:style="{height:scrollHeight+'px','margin-top':marginT+'px'}" scroll-y>
 			<view class="main">
 				<view :class="['chatLeft',item.sendID == vuex_openid?'reverse':'']" v-for="(item,index) in chatList"
-					:key="index"  v-if="item.contentType!=204" :id="'C'+ index">
+					:key="index"  :id="'C'+ index">
 					<image :src="item.sendID == vuex_openid?vuex_avatar_url:friendInfo.icon" mode=""
 						class="chatHeadIcon" @click="goHome(item.sendID)"></image>
 					<view class="triangle" v-if="item.contentType!=102">
 
 					</view>
-					<view class="chatMain" v-if="item.contentType==101 ">
+					<view class="chatMain" v-if="item.contentType==101 || (item.contentType==204 && item.msgFrom==200) ">
 						<text class="chatText">{{item.content}}</text>
 					</view>
 					<view class="chatMain" v-if="item.contentType==202 && item.msgFrom == 200">
@@ -248,6 +248,8 @@
 				this.receiveId = this.vuex_goodsInfo.fromUser
 			} else if (options.where == "session") {
 				this.receiveId = this.vuex_chatList.id
+			} else if(options.where == "whoWant"){
+				this.receiveId = options.userId
 			}
 			this.getScreen()
 			this.getList()

@@ -26,7 +26,13 @@
 			<u-loading :show="followLoading" size="200"></u-loading>
 		</view>
 
-		<wfalls-flow :list="goodsList" ref="wfallsNo3" @edit="editShow = true" v-show="!followLoading && selectedIndex==0"></wfalls-flow>
+		<wfallsFlow :list="goodsList" ref="wfallsNo3" @edit="editShow = true"
+			v-show="!followLoading && selectedIndex==0"></wfallsFlow>
+		<view class="remind" v-if="selectedIndex==0 && goodsList.length==0">
+		
+			<text class="remindInfo">您还没有发布物品哦，快去发布更多更多物品吧~</text>
+		
+		</view>
 
 		<view class="wantList" v-if="selectedIndex==1">
 			<view class="wantItem" v-for="(item,index) in wantList" :key="index">
@@ -140,29 +146,36 @@
 				parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
 				this.$u.api.get_users_items(parameter).then(res => {
 					this.wantList = []
+					let wantList = []
 					console.log(res.data[0].items, "dddddddddd");
 					let wantGroup = res.data[0].items.filter(item => item.toUser.length == 0 && item.wantedUid
 						.length > 0)
 					console.log(wantGroup, "wantGroupwantGroup");
 
 					for (let i = 0; i < wantGroup.length; i++) {
-						let item = {}
-						item.goodsInfo = wantGroup[i]
+						
 						this.$req('/user/get_user_info', {
 							uidList: wantGroup[i].wantedUid,
 							operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
 						}).then(res => {
 							for (let u = 0; u < res.data.length; u++) {
+								let item = {}
+								item.goodsInfo = wantGroup[i]
 								item.userInfo = res.data[u]
-								this.wantList.push(item)
+								wantList.push(item)
 							}
 
 						})
 					}
 					// this.tipsNum = this.wantList.length
-
-
-					console.log(this.wantList, "this.wantListthis.wantListthis.wantList");
+					this.wantList = wantList
+					if (this.wantList.length == 0) {
+						uni.hideTabBarRedDot({
+							index: 3
+						})
+						this.$u.vuex('vuex_noticeNumber', 0)
+					}
+					console.log(this.wantList.length, "this.wantListthis.wantListthis.wantList");
 				})
 			},
 			copy() {
@@ -181,7 +194,7 @@
 			goChat(item) {
 				this.$u.vuex('vuex_goodsInfo', item.goodsInfo)
 				uni.navigateTo({
-					url: '../../chatPart/chatPage?where=detail'
+					url: '../../chatPart/chatPage?where=whoWant&userId=' + item.userInfo.uid
 				})
 			},
 			give(item) {
@@ -200,6 +213,10 @@
 			},
 			edit() {
 				console.log(this.vuex_goodsInfo);
+				if(this.vuex_goodsInfo.toUser.length>0){
+					this.$u.toast('该物品已送出,无法编辑')
+					return
+				}
 				this.$u.vuex('vuex_releaseState', 1);
 				uni.switchTab({
 					url: '../../releasePart/release'
@@ -228,12 +245,12 @@
 			this.avatar = this.vuex_avatar_url
 			this.getMyList()
 			this.giveList()
-			if(this.vuex_noticeNumber>0){
+			if (this.vuex_noticeNumber > 0) {
 				this.selectedIndex = 1
 			}
 		},
 		onShow() {
-			
+
 		}
 	}
 </script>

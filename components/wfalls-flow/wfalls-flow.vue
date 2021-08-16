@@ -10,7 +10,7 @@
                 		</view>
                 		<button type="default" class="x-want" @click="toEdit(item)"
                 			v-if="item.fromUser==vuex_openid">编辑</button>
-                		<button type="default" class="x-want" @click="want(item)" v-else>想要</button>
+                		<button type="default" class="x-want" @click="want(item)" v-else :disabled="item.toUser.length!=0">想要</button>
                 	</view>
                 	<text class="x-details">{{item.desc}}</text>
                 

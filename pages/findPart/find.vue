@@ -6,6 +6,10 @@
 				<text class="logoText">地球天使</text>
 			</view>
 		</u-navbar>
+		<!-- <view class="newUser">
+			<image src="/static/common/image/kk.jpg" mode="" class="newUserImg"></image>
+		</view> -->
+
 		<view class="main">
 			<view class="searchCon">
 				<view class="inputFather">
@@ -47,24 +51,20 @@
 					<u-loading :show="followLoading" size="200"></u-loading>
 				</view>
 
-				<wfallsFlowNo2 :list="myList" ref="wfalls" v-show="selected==0"></wfallsFlowNo2>
-				<view class="remind" v-if="selected==0 && myList.length==0">
-					<image src="/static/common/image/horn.png" mode="" class="horn"></image>
-					<view class="remindInfo">
-						<text>你还没有发布物品</text>
 
-					</view>
+				<wfallsFlowNo2 :list="myList" ref="wfalls" v-show="selected==0"></wfallsFlowNo2>
+
+				<view class="remind" v-if="selected==0 && myList.length==0">
+
+					<text class="remindInfo">这里空空如也哦，快去发布你的物品吧～</text>
 
 				</view>
 
 
 
 				<view class="remind" v-if="selected==1 && goodsList.length==0">
-					<image src="/static/common/image/horn.png" mode="" class="horn"></image>
-					<view class="remindInfo">
-						<text>您关注的地球天使中还没有发布物品哦,</text><text>快去添加更多地球天使吧~</text>
 
-					</view>
+					<text class="remindInfo">这里空空如也哦，快去添加更多关注吧～</text>
 
 				</view>
 				<wfallsFlowNo2 :list="goodsList" ref="wfallsNo2" v-show="selected==1">
@@ -149,6 +149,7 @@
 
 
 
+
 	</view>
 </template>
 
@@ -158,11 +159,7 @@
 	import GoodsWaterfall from '../../components/GoodsWaterfall.vue'
 	import wfallsFlow from '@/components/wfalls-flow/wfalls-flow'
 	import wfallsFlowNo2 from '@/components/wfalls-flow/wfalls-flowNo2'
-	// import {
-	// 	shareMixins
-	// } from '@/common/mixins/share.js'
 	export default {
-		// mixins: [shareMixins],
 		components: {
 			GoodsWaterfall,
 			wfallsFlow,
@@ -173,6 +170,7 @@
 				code: "",
 				search: "",
 				shareShow: false,
+				swiperPopup: true,
 				swiperList: [{
 						image: "https://earth-angel-1302656840.cos.ap-chengdu.myqcloud.com/oG0xUPaAeFLt9a266210615d867291d7fbed30b3f958.png",
 					},
@@ -193,6 +191,25 @@
 				followLoading: false,
 			}
 		},
+		//#ifdef MP-WEIXIN
+		onShareAppMessage(res) {
+			console.log(res.target.dataset.item, "resresresresresres");
+			let info = res.target.dataset.item
+			let sPath = '/pages/findPart/find?uid=' + this
+				.vuex_openid + '&goodsid=' + info.itemId + '&shareName=' + this.vuex_nick_name + '&shareUid=' + this
+				.vuex_openid
+			let sImgUrl = info.imgUrls[0]
+
+			return {
+				title: '来看看这件物品吧~',
+				path: sPath,
+				imageUrl: sImgUrl,
+				success: res => {
+					console.info(res, "onShareAppMessageRESRES")
+				}
+			}
+		},
+		//#endif
 		methods: {
 			goLogin() {
 				this.loginPopup = false
@@ -222,6 +239,8 @@
 						this.$u.toast('该ID不存在');
 					}
 				})
+
+
 
 				// if (this.search.slice(0, 3) == "o0q") {
 				// 	this.$req('/friend/get_friends_info', {
@@ -282,25 +301,28 @@
 				parameter.uidList = [this.vuex_openid]
 				parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
 				this.$u.api.get_users_items(parameter).then(res => {
-					// this.myList = res.data[0].items
-					// this.$refs.wfalls.init();
+					if (res.errCode == 200) {
+						this.loginPopup = true
+						return
+					}
 
-						console.log(res.data, "mylist");
-					
-						this.myList = res.data[0].items
-						let _this = this
-						setTimeout(function() {
-							_this.$refs.wfalls.init();
-							_this.followLoading = false
-						}, 600)
-					
+					console.log(res, "mylist");
+					// let list = this.$u.deepClone(res.data);
+					this.myList = res.data[0].items
+					let _this = this
+					setTimeout(function() {
+						_this.$refs.wfalls.init();
+						_this.followLoading = false
+					}, 600)
+
+
 
 
 				})
 			},
-			getFriendList() {
+			 getFriendList() {
 				this.followLoading = true
-				
+
 				this.$u.api.get_self_follow({
 					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
 				}).then(res => {
@@ -308,55 +330,63 @@
 					if (res.data.length > 0) {
 						let ids = res.data
 						this.$req('/user/get_user_info', {
-							uidList:ids,
+							uidList: ids,
 							operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
-						}).then(res=>{
+						}).then(res => {
 							let friendList = res.data
 							let parameter = {}
 							parameter.uidList = ids
-							parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
-							this.$u.api.get_users_items(parameter).then(res => {
+							parameter.operationId = this.vuex_openid + JSON.stringify(new Date()
+								.getTime())
+							this.$u.api.get_users_items(parameter).then( res => {
 								console.log(res, "444");
-							
+
 								let transfer = []
 								//接口问题，所以需要多重循环拼接处理数据，全部使用for
 								for (let i = 0; i < friendList.length; i++) {
 									for (let e = 0; e < res.data.length; e++) {
 										if (friendList[i].uid == res.data[e].uid) {
-											for (let m = 0; m < res.data[e].items.length; m++) {
-												res.data[e].items[m].icon = friendList[i].icon
-												res.data[e].items[m].userName = friendList[i].name
+											for (let m = 0; m < res.data[e].items
+												.length; m++) {
+												res.data[e].items[m].icon = friendList[i]
+													.icon
+												res.data[e].items[m].userName = friendList[
+													i].name
 												transfer.push(res.data[e].items[m])
 											}
-							
+
 										}
 									}
 								}
-							
-								this.goodsList = transfer.sort(this.sortNumber)
+
+
+								this.goodsList =  transfer.sort(this.sortNumber)
 								console.log(this.goodsList,
-									"this.goodsListthis.goodsListthis.goodsListthis.goodsList");
+									"this.goodsListthis.goodsListthis.goodsListthis.goodsList"
+									);
 								// this.goodsList = this.goodsList.filter(item => item.toUser.length == 0)
-							
-							
+
+
 								let _this = this
 								setTimeout(function() {
 									_this.$refs.wfallsNo2.init();
 									_this.followLoading = false
 								}, 600)
-							
-							
+
+
 							})
-							
-							
-	
+
+
+
 						})
-						
+
+					} else {
+						this.followLoading = false
 					}
-				
+
 				})
-				
-				
+
+
 			},
 			async select(e) {
 				console.log(e);
@@ -450,15 +480,24 @@
 			}
 		},
 		onShow() {
-			if(this.vuex_refresh == true){
+			if (this.vuex_refresh == true) {
 				this.getMyList()
-				this.$u.vuex('vuex_refresh',false)
+				this.$u.vuex('vuex_refresh', false)
 			}
-			
+
+
+			if (this.selected == 0) {
+				this.getMyList()
+			}
+
+
+			// if((this.selected==0 && this.myList.length==0)||(this.selected==1 && this.goodsList.length==0)){
+			// 	this.followLoading = false
+			// }
 			// this.getMyList()
 			// this.getFriendList()
-			
-			
+
+
 			// if (this.selected == 0) {
 			// 	this.getMyList()
 			// } else if (this.selected == 1) {
@@ -526,7 +565,8 @@
 
 		},
 		onLoad() {
-			this.getMyList()
+			// this.getMyList()
+
 			// this.getFriendList()
 		}
 
@@ -535,7 +575,10 @@
 
 <style lang="scss" scoped>
 	.home {
-		
+		.newUser {
+			width: 100%;
+			height: 100%;
+		}
 
 		.btn {
 			padding: 0;
@@ -640,31 +683,7 @@
 
 				}
 
-				.remind {
-					padding: 30rpx;
-					margin: 0 48rpx;
-					box-shadow: 0px 0px 8px 2px rgba(0, 0, 0, 0.12);
-					border-radius: 20rpx;
-					display: flex;
 
-					.horn {
-						width: 32rpx;
-						height: 32rpx;
-						flex-shrink: 0;
-
-					}
-
-					.remindInfo {
-						font-size: 26rpx;
-						font-weight: 500;
-						color: #666666;
-						margin-left: 30rpx;
-						display: flex;
-						flex-direction: column;
-
-
-					}
-				}
 
 				.group {
 					margin-left: 48rpx;

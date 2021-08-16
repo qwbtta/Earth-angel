@@ -17,25 +17,14 @@
 		<u-divider color="#999999" half-width="250" border-color="#D8D8D8">TA的物品</u-divider>
 		<!-- <GoodsWaterfallS :goodsList="flowList" :isMyHome="isMyHome"  @edit="editShow = true" v-if="waterCreate"/> -->
 
-		<wfalls-flow :list="goodsList" ref="wfallsNo3" @edit="editShow = true"></wfalls-flow>
+		<wfallsFlow :list="goodsList" ref="wfallsNo3" @edit="editShow = true"></wfallsFlow>
+		<view class="remind" v-if="goodsList.length==0">
+		
+			<text class="remindInfo">TA还没有发布物品哟~</text>
+		
+		</view>
 
-
-		<u-popup v-model="editShow" mode="center" border-radius="20">
-			<view class="popupHead">
-				管理物品
-			</view>
-			<view class="popupItem" @click="edit">
-				编辑详情
-			</view>
-			<u-line color="#EFEFEF" />
-			<view class="popupItem" @click="deleteGoods">
-				删除
-			</view>
-			<u-line color="#EFEFEF" />
-			<view class="popupItem" @click="editShow = false">
-				取消
-			</view>
-		</u-popup>
+		
 
 
 	</view>
