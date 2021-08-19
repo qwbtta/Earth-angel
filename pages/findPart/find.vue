@@ -6,11 +6,31 @@
 				<text class="logoText">地球天使</text>
 			</view>
 		</u-navbar>
-		<!-- <view class="newUser">
-			<image src="/static/common/image/kk.jpg" mode="" class="newUserImg"></image>
-		</view> -->
+
+		<u-popup v-model="guide" mode="center" width="100%" height="100%">
+
+			<view class="newUser">
+				<image :src="item" mode="aspectFit" class="newUserImg" v-for="(item,index) in  newUserIMg" :key="index"
+					v-if="index == imgIndex"></image>
+			</view>
+			<view class="operationCon">
+				<text class="next" @click="next" v-show="imgIndex!=3">下一步</text>
+				<view :class="imgIndex==3?'start':'skip'" @click="closeGuide">
+					{{imgIndex==3?'开始':'跳过'}}
+				</view>
+			</view>
+
+
+		</u-popup>
+
+
+
+
+
+
 
 		<view class="main">
+
 			<view class="searchCon">
 				<view class="inputFather">
 					<input type="text" placeholder="搜索用户ID" v-model="search" class="search" />
@@ -44,15 +64,16 @@
 						<image v-if="selected==2" src="/static/common/image/selected.png" mode="" class="imgSlected">
 						</image>
 					</view> -->
-
 				</view>
 
 				<view class="loadingCon">
 					<u-loading :show="followLoading" size="200"></u-loading>
 				</view>
 
+				<view class="" v-show="selected==0">
+					<wfallsFlowNo2 :list="myList" ref="wfalls"></wfallsFlowNo2>
+				</view>
 
-				<wfallsFlowNo2 :list="myList" ref="wfalls" v-show="selected==0"></wfallsFlowNo2>
 
 				<view class="remind" v-if="selected==0 && myList.length==0">
 
@@ -67,8 +88,12 @@
 					<text class="remindInfo">这里空空如也哦，快去添加更多关注吧～</text>
 
 				</view>
-				<wfallsFlowNo2 :list="goodsList" ref="wfallsNo2" v-show="selected==1">
-				</wfallsFlowNo2>
+
+				<view class="" v-show="selected==1">
+					<wfallsFlowNo2 :list="goodsList" ref="wfallsNo2">
+					</wfallsFlowNo2>
+				</view>
+
 				<!-- <GoodsWaterfall :goodsList="flowList" v-if="selected==1 && flowList.length!=0" /> -->
 
 
@@ -167,11 +192,21 @@
 		},
 		data() {
 			return {
+				guide: false,
+				loginPopup: false,
+				shareShow: false,
+				imgIndex: 0,
 				code: "",
 				search: "",
-				shareShow: false,
-				swiperPopup: true,
+				newUserIMg: [
+					"https://earth-angel-1302656840.cos.ap-chengdu.myqcloud.com/QB8q6tZhThk05e340e0a7046b7b8ed46a72d25bd3423.png",
+					"https://earth-angel-1302656840.cos.ap-chengdu.myqcloud.com/n3kiy2q2A3Pzb69530f2d111adf64fbe4e60edd54687.png",
+					"https://earth-angel-1302656840.cos.ap-chengdu.myqcloud.com/L5XXRyuBpAvYbeb399a5c090f0207126cb04b2d91a51.png",
+					"https://earth-angel-1302656840.cos.ap-chengdu.myqcloud.com/3mRKH5iBId5485298324f016f17874732e5bfae9941e.png"
+				],
 				swiperList: [{
+						image: "https://earth-angel-1302656840.cos.ap-chengdu.myqcloud.com/qgoMSh0vrxvB723ec2ba686d9b9060b6c8dd23275a35.png",
+					}, {
 						image: "https://earth-angel-1302656840.cos.ap-chengdu.myqcloud.com/oG0xUPaAeFLt9a266210615d867291d7fbed30b3f958.png",
 					},
 					{
@@ -187,7 +222,6 @@
 				myList: [],
 				flowList: [],
 				shareInfo: {},
-				loginPopup: false,
 				followLoading: false,
 			}
 		},
@@ -201,7 +235,7 @@
 			let sImgUrl = info.imgUrls[0]
 
 			return {
-				title: '来看看这件物品吧~',
+				title: '我送给你一份物品，快来看看吧~',
 				path: sPath,
 				imageUrl: sImgUrl,
 				success: res => {
@@ -217,11 +251,20 @@
 					url: '../login/login'
 				})
 			},
+			next() {
+				this.imgIndex = this.imgIndex + 1
+			},
+			closeGuide() {
+				this.guide = false
+				this.getMyList()
+
+			},
 			searchFriend() {
 				if (this.search == this.vuex_openid) {
 					this.$u.toast('不可以搜索自己哟');
 					return false
 				}
+
 
 				this.$req('/friend/get_friends_info', {
 					uid: this.search,
@@ -282,6 +325,7 @@
 
 			},
 			shareMore() {
+				this.shareShow = false
 				this.$u.vuex('vuex_goodsInfo', this.shareInfo)
 				uni.navigateTo({
 					url: './goodsDetail'
@@ -302,6 +346,8 @@
 				parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
 				this.$u.api.get_users_items(parameter).then(res => {
 					if (res.errCode == 200) {
+						this.$u.toast('登录状态过期，请重新登录')
+						this.$u.vuex('vuex_token', "")
 						this.loginPopup = true
 						return
 					}
@@ -309,18 +355,22 @@
 					console.log(res, "mylist");
 					// let list = this.$u.deepClone(res.data);
 					this.myList = res.data[0].items
-					let _this = this
-					setTimeout(function() {
-						_this.$refs.wfalls.init();
-						_this.followLoading = false
-					}, 600)
 
+
+
+
+
+
+					setTimeout(() => {
+						this.$refs.wfalls.init();
+						this.followLoading = false
+					}, 600)
 
 
 
 				})
 			},
-			 getFriendList() {
+			getFriendList() {
 				this.followLoading = true
 
 				this.$u.api.get_self_follow({
@@ -338,7 +388,7 @@
 							parameter.uidList = ids
 							parameter.operationId = this.vuex_openid + JSON.stringify(new Date()
 								.getTime())
-							this.$u.api.get_users_items(parameter).then( res => {
+							this.$u.api.get_users_items(parameter).then(res => {
 								console.log(res, "444");
 
 								let transfer = []
@@ -360,17 +410,16 @@
 								}
 
 
-								this.goodsList =  transfer.sort(this.sortNumber)
+								this.goodsList = transfer.sort(this.sortNumber)
 								console.log(this.goodsList,
 									"this.goodsListthis.goodsListthis.goodsListthis.goodsList"
-									);
+								);
 								// this.goodsList = this.goodsList.filter(item => item.toUser.length == 0)
 
 
-								let _this = this
-								setTimeout(function() {
-									_this.$refs.wfallsNo2.init();
-									_this.followLoading = false
+								setTimeout(() => {
+									this.$refs.wfallsNo2.init();
+									this.followLoading = false
 								}, 600)
 
 
@@ -479,15 +528,29 @@
 				console.log(e);
 			}
 		},
-		onShow() {
+		onPullDownRefresh() {
+			if (this.selected == 0) {
+				this.getMyList()
+			} else if (this.selected == 1) {
+				this.getFriendList()
+			}
+		},
+		async onShow() {
+
+			// let state = {
+			// 	logged:false,
+			// 	displayed:false
+			// }
+			// this.$u.vuex('vuex_firstLogin',state)
+
+
+
+			
+
+
 			if (this.vuex_refresh == true) {
 				this.getMyList()
 				this.$u.vuex('vuex_refresh', false)
-			}
-
-
-			if (this.selected == 0) {
-				this.getMyList()
 			}
 
 
@@ -521,7 +584,7 @@
 
 				// })
 
-				this.$u.api.follow({
+				await this.$u.api.follow({
 					uid: sInfo.shareUid,
 					mutualFollow: true,
 					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
@@ -532,7 +595,7 @@
 
 
 				console.log(sInfo, "vuex分享分享xxxxx");
-				this.$req('/user/get_user_info', {
+				await  this.$req('/user/get_user_info', {
 					uidList: [sInfo.uid],
 					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
 				}).then(res => {
@@ -562,12 +625,49 @@
 
 			}
 
-
+			console.log(this.vuex_firstLogin, "this.vuex_firstLogin.logged");
+			if (this.vuex_firstLogin.logged == false || this.vuex_firstLogin.displayed == false) {
+				
+				
+				this.guide = true
+				let state = {
+					logged: true,
+					displayed: true
+				}
+				this.$u.vuex('vuex_firstLogin', state)
+				
+				
+				
+			}
+			
+			
+			
 		},
 		onLoad() {
-			// this.getMyList()
+			if (this.vuex_firstLogin.logged == true && this.vuex_firstLogin.displayed == true) {
+				this.getMyList()
+				setTimeout(() => {
+					this.getMyList()
+				}, 400)
+			}
 
 			// this.getFriendList()
+		},
+		watch: {
+			shareShow(newVal, oldVal) {
+				console.log(newVal, oldVal);
+				if (newVal == false) {
+					this.getMyList()
+				}
+				// if(newVal == false && oldVal==true){
+				// 	this.guide = true
+				// 	let state = {
+				// 		logged: true,
+				// 		displayed: true
+				// 	}
+				// 	this.$u.vuex('vuex_firstLogin', state)
+				// }
+			}
 		}
 
 	}
@@ -575,10 +675,68 @@
 
 <style lang="scss" scoped>
 	.home {
+
+
 		.newUser {
 			width: 100%;
 			height: 100%;
+			position: absolute;
+			z-index: 98;
+			background-color: #737373;
+
+			.newUserImg {
+				width: 100%;
+				height: 100%;
+			}
 		}
+
+		.operationCon {
+			position: absolute;
+			z-index: 99;
+			width: 100%;
+			display: flex;
+			align-items: center;
+			justify-content: flex-end;
+			margin-top: 144rpx;
+
+			.next {
+				font-size: 40rpx;
+				font-weight: 500;
+				color: #FFFFFF;
+				margin-right: 126rpx;
+
+			}
+
+			.skip {
+				width: 128rpx;
+				height: 128rpx;
+				border-radius: 128rpx;
+				border: 4rpx solid #FFFFFF;
+				text-align: center;
+				line-height: 128rpx;
+				font-size: 40rpx;
+				font-weight: 500;
+				color: #FFFFFF;
+				margin-right: 60rpx;
+
+			}
+		}
+
+
+		.start {
+			width: 128rpx;
+			height: 128rpx;
+			border-radius: 128rpx;
+			background: #25EFCF;
+			border: 4rpx solid #000000;
+			text-align: center;
+			line-height: 128rpx;
+			font-size: 40rpx;
+			font-weight: 500;
+			color: #000000;
+			margin-right: 60rpx;
+		}
+
 
 		.btn {
 			padding: 0;

@@ -33,7 +33,11 @@
 			<text class="remindInfo">您还没有发布物品哦，快去发布更多更多物品吧~</text>
 		
 		</view>
-
+		<view class="remind" v-if="selectedIndex==1 && wantList.length==0">
+		
+			<text class="remindInfo">这里空空如也哦，还没有人想要你的物品～</text>
+		
+		</view>
 		<view class="wantList" v-if="selectedIndex==1">
 			<view class="wantItem" v-for="(item,index) in wantList" :key="index">
 				<view class="itemHead">
@@ -132,10 +136,10 @@
 					// }
 					// this.waterCreate = true
 
-					let _this = this
-					setTimeout(function() {
-						_this.$refs.wfallsNo3.init();
-						_this.followLoading = false
+					
+					setTimeout(()=> {
+						this.$refs.wfallsNo3.init();
+						this.followLoading = false
 					}, 600)
 
 				})
@@ -209,6 +213,7 @@
 						this.$u.toast('赠送成功', 2000)
 						this.giveList()
 					}
+					this.$u.vuex('vuex_refresh',true)
 				})
 			},
 			edit() {

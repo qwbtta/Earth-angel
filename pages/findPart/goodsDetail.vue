@@ -95,6 +95,10 @@
 
 			},
 			goHomePage() {
+				
+				console.log(this.userInfo,"554565456");
+				console.log(this.vuex_openid,"554565456");
+				
 				if (this.userInfo.uid == this.vuex_openid) {
 					uni.navigateTo({
 						url: '../myPart/goodsHome/myGoodsHome'
@@ -153,7 +157,8 @@
 					uid: this.vuex_goodsInfo.fromUser,
 					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
 				}).then(res => {
-					console.log(res.data, "获取用户信息")
+					console.log(this.vuex_goodsInfo.fromUser,"获取用户信息");
+					console.log(res, "获取用户信息")
 
 					if (res.errCode == 0) {
 						this.userInfo = res.data

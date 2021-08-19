@@ -20,9 +20,12 @@
 
 					</view>
 				</view>
-				<view class="item" @click="goGoodsList('received')">
+				<view class="item rela" @click="goGoodsList('received')">
 					<image src="/static/common/image/received.png" mode="" class="mainImg"></image>
 					<text>收到物品</text>
+					<view class="tips" v-if="vuex_receiveTips">
+					
+					</view>
 				</view>
 				<view class="item" @click="goGoodsList('gave')">
 					<image src="/static/common/image/give.png" mode="" class="mainImg"></image>
@@ -92,7 +95,8 @@
 		data() {
 			return {
 				loginPopup: false,
-				redDot: false
+				redDot: false,
+				redDot2: false
 			}
 		},
 		methods: {
@@ -136,6 +140,10 @@
 				})
 			},
 			goGoodsList(e) {
+				if(e=='received'){
+					this.$u.vuex('vuex_receiveTips',false)
+					this.redDot2 = false
+				}
 				uni.navigateTo({
 					url: './goodsList?where=' + e
 				})
@@ -154,33 +162,82 @@
 		onShow() {
 			if (this.vuex_token == '' || this.vuex_wsToken == '') {
 				this.loginPopup = true
-
+				
 			} else {
 				let infoNumber = 0
-				this.$u.api.get_users_items({
-					uidList: [this.vuex_openid],
-					operationId: this.vuex_openid + JSON.stringify(new Date().getTime())
-				}).then(res => {
-					console.log(res.data[0], "res.datares.data”res.datares.data");
-					let wantGroup = res.data[0].items.filter(item => item.toUser.length == 0 && item.wantedUid
-						.length > 0)
-					console.log(wantGroup, "wantGroupwantGroup");
-					if (wantGroup.length > 0) {
-						this.redDot = true
-						uni.showTabBarRedDot({
-							index: 3
+				
+				
+						this.$u.api.received_items({
+						operationId : this.vuex_openid + JSON.stringify(new Date().getTime())
+						}).then(res => {
+							if (res.errCode == 200) {
+								this.$u.toast('登录状态过期，请重新登录')
+								this.$u.vuex('vuex_token',"")
+								this.loginPopup = true
+								return
+							}
+							console.log(res.data.items.length, "收到收到收到");
+							if(res.data.items.length!= this.vuex_receiveLength && this.vuex_receiveTips == false){
+								infoNumber = infoNumber + res.data.items.length
+							
+								this.$u.vuex('vuex_receiveLength',res.data.items.length)
+								this.$u.vuex('vuex_receiveTips',true)
+								
+								uni.showTabBarRedDot({
+									index: 3
+								})
+								
+								if(this.vuex_receiveTips){
+									uni.showTabBarRedDot({
+										index: 3
+									})
+								}
+								
+							}
+							
+							this.$u.api.get_users_items({
+								uidList: [this.vuex_openid],
+								operationId: this.vuex_openid + JSON.stringify(new Date().getTime())
+							}).then(res => {
+								console.log(res.data[0],"res.datares.data”res.datares.data");
+								let wantGroup = res.data[0].items.filter(item => item.toUser.length == 0 && item.wantedUid
+									.length > 0)
+								console.log(wantGroup, "wantGroupwantGroup");
+								if (wantGroup.length > 0) {
+									this.redDot = true
+									infoNumber = infoNumber + wantGroup.length
+									uni.showTabBarRedDot({
+										index: 3
+									})
+									this.$u.vuex('vuex_noticeNumber', wantGroup.length)
+								} else if (wantGroup.length == 0) {
+									this.redDot = false
+									if(infoNumber>0){
+										uni.showTabBarRedDot({
+											index: 3
+										})
+									}else{
+										uni.hideTabBarRedDot({
+											index: 3
+										})
+										this.$u.vuex('vuex_noticeNumber', 0)
+									}
+									
+									if(this.vuex_receiveTips){
+										uni.showTabBarRedDot({
+											index: 3
+										})
+									}
+									
+								}
+								
+							})
+							
+							
+							
 						})
-						this.$u.vuex('vuex_noticeNumber', 10)
-					} else if (wantGroup.length == 0) {
-						this.redDot = false
-						uni.hideTabBarRedDot({
-							index: 3
-						})
-						console.log("4444444");
-						this.$u.vuex('vuex_noticeNumber', 0)
-					}
-
-				})
+										
+				
 			}
 
 

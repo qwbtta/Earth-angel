@@ -10,21 +10,21 @@
 	// 		"query": "uuid=c4bba940-f69e-11ea-a419-6bafda9d095e&__id__=1" //启动参数，在页面的onLoad函数里面得到
 	// 	}]
 	// },
-	"pages": [ {
-			"path": "pages/findPart/find",
-			"style": {
-				"navigationStyle": "custom",
-				"navigationBarTitleText": "",
-				"enablePullDownRefresh": false
-			}
-		},{
+	"pages": [{
 			"path": "pages/login/login",
 			"style": {
 				"navigationBarTitleText": "",
 				"enablePullDownRefresh": false
 			}
 
-		},{
+		}, {
+			"path": "pages/findPart/find",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": true
+			}
+		}, {
 			"path": "pages/findPart/whoWants",
 			"style": {
 				"navigationBarTitleText": "",

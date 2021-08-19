@@ -3,7 +3,7 @@
 		<view class="main">
 			<view class="remind" v-if="sessionList.length==0">
 			
-				<text class="remindInfo">还没有消息哦，快去联系地球天使吧～</text>
+				<text class="remindInfo">查看物品详情，和朋友聊聊吧～</text>
 			
 			</view>
 			<view class="listItem" v-for="item in sessionList" :key="item.id" @click="goChatPage(item)">
@@ -78,6 +78,14 @@
 					operationID: this.vuex_openid + JSON.stringify(new Date().getTime()),
 					msgIncr: this.vuex_msgIncr,
 				}).then(res => {
+					
+					if (res.errCode == 200) {
+						this.$u.toast('登录状态过期，请重新登录')
+						this.$u.vuex('vuex_wsToken',"")
+						this.loginPopup = true
+						return
+					}
+					
 					console.log(res.data.seq, "最新seq");
 					this.seq = res.data.seq
 					this.$u.vuex('vuex_msgIncr', this.vuex_msgIncr + 1)

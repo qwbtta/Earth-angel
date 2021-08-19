@@ -9,8 +9,12 @@
 						<text class="id" @longpress="copy">ID：{{id}}</text>
 					</view>
 				</view>
-				<button type="default" class="btn" @click="follow" v-if="isFollow == false">关注</button>
-				<button type="default" class="btn" @click="cancelFollow" v-if="isFollow == true">取消关注</button>
+				<view class="headRight">
+					<button type="default" class="btn" @click="follow" v-if="isFollow == false">关注</button>
+					<button type="default" class="btn" @click="cancelFollow" v-if="isFollow == true">取消关注</button>
+					<button type="default" class="btn" @click="goChat">联系TA</button>
+				</view>
+				
 			</view>
 		</view>
 
@@ -53,7 +57,11 @@
 			}
 		},
 		methods: {
-
+			goChat(){
+				uni.navigateTo({
+					url: '../../chatPart/chatPage?where=whoWant&userId=' + this.id
+				})
+			},
 			getList() {
 				this.waterCreate = false
 				let parameter = {}
@@ -71,10 +79,10 @@
 					// }
 					// this.waterCreate = true
 
-					let _this = this
-					setTimeout(function() {
-						_this.$refs.wfallsNo3.init();
-					}, 300)
+					
+					setTimeout(()=> {
+						this.$refs.wfallsNo3.init();
+					}, 600)
 					console.log(this.flowList, "6666");
 
 				})
@@ -225,6 +233,11 @@
 						}
 					}
 				}
+				.headRight{
+					display: flex;
+					flex-direction: column;
+					align-items: center;
+				}
 
 				.btn {
 					padding: 0;
@@ -238,6 +251,7 @@
 					font-weight: 500;
 					color: #000000;
 					line-height: 52rpx;
+					margin-top: 20rpx;
 				}
 
 			}

@@ -8,7 +8,12 @@
 
 			// this.$u.vuex('vuex_token','')
 			// this.$u.vuex('vuex_wsToken','')
-
+			
+			let state = {
+				logged:false,
+				displayed:false
+			}
+			this.$u.vuex('vuex_firstLogin',state)
 
 			console.log(options, "onlaunch获取");
 			if (options.query.goodsid != undefined) {
@@ -23,7 +28,13 @@
 			}
 
 
+			if(this.vuex_firstLogin.logged == false){
+				this.$u.vuex('vuex_token', "")
+				this.$u.vuex('vuex_wsToken', "")
+			}
 
+
+			
 			// 1.1.0版本之前关于http拦截器代码，已平滑移动到/common/http.interceptor.js中
 			// 注意，需要在/main.js中实例化Vue之后引入如下(详见文档说明)：
 			// import httpInterceptor from '@/common/http.interceptor.js'
@@ -61,29 +72,92 @@
 
 
 			if (this.vuex_token != '' && this.vuex_wsToken != '') {
-
+				
 				let infoNumber = 0
-				this.$u.api.get_users_items({
-					uidList: [this.vuex_openid],
-					operationId: this.vuex_openid + JSON.stringify(new Date().getTime())
-				}).then(res => {
-					console.log(res.data[0],"res.datares.data”res.datares.data");
-					let wantGroup = res.data[0].items.filter(item => item.toUser.length == 0 && item.wantedUid
-						.length > 0)
-					console.log(wantGroup, "wantGroupwantGroup");
-					if (wantGroup.length > 0) {
-						uni.showTabBarRedDot({
-							index: 3
+				
+				
+				
+					this.$u.api.received_items({
+					operationId : this.vuex_openid + JSON.stringify(new Date().getTime())
+					}).then(res => {
+						console.log(res.data.items.length, "收到收到收到");
+						if(res.data.items.length!= this.vuex_receiveLength && this.vuex_receiveTips == false){
+							infoNumber = infoNumber + res.data.items.length
+						
+							this.$u.vuex('vuex_receiveLength',res.data.items.length)
+							this.$u.vuex('vuex_receiveTips',true)
+							
+							uni.showTabBarRedDot({
+								index: 3
+							})
+							if(this.vuex_receiveTips){
+								uni.showTabBarRedDot({
+									index: 3
+								})
+							}
+							
+						}
+						
+						this.$u.api.get_users_items({
+							uidList: [this.vuex_openid],
+							operationId: this.vuex_openid + JSON.stringify(new Date().getTime())
+						}).then(res => {
+							console.log(res.data[0],"res.datares.data”res.datares.data");
+							let wantGroup = res.data[0].items.filter(item => item.toUser.length == 0 && item.wantedUid
+								.length > 0)
+							console.log(wantGroup, "wantGroupwantGroup");
+							if (wantGroup.length > 0) {
+								infoNumber = infoNumber + wantGroup.length
+								uni.showTabBarRedDot({
+									index: 3
+								})
+								this.$u.vuex('vuex_noticeNumber', wantGroup.length)
+							} else if (wantGroup.length == 0) {
+								if(infoNumber>0){
+									uni.showTabBarRedDot({
+										index: 3
+									})
+								}else{
+									uni.hideTabBarRedDot({
+										index: 3
+									})
+									this.$u.vuex('vuex_noticeNumber', 0)
+								}		
+								
+								if(this.vuex_receiveTips){
+									uni.showTabBarRedDot({
+										index: 3
+									})
+								}
+							}
+							
 						})
-						this.$u.vuex('vuex_noticeNumber', 10)
-					} else if (wantGroup.length == 0) {
-						uni.hideTabBarRedDot({
-							index: 3
-						})
-						console.log("4444444");
-						this.$u.vuex('vuex_noticeNumber', 0)
-					}
-				})
+						
+						
+						
+						
+						
+					})
+				
+				
+				
+				if(this.vuex_receiveTips){
+					uni.showTabBarRedDot({
+						index: 3
+					})
+				}
+				
+				
+				
+				
+				
+				
+				
+				
+				
+
+				
+				
 
 
 			// 	// this.$req('/friend/get_friend_apply_list', {
@@ -171,10 +245,10 @@
 		}
 	}
 	
-	.popupMain {
+	.x-popupMain {
 		width: 580rpx;
 
-		.popupHead {
+		.x-popupHead {
 			padding: 0 60rpx;
 			min-height: 180rpx;
 			border-bottom: 2rpx solid rgba(151, 151, 151, 0.5);
@@ -187,12 +261,12 @@
 			line-height: 44rpx;
 		}
 
-		.popupFooter {
+		.x-popupFooter {
 			font-size: 32rpx;
 			font-weight: 500;
 			color: #333333;
 
-			.popupFooterItem {
+			.x-popupFooterItem {
 				width: 290rpx;
 				height: 106rpx;
 				line-height: 106rpx;
@@ -203,12 +277,12 @@
 				background-color: #F1F1F1;
 			}
 
-			.confirm {
+			.x-confirm {
 				background-color: #25EFCF;
 				border-left: 2rpx solid rgba(151, 151, 151, 0.5);
 			}
 
-			.confirm:active {
+			.x-confirm:active {
 				background-color: #25EFCF;
 			}
 		}

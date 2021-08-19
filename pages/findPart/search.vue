@@ -231,14 +231,14 @@
 
 			.footer {
 				display: flex;
-				justify-content: space-between;
+				// justify-content: space-between;
 				margin-top: 24rpx;
 
 				.item {
 					display: flex;
 					flex-direction: column;
 					align-items: center;
-
+					margin-right: 20rpx;
 					.goodsImg {
 						width: 126rpx;
 						height: 126rpx;

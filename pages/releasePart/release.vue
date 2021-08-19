@@ -178,10 +178,11 @@
 				} else if (this.photoList.length == 0) {
 					this.$u.toast('请选择图片')
 					return false
-				} else if (this.friendChoose == false && this.groupChoose == false) {
-					this.$u.toast('请选择发布位置')
-					return false
-				}
+				} 
+				// else if (this.friendChoose == false && this.groupChoose == false) {
+				// 	this.$u.toast('请选择发布位置')
+				// 	return false
+				// }
 
 				this.followLoading = true
 
@@ -330,16 +331,6 @@
 
 		},
 
-		onTabItemTap(e) {
-			if (e.index == 3) {
-				this.goodsName = ''
-				this.goodsDescribe = ''
-				this.photoList = []
-				this.friendChoose = false
-				this.groupChoose = false
-				this.$u.vuex('vuex_releaseState', 0);
-			}
-		}
 	}
 </script>
 

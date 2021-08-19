@@ -13,7 +13,7 @@ try {
 
 // 需要永久存储，且下次APP启动需要取出的，在state中的变量名
 let saveStateKeys = ['vuex_nick_name', 'vuex_avatar_url', 'vuex_gender', 'vuex_openid', 'vuex_token', 'vuex_userId',
-	'vuex_wsToken', 'vuex_msgIncr','vuex_firstLogin'
+	'vuex_wsToken', 'vuex_msgIncr','vuex_firstLogin','vuex_receiveLength'
 ];
 
 // 保存变量到本地存储中
@@ -40,6 +40,8 @@ const store = new Vuex.Store({
 		vuex_openid: lifeData.vuex_openid ? lifeData.vuex_openid : '',
 		vuex_token: lifeData.vuex_token ? lifeData.vuex_token : '',
 		vuex_userId: lifeData.vuex_userId ? lifeData.vuex_userId : '',
+		vuex_receiveLength: lifeData.vuex_receiveLength ? lifeData.vuex_receiveLength : 0,
+		vuex_receiveTips: false,
 		vuex_search: {},
 		vuex_searchGroup: {},
 		vuex_wsToken: lifeData.vuex_wsToken ? lifeData.vuex_wsToken : '',
@@ -53,7 +55,7 @@ const store = new Vuex.Store({
 		vuex_shareInfo: {},
 		vuex_groupShareId:"",
 		vuex_noticeNumber: 0,
-		vuex_firstLogin: lifeData.vuex_firstLogin ? lifeData.vuex_firstLogin : true,
+		vuex_firstLogin: lifeData.vuex_firstLogin ? lifeData.vuex_firstLogin : {logged:false,displayed:false},
 		vuex_refresh: false,
 		
 		

@@ -12,7 +12,7 @@ export const shareMixins = {
     onShareAppMessage () {
 		console.log(this.shareData);
         return {
-            title: '来看看这件物品吧~',
+            title: '我送给你一份物品，快来看看吧~',
             path: this.shareData.path,
             success: res => {
                 console.info(res,"onShareAppMessageRESRES")

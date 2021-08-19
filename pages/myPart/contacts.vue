@@ -14,12 +14,12 @@
 				<text class="remindInfo">还没有关注的人哦，快去关注更多人吧～</text>
 			
 			</view>
-			<view class="followItem u-flex" v-for="item in friends" :key="item.uid" v-if="selectedIndex==0"
+			<view class="followItem u-flex" v-for="item in friends" :key="item.uid" v-if="selectedIndex==0" @click="goHomePage(item)"
 				>
-				<image :src="item.icon" mode="" class="itemImg" @click="goHomePage(item)"></image>
+				<image :src="item.icon" mode="" class="itemImg" ></image>
 				<view class="followItemRight">
 					<text class="name">{{item.name}}</text>
-					<view class="cancel" @click="showCancelPopup(item)">
+					<view class="cancel" @click.stop="showCancelPopup(item)">
 						取消关注
 					</view>
 				</view>
@@ -40,15 +40,15 @@
 
 
 		<u-popup v-model="showPopup" mode="center" border-radius="12">
-			<view class="popupMain">
-				<view class="popupHead">
+			<view class="x-popupMain">
+				<view class="x-popupHead">
 					<text>{{'确定要取消对"'+ cancelInfo.name +'"的关注吗?'}}</text>
 				</view>
-				<view class="popupFooter u-flex">
-					<view class="popupFooterItem" @click="showPopup = false">
+				<view class="x-popupFooter u-flex">
+					<view class="x-popupFooterItem" @click="showPopup = false">
 						取消
 					</view>
-					<view class="popupFooterItem confirm" @click="confirm">
+					<view class="x-popupFooterItem x-confirm" @click="confirm">
 						确定
 					</view>
 				</view>

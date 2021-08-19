@@ -61,7 +61,22 @@
 							that.$u.vuex('vuex_token', loginRes.data.earthAngelToken);
 							that.$u.vuex('vuex_wsToken', loginRes.data.openIMToken);
 							
+							let state = {
+								logged:true,
+								displayed:false
+							}
+							this.$u.vuex('vuex_firstLogin',state)
 							
+							// if (this.vuex_firstLogin.displayed == false){
+								
+								
+							// }else{
+							// 	let state = {
+							// 		logged:true,
+							// 		displayed:true
+							// 	}
+							// 	this.$u.vuex('vuex_firstLogin',state)
+							// }
 							
 							
 							this.loading = false
