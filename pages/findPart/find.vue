@@ -6,7 +6,6 @@
 				<text class="logoText">地球天使</text>
 			</view>
 		</u-navbar>
-
 		<u-popup v-model="guide" mode="center" width="100%" height="100%">
 
 			<view class="newUser">
@@ -50,12 +49,13 @@
 			<view class="goodsCon">
 				<view class="tabCon u-flex">
 					<view :class="selected==0?'tab-item-slected':'tab-item'" @click="select(0)">
-						<text>我的发布 </text>
+
+						<text>我的关注 </text>
 						<image v-if="selected==0" src="/static/common/image/selected.png" mode="" class="imgSlected">
 						</image>
 					</view>
 					<view :class="selected==1?'tab-item-slected':'tab-item'" @click="select(1)">
-						<text>我的关注 </text>
+						<text>我的发布 </text>
 						<image v-if="selected==1" src="/static/common/image/selected.png" mode="" class="imgSlected">
 						</image>
 					</view>
@@ -66,32 +66,29 @@
 					</view> -->
 				</view>
 
-				<view class="loadingCon">
-					<u-loading :show="followLoading" size="200"></u-loading>
-				</view>
-
 				<view class="" v-show="selected==0">
-					<wfallsFlowNo2 :list="myList" ref="wfalls"></wfallsFlowNo2>
+					<wfallsFlowNo2 :list="goodsList" ref="wfallsNo2">
+					</wfallsFlowNo2>
 				</view>
 
 
-				<view class="remind" v-if="selected==0 && myList.length==0">
-
-					<text class="remindInfo">这里空空如也哦，快去发布你的物品吧～</text>
-
-				</view>
-
-
-
-				<view class="remind" v-if="selected==1 && goodsList.length==0">
+				<view class="remind" v-if="selected==0 && goodsList.length==0">
 
 					<text class="remindInfo">这里空空如也哦，快去添加更多关注吧～</text>
+				</view>
+
+
+
+				<view class="remind" v-if="selected==1 && myList.length==0">
+					<text class="remindInfo">这里空空如也哦，快去发布你的物品吧～</text>
+
+
 
 				</view>
 
 				<view class="" v-show="selected==1">
-					<wfallsFlowNo2 :list="goodsList" ref="wfallsNo2">
-					</wfallsFlowNo2>
+
+					<wfallsFlowNo2 :list="myList" ref="wfalls"></wfallsFlowNo2>
 				</view>
 
 				<!-- <GoodsWaterfall :goodsList="flowList" v-if="selected==1 && flowList.length!=0" /> -->
@@ -143,7 +140,8 @@
 			<view class="shareMain">
 
 				<text class="popupTitle">{{shareInfo.shareName}}给你分享的闲置物品</text>
-				<image :src="shareInfo.imgUrls[0]" mode="aspectFit" class="popupImg"></image>
+				<image :src="shareInfo.imgUrls[0]" mode="aspectFit" :class="shareInfo.toUser>0?'goodsImg':'popupImg'">
+				</image>
 				<view class="popupInfo">
 					<view class="popupInfoLeft u-flex">
 						<image :src="shareInfo.icon" mode="" class="popupHeadIcon"></image>
@@ -204,9 +202,11 @@
 					"https://earth-angel-1302656840.cos.ap-chengdu.myqcloud.com/L5XXRyuBpAvYbeb399a5c090f0207126cb04b2d91a51.png",
 					"https://earth-angel-1302656840.cos.ap-chengdu.myqcloud.com/3mRKH5iBId5485298324f016f17874732e5bfae9941e.png"
 				],
-				swiperList: [{
-						image: "https://earth-angel-1302656840.cos.ap-chengdu.myqcloud.com/qgoMSh0vrxvB723ec2ba686d9b9060b6c8dd23275a35.png",
-					}, {
+				swiperList: [
+					// {
+					// 	image: "https://earth-angel-1302656840.cos.ap-chengdu.myqcloud.com/qgoMSh0vrxvB723ec2ba686d9b9060b6c8dd23275a35.png",
+					// },
+					{
 						image: "https://earth-angel-1302656840.cos.ap-chengdu.myqcloud.com/oG0xUPaAeFLt9a266210615d867291d7fbed30b3f958.png",
 					},
 					{
@@ -222,7 +222,6 @@
 				myList: [],
 				flowList: [],
 				shareInfo: {},
-				followLoading: false,
 			}
 		},
 		//#ifdef MP-WEIXIN
@@ -256,7 +255,7 @@
 			},
 			closeGuide() {
 				this.guide = false
-				this.getMyList()
+				this.getFriendList()
 
 			},
 			searchFriend() {
@@ -264,6 +263,7 @@
 					this.$u.toast('不可以搜索自己哟');
 					return false
 				}
+
 
 
 				this.$req('/friend/get_friends_info', {
@@ -340,18 +340,13 @@
 				return b.createTime - a.createTime
 			},
 			getMyList() {
-				this.followLoading = true
+				
 				let parameter = {}
 				parameter.uidList = [this.vuex_openid]
 				parameter.operationId = this.vuex_openid + JSON.stringify(new Date().getTime())
 				this.$u.api.get_users_items(parameter).then(res => {
-					if (res.errCode == 200) {
-						this.$u.toast('登录状态过期，请重新登录')
-						this.$u.vuex('vuex_token', "")
-						this.loginPopup = true
-						return
-					}
-
+				
+	
 					console.log(res, "mylist");
 					// let list = this.$u.deepClone(res.data);
 					this.myList = res.data[0].items
@@ -363,20 +358,28 @@
 
 					setTimeout(() => {
 						this.$refs.wfalls.init();
-						this.followLoading = false
 					}, 600)
 
 
 
 				})
+				.catch(res=>{
+					if (res.errCode == 200) {
+						this.$u.toast('登录状态过期，请重新登录')
+						this.$u.vuex('vuex_token', "")
+						this.loginPopup = true
+						return
+					}
+				})
 			},
 			getFriendList() {
-				this.followLoading = true
-
 				this.$u.api.get_self_follow({
 					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
 				}).then(res => {
-					console.log(res, "44444444");
+					console.log(res.errCode, "44444444");
+					
+					
+					
 					if (res.data.length > 0) {
 						let ids = res.data
 						this.$req('/user/get_user_info', {
@@ -419,7 +422,6 @@
 
 								setTimeout(() => {
 									this.$refs.wfallsNo2.init();
-									this.followLoading = false
 								}, 600)
 
 
@@ -429,10 +431,16 @@
 
 						})
 
-					} else {
-						this.followLoading = false
-					}
+					} 
 
+				})
+				.catch(res=>{
+					if (res.errCode == 200) {
+						this.$u.toast('登录状态过期，请重新登录')
+						this.$u.vuex('vuex_token', "")
+						this.loginPopup = true
+						return
+					}
 				})
 
 
@@ -441,10 +449,10 @@
 				console.log(e);
 				if (e === 0) {
 					this.selected = 0
-					this.getMyList()
+					this.getFriendList()
 				} else if (e === 1) {
 					this.selected = 1
-					this.getFriendList()
+					this.getMyList()
 
 				} else if (e === 2) {
 					this.selected = 2
@@ -530,9 +538,9 @@
 		},
 		onPullDownRefresh() {
 			if (this.selected == 0) {
-				this.getMyList()
-			} else if (this.selected == 1) {
 				this.getFriendList()
+			} else if (this.selected == 1) {
+				this.getMyList()
 			}
 		},
 		async onShow() {
@@ -545,7 +553,7 @@
 
 
 
-			
+
 
 
 			if (this.vuex_refresh == true) {
@@ -554,9 +562,7 @@
 			}
 
 
-			// if((this.selected==0 && this.myList.length==0)||(this.selected==1 && this.goodsList.length==0)){
-			// 	this.followLoading = false
-			// }
+			
 			// this.getMyList()
 			// this.getFriendList()
 
@@ -585,20 +591,23 @@
 				// })
 
 				await this.$u.api.follow({
-					uid: sInfo.shareUid,
-					mutualFollow: true,
-					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
-				}).then(res => {
-					console.log(res);
-				})
-
+						uid: sInfo.shareUid,
+						mutualFollow: true,
+						operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
+					}).then(res => {
+						console.log(res);
+					})
+					.catch(err => {
+						console.log(err);
+					})
 
 
 				console.log(sInfo, "vuex分享分享xxxxx");
-				await  this.$req('/user/get_user_info', {
+				await this.$req('/user/get_user_info', {
 					uidList: [sInfo.uid],
 					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
 				}).then(res => {
+					console.log(res, "6666666");
 					let uinfo = res.data[0]
 
 					let parameter = {}
@@ -617,38 +626,45 @@
 						console.log(this.vuex_shareInfo, "重置重置");
 						console.log(this.shareInfo, "分享分享");
 
+
+
+
 					})
 
 
 				})
 
 
+			} else {
+				console.log(this.vuex_firstLogin, "this.vuex_firstLogin.logged");
+				if (this.vuex_firstLogin.logged == false || this.vuex_firstLogin.displayed == false) {
+
+
+					this.guide = true
+					let state = {
+						logged: true,
+						displayed: true
+					}
+					this.$u.vuex('vuex_firstLogin', state)
+
+
+
+				}
 			}
 
-			console.log(this.vuex_firstLogin, "this.vuex_firstLogin.logged");
-			if (this.vuex_firstLogin.logged == false || this.vuex_firstLogin.displayed == false) {
-				
-				
-				this.guide = true
-				let state = {
-					logged: true,
-					displayed: true
-				}
-				this.$u.vuex('vuex_firstLogin', state)
-				
-				
-				
-			}
-			
-			
-			
+
+
+
+
+
 		},
 		onLoad() {
 			if (this.vuex_firstLogin.logged == true && this.vuex_firstLogin.displayed == true) {
-				this.getMyList()
-				setTimeout(() => {
-					this.getMyList()
-				}, 400)
+				this.getFriendList()
+				// setTimeout(() => {
+				// 	this.getFriendList()
+				// }, 400)
+
 			}
 
 			// this.getFriendList()
@@ -657,16 +673,23 @@
 			shareShow(newVal, oldVal) {
 				console.log(newVal, oldVal);
 				if (newVal == false) {
-					this.getMyList()
+					if (this.vuex_firstLogin.logged == true && this.vuex_firstLogin.displayed == true) {
+						this.getFriendList()
+					}
+
+					if (this.vuex_firstLogin.logged == false || this.vuex_firstLogin.displayed == false) {
+
+						this.guide = true
+						let state = {
+							logged: true,
+							displayed: true
+						}
+						this.$u.vuex('vuex_firstLogin', state)
+
+
+					}
 				}
-				// if(newVal == false && oldVal==true){
-				// 	this.guide = true
-				// 	let state = {
-				// 		logged: true,
-				// 		displayed: true
-				// 	}
-				// 	this.$u.vuex('vuex_firstLogin', state)
-				// }
+
 			}
 		}
 
@@ -697,7 +720,7 @@
 			display: flex;
 			align-items: center;
 			justify-content: flex-end;
-			margin-top: 144rpx;
+			margin-top: 156rpx;
 
 			.next {
 				font-size: 40rpx;
@@ -960,6 +983,30 @@
 				width: 100%;
 				display: block;
 				margin: 42rpx auto;
+			}
+
+			.goodsImg {
+				width: 100%;
+				display: block;
+				margin: 42rpx auto;
+				position: relative;
+			}
+
+			.goodsImg::before {
+				content: "已送出";
+				font-size: 32rpx;
+				font-weight: 600;
+				color: #FFFFFF;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				position: absolute;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				top: 0;
+				background-color: rgba(196, 196, 196, 0.7);
+				z-index: 99;
 			}
 
 			.popupInfo {

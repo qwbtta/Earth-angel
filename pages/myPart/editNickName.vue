@@ -8,7 +8,7 @@
 		
 		
 		<view class="footer">
-			<button type="default" class="btn" @click="confirm">修改</button>
+			<button type="default" class="btn" @click="confirm">保存</button>
 		</view>
 	</view>
 </template>

@@ -56,6 +56,7 @@ const store = new Vuex.Store({
 		vuex_groupShareId:"",
 		vuex_noticeNumber: 0,
 		vuex_firstLogin: lifeData.vuex_firstLogin ? lifeData.vuex_firstLogin : {logged:false,displayed:false},
+		// vuex_firstLogin: {logged:false,displayed:false},
 		vuex_refresh: false,
 		
 		

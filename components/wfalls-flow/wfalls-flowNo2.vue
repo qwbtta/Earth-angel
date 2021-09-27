@@ -52,8 +52,12 @@
 		
 		methods: {
 
-			want(e) {
+			async want(e) {
 				console.log(e);
+				await this.$u.vuex('vuex_goodsInfo', e);
+				uni.navigateTo({
+					url: '../chatPart/chatPage?where=detail'
+				})
 				this.$u.api.user_want_the_item({
 					itemId: e.itemId,
 					operationID: this.vuex_openid + JSON.stringify(new Date().getTime())

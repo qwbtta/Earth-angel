@@ -11,19 +11,19 @@
 	// 	}]
 	// },
 	"pages": [{
-			"path": "pages/login/login",
-			"style": {
-				"navigationBarTitleText": "",
-				"enablePullDownRefresh": false
-			}
-
-		}, {
 			"path": "pages/findPart/find",
 			"style": {
 				"navigationStyle": "custom",
 				"navigationBarTitleText": "",
 				"enablePullDownRefresh": true
 			}
+		}, {
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false
+			}
+
 		}, {
 			"path": "pages/findPart/whoWants",
 			"style": {
@@ -217,16 +217,16 @@
 				"text": "发现"
 			},
 			{
-				"pagePath": "pages/chatPart/sessionList",
-				"iconPath": "static/common/image/tab-chat.png",
-				"selectedIconPath": "static/common/image/tab-chat-selected.png",
-				"text": "消息"
-			},
-			{
 				"pagePath": "pages/releasePart/release",
 				"iconPath": "static/common/image/tab-release.png",
 				"selectedIconPath": "static/common/image/tab-release-selected.png",
 				"text": "发布"
+			},
+			{
+				"pagePath": "pages/chatPart/sessionList",
+				"iconPath": "static/common/image/tab-chat.png",
+				"selectedIconPath": "static/common/image/tab-chat-selected.png",
+				"text": "消息"
 			},
 			{
 				"pagePath": "pages/myPart/my",

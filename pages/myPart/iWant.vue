@@ -1,5 +1,9 @@
 <template>
 	<view class="iWant">
+		<view class="remind" v-if="list.length==0">
+		
+			<text class="remindInfo">这里空空如也哦，快去添加更多关注吧～</text>
+		</view>
 		<view class="item" v-for="(item,index) in list " :key="index">
 			<view class="head">
 				<view class="headLeft" @click="goHomePage(item)">
@@ -10,8 +14,11 @@
 			</view>
 
 			<view class="main">
-				<image :src="item.goodsInfo.imgUrls[0]" mode="aspectFit"
-					:class="item.goodsInfo.toUser.length>0?'goodsImg':'orinImg'" @click="goDetail(item)"></image>
+				<image :src="item.goodsInfo.imgUrls[0]" mode="aspectFit" class="orinImg" @click="goDetail(item)"
+					v-if="item.goodsInfo.toUser.length==0"></image>
+				
+				<image :src="item.goodsInfo.imgUrls[0]" mode="aspectFit" :class="item.goodsInfo.toUser==vuex_openid?'reciveImg':'goodsImg'" @click="goDetail(item)"
+					v-else></image>
 				<view class="mainRight">
 					<text class="goodsName">{{item.goodsInfo.name}}</text>
 					<text class="state1" v-if="item.goodsInfo.toUser.length==0">对方还未决定赠送对象</text>
@@ -163,6 +170,30 @@
 
 				.goodsImg::before {
 					content: "已送出";
+					font-size: 32rpx;
+					font-weight: 600;
+					color: #FFFFFF;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					position: absolute;
+					left: 0;
+					right: 0;
+					bottom: 0;
+					top: 0;
+					background-color: rgba(196, 196, 196, 0.7);
+					z-index: 2;
+				}
+
+				.reciveImg {
+					width: 152rpx;
+					height: 152rpx;
+					border-radius: 20rpx;
+					position: relative;
+				}
+
+				.reciveImg::before {
+					content: "已收到";
 					font-size: 32rpx;
 					font-weight: 600;
 					color: #FFFFFF;

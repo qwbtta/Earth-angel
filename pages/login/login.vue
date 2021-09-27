@@ -52,15 +52,28 @@
 						}
 						
 						// console.log(reqData);
-						that.$u.api.wxLogin(reqData).then(loginRes=>{
+						that.$u.api.wxLogin(reqData).then( async loginRes=>{
 							console.log(loginRes,"后台返回");
-							that.$u.vuex('vuex_nick_name', res.userInfo.nickName);
+							// that.$u.vuex('vuex_nick_name', res.userInfo.nickName);
 							that.$u.vuex('vuex_avatar_url', res.userInfo.avatarUrl);
 							that.$u.vuex('vuex_gender', res.userInfo.gender);
 							that.$u.vuex('vuex_openid', loginRes.data.openid);
 							that.$u.vuex('vuex_token', loginRes.data.earthAngelToken);
 							that.$u.vuex('vuex_wsToken', loginRes.data.openIMToken);
 							
+							
+							
+							await that.$req('/user/get_user_info', {
+								uidList: [loginRes.data.openid],
+								operationID: that.vuex_openid + JSON.stringify(new Date()
+									.getTime())
+							}).then(val => {
+								console.log(val, "5555");
+								that.$u.vuex('vuex_nick_name', val.data[0].name);
+							})
+							
+							
+						
 							let state = {
 								logged:true,
 								displayed:false
@@ -87,7 +100,7 @@
 												isTab:this.tabStatus,
 												duration:800
 											})
-							uni.switchTab({
+							uni.reLaunch({
 								url:'../findPart/find'
 							})
 						}).catch(err=>{

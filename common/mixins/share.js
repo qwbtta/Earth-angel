@@ -3,7 +3,8 @@ export const shareMixins = {
         return {
             shareData: {
                 title: '',
-                path: '/pages/release/release'
+                path: '/pages/release/release',
+				imageUrl:''
             }
         }
     },
@@ -14,6 +15,7 @@ export const shareMixins = {
         return {
             title: '我送给你一份物品，快来看看吧~',
             path: this.shareData.path,
+			imageUrl:this.shareData.imageUrl,
             success: res => {
                 console.info(res,"onShareAppMessageRESRES")
             }

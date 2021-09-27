@@ -35,7 +35,7 @@
 
 		<view class="footer">
 			<image src="/static/common/image/sendPhoto.png" mode="" class="sendPhoto" @click="sendImg"></image>
-			<input type="text" v-model="myInput" class="mainInput" />
+			<input type="text" v-model="myInput" class="mainInput"  adjust-position="false"  />
 			<button type="default" class="sendBtn" @click="sent">发送</button>
 		</view>
 	</view>
@@ -65,9 +65,9 @@
 				console.log(this.headShow);
 				if (this.headShow) {
 					this.marginT = 95
-					this.scrollHeight = uni.getSystemInfoSync().safeArea.height - 228
+					this.scrollHeight = uni.getSystemInfoSync().safeArea.height - 200
 				} else {
-					this.scrollHeight = uni.getSystemInfoSync().safeArea.height - 160
+					this.scrollHeight = uni.getSystemInfoSync().safeArea.height - 132
 				}
 
 			},
@@ -167,11 +167,18 @@
 				});
 			},
 			goHome(id){
-				this.$u.vuex('vuex_search',this.friendInfo)
-				console.log(this.friendInfo,"this.friendInfothis.friendInfothis.friendInfo");
-				uni.navigateTo({
-					url:'../myPart/goodsHome/goodsHome?id=' + id
-				})
+				if(id == this.vuex_openid){
+					uni.navigateTo({
+						url:'../myPart/goodsHome/myGoodsHome'
+					})
+				}else{
+					this.$u.vuex('vuex_search',this.friendInfo)
+					console.log(this.friendInfo,"this.friendInfothis.friendInfothis.friendInfo");
+					uni.navigateTo({
+						url:'../myPart/goodsHome/goodsHome?id=' + id
+					})
+				}
+				
 			},
 			preview(item) {
 				uni.previewImage({

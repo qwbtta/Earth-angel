@@ -1,6 +1,5 @@
 <template>
 	<view class="release">
-
 		<view class="titleCon">
 			<text>物品名称</text>
 			<image src="/static/common/image/moon.png" mode="" class="titleImg"></image>
@@ -10,7 +9,7 @@
 			<text>物品描述</text>
 			<image src="/static/common/image/moon.png" mode="" class="titleImg"></image>
 		</view>
-		<textarea class="describeInput" maxlength="130" v-model="goodsDescribe" placeholder="请对物品添加一些描述..."/>
+		<textarea class="describeInput" maxlength="130" v-model="goodsDescribe" placeholder="请对物品添加一些描述..." />
 		<view class="titleCon">
 			<text>上传照片</text>
 			<image src="/static/common/image/moon.png" mode="" class="titleImg"></image>
@@ -24,7 +23,7 @@
 				v-if="photoList.length<6"></image>
 
 		</view>
-		<!-- <view class="titleCon">
+	<!-- 	<view class="titleCon">
 			<text>选择发布的位置</text>
 			<image src="/static/common/image/moon.png" mode="" class="titleImg"></image>
 		</view>
@@ -134,7 +133,7 @@
 				let _this = this
 				uni.chooseImage({
 					count: 6,
-					sourceType: ['album'],
+					sourceType: ['album', 'camera'],
 					success(res) {
 						res.tempFilePaths.forEach(item => {
 							_this.photoList.push(item);
@@ -155,7 +154,6 @@
 					this.$req('/group/get_joined_group_list', {
 						operationID: this.vuex_openid + JSON.stringify(new Date().getTime())
 					}).then(res => {
-
 						for (let i = 0; i < res.data.length; i++) {
 							res.data[i].checked = false
 						}
@@ -178,7 +176,7 @@
 				} else if (this.photoList.length == 0) {
 					this.$u.toast('请选择图片')
 					return false
-				} 
+				}
 				// else if (this.friendChoose == false && this.groupChoose == false) {
 				// 	this.$u.toast('请选择发布位置')
 				// 	return false
@@ -242,9 +240,9 @@
 							// uni.navigateTo({
 							// 	url: '../myPart/goodsHome/myGoodsHome?id=' + this.vuex_openid
 							// })
-							this.$u.vuex('vuex_refresh',true)
+							this.$u.vuex('vuex_refresh', true)
 							uni.switchTab({
-								url:'../findPart/find'
+								url: '../findPart/find'
 							})
 							this.$u.toast('发布成功');
 						} else {
@@ -305,7 +303,6 @@
 			}
 		},
 		onShow() {
-
 			if (this.vuex_token == '' || this.vuex_wsToken == '') {
 				this.loginPopup = true
 			}
@@ -335,7 +332,7 @@
 </script>
 
 <style>
-	page{
+	page {
 		height: 100%;
 		background-color: #F1F1F1;
 	}
@@ -344,7 +341,7 @@
 	.release {
 		border-top: 1px solid #DBDEE3;
 		padding: 44rpx 48rpx 100rpx;
-	
+
 		/deep/ .u-icon {
 			display: none;
 		}

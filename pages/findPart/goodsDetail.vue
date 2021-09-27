@@ -75,6 +75,12 @@
 			}
 		},
 		methods: {
+			swiperClick(e){
+				console.log(this.swiperList[e]);
+				uni.previewImage({
+					urls: [this.swiperList[e]],
+				});
+			},
 			goTransfer() {
 				uni.navigateTo({
 					url: '../myPart/goodsHome/transfer'
@@ -162,6 +168,7 @@
 
 					if (res.errCode == 0) {
 						this.userInfo = res.data
+						this.shareData.imageUrl = this.swiperList[0]
 						this.shareData.path = '/pages/findPart/find?uid=' + this.userInfo.uid + '&goodsid=' + this
 							.vuex_goodsInfo.itemId + '&shareName=' + this.vuex_nick_name + '&shareUid=' + this
 							.vuex_openid
